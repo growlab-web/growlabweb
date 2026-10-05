@@ -1,0 +1,59 @@
+---
+const cases = [
+  { tag: 'E-commerce · Moda', name: 'Aurora Studio', text: 'Reestructuramos su embudo de Meta Ads y email.', kpi: '+312%', kpiText: 'ventas online en 6 meses', bg: 'from-[#17102e]', visual: 'v1' },
+  { tag: 'SaaS · B2B', name: 'Flowly', text: 'Estrategia SEO + LinkedIn para captar demos cualificadas.', kpi: '-48%', kpiText: 'coste por lead', bg: 'from-[#0f2318]', visual: 'v2' },
+  { tag: 'Restauración', name: 'Casa Brasa', text: 'Contenido en vídeo corto y campañas locales.', kpi: '3,1M', kpiText: 'visualizaciones orgánicas', bg: 'from-[#2a1020]', visual: 'v3' },
+];
+---
+
+<!-- Tarjetas apiladas: sticky + escala/desenfoque con GSAP -->
+<section id="casos" class="px-(--pad) pb-[20vh] pt-[10vh]">
+  <div data-cases-head class="mb-[8vh]">
+    <p class="eyebrow">Casos de éxito</p>
+    <h2 class="text-[clamp(2rem,5vw,4.5rem)] font-medium leading-[1.02] tracking-[-0.03em]">Resultados, no promesas</h2>
+  </div>
+
+  <div class="flex flex-col gap-[12vh]">
+    {
+      cases.map((c) => (
+        <article data-case class="sticky top-[12vh] will-change-transform max-md:top-[9vh]">
+          <div
+            data-case-inner
+            class={`grid min-h-[62vh] grid-cols-[1fr_1.2fr] gap-8 overflow-hidden rounded-[32px] border border-white/10 bg-gradient-to-br ${c.bg} to-panel p-[clamp(1.5rem,3vw,3rem)] max-md:grid-cols-1`}
+          >
+            <div class="flex flex-col justify-between gap-6">
+              <span class="self-start rounded-full border border-white/20 px-3.5 py-1.5 text-[.8rem] text-muted">{c.tag}</span>
+              <div class="flex flex-col gap-6">
+                <h3 class="text-[clamp(2.4rem,5vw,4.5rem)] font-medium leading-none tracking-[-0.04em]">{c.name}</h3>
+                <p class="max-w-[34ch] text-muted">{c.text}</p>
+              </div>
+              <div class="text-[1.1rem] text-muted">
+                <b class="block font-display text-[clamp(2.5rem,5vw,4.5rem)] font-bold leading-none tracking-[-0.04em] text-lime">{c.kpi}</b>
+                {c.kpiText}
+              </div>
+            </div>
+            <div class={`relative min-h-[260px] overflow-hidden rounded-[20px] ${c.visual}`} />
+          </div>
+        </article>
+      ))
+    }
+  </div>
+</section>
+
+<style>
+  .v1 {
+    background:
+      radial-gradient(circle at 30% 30%, var(--color-iris), transparent 55%),
+      radial-gradient(circle at 75% 70%, var(--color-rose), transparent 55%), #120b25;
+  }
+  .v2 {
+    background:
+      radial-gradient(circle at 70% 30%, var(--color-lime), transparent 50%),
+      radial-gradient(circle at 25% 75%, #1f8a5b, transparent 55%), #08150e;
+  }
+  .v3 {
+    background:
+      radial-gradient(circle at 50% 40%, var(--color-rose), transparent 55%),
+      radial-gradient(circle at 20% 80%, #ff9a3b, transparent 50%), #200b17;
+  }
+</style>

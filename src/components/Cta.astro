@@ -1,0 +1,32 @@
+---
+const email = 'hola@nova.agency';
+---
+
+<section
+  id="contacto"
+  data-cta
+  class="relative flex min-h-screen flex-col items-center justify-center gap-12 overflow-hidden p-(--pad) text-center"
+>
+  <div
+    data-cta-blob
+    class="pointer-events-none absolute left-1/4 top-[20%] h-[50vw] w-[50vw] rounded-full bg-iris opacity-35 blur-[90px]"
+  >
+  </div>
+
+  <h2 class="relative z-[2] font-medium leading-[.9] tracking-[-0.05em]">
+    <span class="block overflow-hidden text-[clamp(2.5rem,8vw,7rem)]"><span data-cta-line class="block">¿Listo para</span></span>
+    <span
+      data-cta-big
+      class="grad-text block text-[clamp(5rem,26vw,24rem)] will-change-transform"
+    >
+      crecer?
+    </span>
+  </h2>
+
+  <a
+    href={`mailto:${email}`}
+    class="btn relative z-[2] !px-12 !py-[1.4rem] text-[clamp(1.2rem,3.5vw,2.6rem)]"
+  >
+    {email}
+  </a>
+</section>

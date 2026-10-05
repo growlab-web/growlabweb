@@ -1,0 +1,32 @@
+---
+const steps = [
+  { n: '01', t: 'Descubrimiento', d: 'Auditamos tu negocio, tu mercado y tu competencia para encontrar oportunidades reales.' },
+  { n: '02', t: 'Estrategia', d: 'Definimos objetivos, canales y presupuesto con un plan claro y KPIs acordados.' },
+  { n: '03', t: 'Ejecución', d: 'Lanzamos campañas y contenidos con ciclos cortos de prueba y aprendizaje.' },
+  { n: '04', t: 'Optimización', d: 'Analizamos datos cada semana y escalamos lo que funciona.' },
+];
+---
+
+<section id="proceso" class="grid grid-cols-2 gap-[6vw] border-t border-white/10 px-(--pad) py-[15vh] max-md:grid-cols-1">
+  <div data-process-left class="self-start md:sticky md:top-[15vh]">
+    <p class="eyebrow">Cómo trabajamos</p>
+    <h2 class="text-[clamp(2rem,5vw,4.5rem)] font-medium leading-[1.02] tracking-[-0.03em]">
+      Un método simple, <em class="grad-text not-italic">repetible</em> y medible
+    </h2>
+    <div class="mt-12 h-[3px] max-w-[300px] overflow-hidden bg-white/10">
+      <i data-process-line class="block h-full origin-left scale-x-0 bg-lime"></i>
+    </div>
+  </div>
+
+  <ol data-process-steps class="flex list-none flex-col gap-[12vh]">
+    {
+      steps.map((s) => (
+        <li class="border-t border-white/15 py-8">
+          <span class="font-display text-[.9rem] font-medium text-lime">{s.n}</span>
+          <h3 class="mb-4 mt-2 text-[clamp(1.8rem,3.5vw,3rem)] tracking-[-0.03em]">{s.t}</h3>
+          <p class="max-w-[40ch] text-muted">{s.d}</p>
+        </li>
+      ))
+    }
+  </ol>
+</section>

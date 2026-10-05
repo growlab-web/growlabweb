@@ -1,0 +1,18 @@
+---
+// Pantalla de carga: negro, texto técnico en las esquinas y una lluvia de líneas diagonales (canvas 2D).
+---
+
+<div id="loader" class="fixed inset-0 z-[100] bg-black" aria-hidden="true">
+  <canvas data-rain class="absolute inset-0 h-full w-full"></canvas>
+
+  <div class="absolute left-[1.8vw] top-5 flex gap-4 font-display text-[.8rem] tracking-wide">
+    <span>NOVA</span>
+    <span class="text-white/35">AG—01 / SYS.04</span>
+  </div>
+
+  <div
+    class="absolute bottom-5 left-[1.8vw] font-body text-[.6rem] uppercase tracking-[.14em] text-white/40"
+  >
+    Iniciando experiencia interactiva
+  </div>
+</div>

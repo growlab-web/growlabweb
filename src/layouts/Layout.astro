@@ -1,0 +1,43 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description: string;
+}
+const { title, description } = Astro.props;
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#000000" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Host+Grotesk:wght@300;400;500;600&family=Nunito+Sans:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <title>{title}</title>
+  </head>
+  <body class="overflow-x-hidden bg-black font-body text-white antialiased">
+    <!-- barra de progreso de scroll -->
+    <div
+      data-progress
+      class="fixed inset-x-0 top-0 z-[80] h-[3px] origin-left scale-x-0 bg-gradient-to-r from-lime via-iris to-rose"
+      aria-hidden="true"
+    >
+    </div>
+    <slot />
+    <script>
+      import '../scripts/main.js';
+    </script>
+  </body>
+</html>

@@ -1,0 +1,37 @@
+---
+const links = [
+  { href: '#top', label: 'Inicio' },
+  { href: '#servicios', label: 'Servicios' },
+  { href: '#casos', label: 'Casos' },
+  { href: '#proceso', label: 'Proceso' },
+];
+---
+
+<header
+  data-nav
+  class="fixed inset-x-0 top-[17px] z-[70] mx-auto flex h-[42px] w-[min(606px,calc(100%-24px))] items-center justify-between gap-4 border border-white/10 bg-[#08080bd9] pl-[10px] pr-[6px] backdrop-blur-md"
+>
+  <a href="#top" class="flex items-center gap-[10px] font-display text-[.95rem] font-light">
+    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true">
+      <path d="M12 2v20M2 12h20M4.9 4.9l14.2 14.2M19.1 4.9L4.9 19.1"></path>
+    </svg>
+    Nova
+  </a>
+
+  <nav class="hidden gap-7 font-display text-[.92rem] font-light sm:flex" aria-label="Principal">
+    {
+      links.map((l) => (
+        <a href={l.href} class="opacity-90 transition hover:text-lime hover:opacity-100">
+          {l.label}
+        </a>
+      ))
+    }
+  </nav>
+
+  <a
+    href="#contacto"
+    class="inline-flex h-[30px] items-center gap-[.7rem] border border-white/85 px-3 font-display text-[.92rem] font-light transition-colors hover:bg-white hover:text-black"
+  >
+    Contacto <i class="h-[3px] w-[3px] rounded-full bg-current"></i>
+  </a>
+</header>

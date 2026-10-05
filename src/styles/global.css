@@ -1,0 +1,96 @@
+@import "tailwindcss";
+
+/* ───────── Tokens de diseño (Tailwind v4) ───────── */
+@theme {
+  --font-display: "Host Grotesk", system-ui, sans-serif;
+  --font-body: "Nunito Sans", system-ui, sans-serif;
+
+  --color-ink: #000000;
+  --color-panel: #0e0e15;
+  --color-muted: #8b8b9c;
+  --color-lime: #b6ff3b;
+  --color-mint: #42f0a0;
+  --color-iris: #7a5cff;
+  --color-rose: #ff4fa3;
+}
+
+:root {
+  --pad: clamp(20px, 5vw, 72px);
+}
+
+html {
+  background: #000;
+}
+
+/* Lenis (scroll suave) */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+@layer base {
+  body {
+    background: #000;
+    color: #fff;
+    font-family: var(--font-body);
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+  }
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+}
+
+@layer components {
+  /* Texto con degradado de la marca */
+  .grad-text {
+    background: linear-gradient(90deg, var(--color-lime), var(--color-iris), var(--color-rose));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .eyebrow {
+    @apply mb-6 font-display text-[.8rem] uppercase tracking-[.2em] text-lime;
+  }
+
+  /* Botón principal (secciones) */
+  .btn {
+    @apply inline-flex items-center gap-3 rounded-full bg-lime px-7 py-4 font-display font-medium text-black transition-colors duration-300 hover:bg-white;
+  }
+
+  /* Botones rectos del hero */
+  .hbtn {
+    @apply inline-flex h-12 items-center justify-center rounded-[2px] bg-white px-6 font-display text-[.95rem] font-medium text-black transition-colors duration-300 hover:bg-mint;
+  }
+
+  /* Titulares grandes del hero y paneles */
+  .display-xl {
+    @apply font-display font-light leading-[.96] tracking-[-0.035em];
+    font-size: clamp(2.8rem, 6.2vw, 8rem);
+  }
+
+  .cap {
+    @apply font-body uppercase leading-snug;
+    font-size: clamp(0.7rem, 0.85vw, 0.9rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

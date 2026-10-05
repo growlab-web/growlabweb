@@ -1,0 +1,96 @@
+---
+const services = [
+  { n: '01', t: 'Performance & Ads', d: 'Campañas en Meta, Google y TikTok optimizadas al céntimo para maximizar tu ROAS.', art: 'bars' },
+  { n: '02', t: 'SEO & Contenido', d: 'Posicionamiento orgánico y contenido que atrae tráfico cualificado mes tras mes.', art: 'rings' },
+  { n: '03', t: 'Branding & Diseño', d: 'Identidades visuales y webs con identidad propia que se recuerdan.', art: 'shapes' },
+  { n: '04', t: 'Social Media', d: 'Comunidad, vídeo corto y estrategia orgánica que convierte seguidores en clientes.', art: 'dots' },
+  { n: '05', t: 'Email & Automatización', d: 'Flujos que nutren leads y recuperan ventas mientras duermes.', art: 'bars-rev' },
+];
+---
+
+<!-- Scroll horizontal con pin (GSAP ScrollTrigger) -->
+<section id="servicios" data-services class="relative">
+  <div class="flex h-screen flex-col justify-center gap-12 overflow-hidden" data-services-pin>
+    <div data-services-head class="px-(--pad)">
+      <p class="eyebrow">Servicios</p>
+      <h2 class="max-w-[900px] text-[clamp(2rem,5vw,4.5rem)] font-medium leading-[1.02] tracking-[-0.03em]">
+        Todo lo que tu marca necesita para crecer
+      </h2>
+    </div>
+
+    <div data-services-track class="flex w-max gap-8 px-(--pad) will-change-transform">
+      {
+        services.map((s) => (
+          <article class="card relative flex h-[clamp(340px,48vh,460px)] w-[clamp(280px,32vw,440px)] flex-col gap-4 overflow-hidden rounded-[28px] border border-white/10 bg-panel p-8 transition-colors duration-300 hover:border-lime">
+            <span class="font-display text-[.9rem] font-medium text-lime">{s.n}</span>
+            <h3 class="text-[1.8rem] font-medium tracking-[-0.03em]">{s.t}</h3>
+            <p class="max-w-[30ch] text-muted">{s.d}</p>
+            <div class={`art art-${s.art}`} aria-hidden="true">
+              <i />
+              <i />
+              <i />
+              <i />
+              <i />
+            </div>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .art {
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 45%;
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 0 2rem 2rem;
+  }
+  /* barras */
+  .art-bars i,
+  .art-bars-rev i {
+    width: 22px;
+    border-radius: 6px 6px 0 0;
+    background: linear-gradient(var(--color-lime), transparent);
+  }
+  .art-bars i:nth-child(1) { height: 30%; }
+  .art-bars i:nth-child(2) { height: 50%; }
+  .art-bars i:nth-child(3) { height: 42%; }
+  .art-bars i:nth-child(4) { height: 75%; }
+  .art-bars i:nth-child(5) { height: 100%; }
+  .art-bars-rev i { background: linear-gradient(var(--color-rose), transparent); }
+  .art-bars-rev i:nth-child(1) { height: 100%; }
+  .art-bars-rev i:nth-child(2) { height: 75%; }
+  .art-bars-rev i:nth-child(3) { height: 60%; }
+  .art-bars-rev i:nth-child(4) { height: 45%; }
+  .art-bars-rev i:nth-child(5) { height: 30%; }
+  /* anillos */
+  .art-rings { padding: 0; }
+  .art-rings i {
+    position: absolute;
+    right: -40px;
+    bottom: -60px;
+    border: 2px solid var(--color-iris);
+    border-radius: 50%;
+  }
+  .art-rings i:nth-child(1) { width: 120px; height: 120px; }
+  .art-rings i:nth-child(2) { width: 200px; height: 200px; opacity: 0.6; }
+  .art-rings i:nth-child(3) { width: 290px; height: 290px; opacity: 0.3; }
+  .art-rings i:nth-child(n + 4) { display: none; }
+  /* formas */
+  .art-shapes i { width: 70px; height: 70px; background: var(--color-rose); }
+  .art-shapes i:nth-child(1) { border-radius: 50%; }
+  .art-shapes i:nth-child(2) { background: var(--color-lime); }
+  .art-shapes i:nth-child(3) { background: var(--color-iris); border-radius: 50% 0 50% 0; }
+  .art-shapes i:nth-child(n + 4) { display: none; }
+  /* puntos */
+  .art-dots i { width: 46px; height: 46px; border-radius: 50%; background: var(--color-lime); }
+  .art-dots i:nth-child(2) { background: var(--color-iris); }
+  .art-dots i:nth-child(3) { background: var(--color-rose); }
+  .art-dots i:nth-child(4) { background: #fff; }
+  .art-dots i:nth-child(5) { display: none; }
+</style>

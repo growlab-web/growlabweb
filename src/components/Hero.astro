@@ -1,0 +1,105 @@
+---
+const stats = [
+  { n: '250+', l: 'Proyectos entregados' },
+  { n: '4,8x', l: 'ROAS medio en campañas' },
+  { n: '12M€', l: 'Facturación generada' },
+  { n: '98%', l: 'Clientes que repiten' },
+];
+---
+
+<!--
+  Hero fijo (pin) con tres etapas controladas por el scroll:
+  casi-esfera  →  galaxia (panel 2)  →  cerebro (panel 3)
+-->
+<section
+  id="top"
+  data-hero
+  class="relative h-screen min-h-[640px] overflow-hidden bg-[linear-gradient(175deg,#02090d_0%,#000_45%,#000_100%)] [--gx:1.8vw]"
+>
+  <!-- degradados del fondo (se animan solos y con cada etapa) -->
+  <div
+    data-aurora="a"
+    class="pointer-events-none absolute -left-[16vw] -top-[10vw] z-0 h-[26vw] w-[62vw] rotate-[-16deg] rounded-full bg-[radial-gradient(closest-side,#1f9aa4,#0f5b6b_55%,transparent)] opacity-50 blur-[80px] will-change-transform"
+  >
+  </div>
+  <div
+    data-aurora="b"
+    class="pointer-events-none absolute -bottom-[8vw] -right-[14vw] z-0 h-[20vw] w-[78vw] rounded-full bg-[radial-gradient(closest-side,#3fb7c9,#1d5f8c_55%,transparent)] opacity-40 blur-[80px] will-change-transform"
+  >
+  </div>
+  <div
+    data-aurora="c"
+    class="pointer-events-none absolute -left-[6vw] top-[2vw] z-0 h-[34vw] w-[46vw] rounded-full bg-[radial-gradient(closest-side,#6b4fe0,#3a2f9a_55%,transparent)] opacity-0 blur-[80px] will-change-transform"
+  >
+  </div>
+
+  <!-- objeto 3D -->
+  <canvas id="hero3d" class="absolute inset-0 z-[1] block h-full w-full" aria-hidden="true"></canvas>
+
+  <!-- etapa 1: titular -->
+  <div data-hero-title class="pointer-events-none relative z-[2] px-(--gx) pt-24">
+    <h1 class="display-xl">
+      <span data-line class="block">Resultados en vez</span>
+      <span data-line class="block">de humo.</span>
+    </h1>
+  </div>
+
+  <!-- etapa 1: textos inferiores -->
+  <div
+    data-foot-wrap
+    class="pointer-events-none absolute inset-x-0 top-[77.7%] z-[2] flex items-start justify-between gap-8 px-(--gx) before:absolute before:left-0 before:top-0 before:h-px before:w-[33.3%] before:bg-white/25 after:absolute after:right-0 after:top-0 after:h-px after:w-[31%] after:bg-white/25 max-md:before:w-full max-md:after:hidden"
+  >
+    <p data-foot class="cap max-w-[24em] pt-7 tracking-[.01em]">
+      Lee a tu audiencia — clics, scroll, intención — y responde con resultados.
+    </p>
+    <p data-foot class="max-w-[19.5em] pt-7 font-body text-[clamp(.75rem,.95vw,.95rem)] leading-snug text-[#eef0f4] max-md:hidden">
+      Estrategia, performance y contenido que convierten tu presencia digital en clientes, afinados para sentirse vivos en cada clic.
+    </p>
+  </div>
+
+  <div data-actions class="absolute bottom-5 right-(--gx) z-[3] flex gap-1">
+    <a href="#contacto" class="hbtn min-w-[190px]">Enviar solicitud</a>
+    <a href="#contacto" class="hbtn w-11 px-0" aria-label="Contacto">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true">
+        <path d="M12 2v20M2 12h20M4.9 4.9l14.2 14.2M19.1 4.9L4.9 19.1"></path>
+      </svg>
+    </a>
+  </div>
+
+  <!-- etapa 2: galaxia -->
+  <div data-panel="2" class="pointer-events-none invisible absolute inset-0 z-[2] opacity-0">
+    <h2 class="display-xl absolute inset-x-(--gx) top-24 text-center">
+      Lee a tu audiencia,<br />en movimiento
+    </h2>
+    <p
+      class="absolute bottom-[16%] left-1/2 w-[min(34em,86vw)] -translate-x-1/2 text-center font-body text-[clamp(.72rem,.85vw,.9rem)] leading-normal text-[#d4d8e0] max-md:bottom-[24%]"
+    >
+      Cada campaña es una respuesta a tu público: clics, scroll y pausas, leídos en vivo y convertidos en decisiones.
+    </p>
+    <div
+      class="absolute inset-x-0 bottom-0 grid h-[12%] grid-cols-4 border-t border-white/15 pl-[7vw] max-md:h-auto max-md:grid-cols-2 max-md:pl-0 max-md:pb-3"
+    >
+      {
+        stats.map((s) => (
+          <div class="flex flex-col gap-[.15rem] border-l border-white/15 pl-[1.4vw] pt-[1.1vh] max-md:pl-3.5">
+            <b class="font-display text-[clamp(1.3rem,1.9vw,2.2rem)] font-light leading-[1.1] tracking-[-0.02em]">{s.n}</b>
+            <span class="font-body text-[clamp(.6rem,.7vw,.78rem)] leading-tight text-[#d4d8e0]">{s.l}</span>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+
+  <!-- etapa 3: cerebro (el titular de arriba vuelve a aparecer) -->
+  <div data-panel="3" class="pointer-events-none invisible absolute inset-0 z-[2] opacity-0">
+    <p class="cap absolute left-(--gx) top-[56%] max-w-[21em]">
+      Cada decisión se mide, se prueba y se optimiza semana a semana.
+    </p>
+    <p class="cap absolute right-(--gx) top-[56%] max-w-[12em] max-md:hidden">
+      Sin métricas vanidosas. Solo resultados que se ven en caja.
+    </p>
+    <h3 class="display-xl absolute bottom-[4%] right-(--gx) text-right max-md:text-[2.2rem]">
+      Lee, aprende<br />y vende.
+    </h3>
+  </div>
+</section>

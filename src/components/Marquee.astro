@@ -1,0 +1,19 @@
+---
+const a = 'SEO ✦ Social Ads ✦ Branding ✦ Contenido ✦ Email Marketing ✦ Analítica ✦ ';
+const b = 'Estrategia ✦ Creatividad ✦ Datos ✦ Crecimiento ✦ ';
+---
+
+<section data-marquee class="overflow-hidden border-y border-white/10 bg-panel py-[6vw]">
+  <div
+    data-marquee-row="-1"
+    class="w-max whitespace-nowrap font-display text-[clamp(3rem,9vw,8rem)] font-bold leading-[1.1] tracking-[-0.04em]"
+  >
+    <span>{a.repeat(2)}</span>
+  </div>
+  <div
+    data-marquee-row="1"
+    class="w-max whitespace-nowrap font-display text-[clamp(3rem,9vw,8rem)] font-bold leading-[1.1] tracking-[-0.04em] text-transparent [-webkit-text-stroke:1.5px_rgba(255,255,255,.33)]"
+  >
+    <span>{b.repeat(3)}</span>
+  </div>
+</section>
