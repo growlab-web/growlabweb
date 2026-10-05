@@ -43,7 +43,14 @@ const heroReady = hasHero
   : Promise.resolve();
 
 /* ---------- Pantalla de carga con lluvia (sólo en el inicio) ---------- */
-const loader = $('#loader');
+let introSeen = false;
+try { introSeen = sessionStorage.getItem('gl-intro') === '1'; } catch (e) { /* sin sessionStorage */ }
+const loaderEl = $('#loader');
+if (loaderEl && introSeen) loaderEl.remove();
+const loader = introSeen ? null : loaderEl;
+if (loader) { try { sessionStorage.setItem('gl-intro', '1'); } catch (e) { /* sin sessionStorage */ } }
+const heroEl = $('[data-hero]');
+const objectOnRight = heroEl && !heroEl.hasAttribute('data-pin');   // páginas interiores: el objeto va a la derecha
 const fontsReady = document.fonts ? document.fonts.ready : Promise.resolve();
 let revealed = false;
 
@@ -54,7 +61,7 @@ function reveal() {
 }
 
 if (loader) {
-  const rain = startRain($('[data-rain]', loader));
+  const rain = startRain($('[data-rain]', loader), { cx: objectOnRight ? 0.7 : 0.5, cy: objectOnRight ? 0.5 : 0.54 });
   gsap.to({ v: 0 }, { v: 1, duration: 0.4, ease: 'power1.in', onUpdate() { rain.setIntensity(this.targets()[0].v); } });
   const minTime = new Promise((r) => setTimeout(r, reduceMotion ? 200 : 1100));
   Promise.all([minTime, heroReady, fontsReady]).then(() => {
@@ -167,6 +174,22 @@ function initPage() {
       scrollTrigger: { trigger: '[data-cta]', start: 'top bottom', end: 'bottom bottom', scrub: true },
     });
   }
+
+  /* CONTADORES: cifras que suben hasta su valor */
+  $$('[data-count]').forEach((el) => {
+    const end = parseFloat(el.dataset.count), dec = Number(el.dataset.dec || 0), suffix = el.dataset.suffix || '';
+    const o = { v: 0 };
+    gsap.to(o, {
+      v: end, duration: 2.2, ease: 'power3.out',
+      onUpdate: () => (el.textContent = o.v.toFixed(dec).replace('.', ',') + suffix),
+      scrollTrigger: { trigger: el, start: 'top 90%', once: true },
+    });
+  });
+
+  /* REVELADO: cualquier bloque marcado con data-reveal sube y aparece al entrar en pantalla */
+  $$('[data-reveal]').forEach((el) => {
+    gsap.from(el, { y: 50, opacity: 0, duration: 1, ease: 'expo.out', scrollTrigger: { trigger: el, start: 'top 88%' } });
+  });
 
   ScrollTrigger.refresh();
 }

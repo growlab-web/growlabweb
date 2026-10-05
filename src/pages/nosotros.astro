@@ -1,0 +1,61 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Nav from '../components/Nav.astro';
+import PageHero from '../components/PageHero.astro';
+import Manifesto from '../components/Manifesto.astro';
+import Stats from '../components/Stats.astro';
+import Cta from '../components/Cta.astro';
+import Footer from '../components/Footer.astro';
+
+const values = [
+  { t: 'Datos primero', d: 'Cada decisión parte de un número. Medimos, probamos y optimizamos semana a semana, sin métricas vanidosas.' },
+  { t: 'Creatividad con propósito', d: 'La idea buena es la que vende. Diseñamos mensajes y piezas pensadas para convertir, no solo para gustar.' },
+  { t: 'Transparencia total', d: 'Accesos, reportes y presupuesto a la vista. Sabes siempre dónde está cada euro y qué resultado está dando.' },
+];
+---
+
+<Layout
+  title="Nosotros · GrowLab Agencia Digital"
+  description="Somos un equipo de estrategas, analistas y desarrolladores que combina datos y creatividad para hacer crecer marcas."
+>
+  <Nav />
+  <main class="page-in">
+    <PageHero
+      shape="brain"
+      eyebrow="Nosotros"
+      lines={['Datos, creatividad', 'y obsesión por crecer.']}
+      text="Somos un equipo de estrategas, analistas y desarrolladores que trabaja como una sola unidad para escalar tu negocio."
+    />
+
+    <Manifesto
+      eyebrow="Quiénes somos"
+      text="GrowLab nace de una idea simple: el marketing tiene que medirse en resultados. Unimos performance, analítica, desarrollo web y automatización con IA para que cada acción tenga un porqué, un número y un siguiente paso."
+    />
+
+    <Stats />
+
+    <section class="border-t border-white/10 px-(--pad) py-[12vh]">
+      <div data-reveal class="mb-[7vh]">
+        <p class="eyebrow">Cómo pensamos</p>
+        <h2 class="max-w-[16em] text-[clamp(2rem,5vw,4.5rem)] font-medium leading-[1.02] tracking-[-0.03em]">
+          Tres ideas que guían cada proyecto
+        </h2>
+      </div>
+
+      <div class="grid gap-6 md:grid-cols-3">
+        {
+          values.map((v, i) => (
+            <article data-reveal class="rounded-[28px] border border-white/10 bg-panel p-8 transition-colors duration-300 hover:border-secondary">
+              <span class="font-display text-[.9rem] font-medium text-secondary">0{i + 1}</span>
+              <h3 class="mb-4 mt-3 text-[1.7rem] font-medium tracking-[-0.03em]">{v.t}</h3>
+              <p class="text-muted">{v.d}</p>
+            </article>
+          ))
+        }
+      </div>
+    </section>
+
+    <Cta />
+  </main>
+  <Footer />
+</Layout>

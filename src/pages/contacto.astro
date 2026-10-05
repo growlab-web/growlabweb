@@ -1,6 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import Nav from '../components/Nav.astro';
+import PageHero from '../components/PageHero.astro';
 import ContactForm from '../components/ContactForm.astro';
 import Footer from '../components/Footer.astro';
 import { site } from '../data/site.js';
@@ -11,40 +12,34 @@ import { site } from '../data/site.js';
   description="Cuéntanos tu proyecto. Te respondemos en menos de 24 horas laborables."
 >
   <Nav />
-  <main class="page-in relative overflow-hidden">
-    <!-- resplandores de fondo -->
-    <div class="pointer-events-none absolute -left-[12vw] -top-[8vw] h-[30vw] w-[56vw] rotate-[-16deg] rounded-full bg-[radial-gradient(closest-side,#386fde,#1d3f94_55%,transparent)] opacity-40 blur-[80px]"></div>
-    <div class="pointer-events-none absolute -bottom-[10vw] -right-[10vw] h-[26vw] w-[50vw] rounded-full bg-[radial-gradient(closest-side,#abe155,#4f7a1c_55%,transparent)] opacity-20 blur-[90px]"></div>
+  <main class="page-in">
+    <PageHero
+      compact
+      shape="sphere"
+      eyebrow="Contacto"
+      lines={['Hablemos de tu', 'próximo proyecto.']}
+      text="Cuéntanos qué quieres lograr. Revisamos tu caso y te respondemos en menos de 24 horas laborables con una propuesta clara."
+    />
 
-    <section class="relative z-[1] mx-auto grid min-h-screen max-w-[1300px] gap-[clamp(2rem,6vw,6rem)] px-(--pad) pb-[10vh] pt-[18vh] lg:grid-cols-[1fr_1.1fr]">
-      <div class="lg:sticky lg:top-[18vh] lg:self-start">
-        <p class="eyebrow">Contacto</p>
-        <h1 class="display-xl mb-8 !text-[clamp(2.6rem,5.6vw,5.4rem)]">
-          Hablemos de tu <span class="grad-text">próximo proyecto</span>
-        </h1>
-        <p class="mb-10 max-w-[38ch] text-[1.05rem] leading-relaxed text-muted">
-          Cuéntanos qué quieres lograr. Revisamos tu caso y te respondemos en menos de 24 horas laborables con una propuesta clara.
-        </p>
+    <section class="mx-auto grid max-w-[1300px] gap-[clamp(2rem,6vw,6rem)] px-(--pad) py-[10vh] lg:grid-cols-[1fr_1.1fr]">
+      <dl data-reveal class="grid content-start gap-8 lg:sticky lg:top-[16vh] lg:self-start">
+        <div>
+          <dt class="mb-1 font-display text-[.78rem] uppercase tracking-[.14em] text-white/50">Correo</dt>
+          <dd><a class="font-display text-[1.3rem] transition-colors hover:text-secondary" href={`mailto:${site.email}`}>{site.email}</a></dd>
+        </div>
+        <div>
+          <dt class="mb-1 font-display text-[.78rem] uppercase tracking-[.14em] text-white/50">Horario</dt>
+          <dd class="text-muted">Lunes a viernes, 9:00 – 18:00</dd>
+        </div>
+        <div>
+          <dt class="mb-1 font-display text-[.78rem] uppercase tracking-[.14em] text-white/50">Síguenos</dt>
+          <dd class="flex flex-wrap gap-x-5 gap-y-1 text-muted">
+            {site.social.map((s) => <a href={s.href} class="transition-colors hover:text-secondary">{s.label}</a>)}
+          </dd>
+        </div>
+      </dl>
 
-        <dl class="grid gap-6 border-t border-white/10 pt-8">
-          <div>
-            <dt class="mb-1 font-display text-[.78rem] uppercase tracking-[.14em] text-white/50">Correo</dt>
-            <dd><a class="font-display text-[1.2rem] transition-colors hover:text-secondary" href={`mailto:${site.email}`}>{site.email}</a></dd>
-          </div>
-          <div>
-            <dt class="mb-1 font-display text-[.78rem] uppercase tracking-[.14em] text-white/50">Horario</dt>
-            <dd class="text-muted">Lunes a viernes, 9:00 – 18:00</dd>
-          </div>
-          <div>
-            <dt class="mb-1 font-display text-[.78rem] uppercase tracking-[.14em] text-white/50">Síguenos</dt>
-            <dd class="flex flex-wrap gap-x-5 gap-y-1 text-muted">
-              {site.social.map((s) => <a href={s.href} class="transition-colors hover:text-secondary">{s.label}</a>)}
-            </dd>
-          </div>
-        </dl>
-      </div>
-
-      <div class="rounded-[28px] border border-white/10 bg-white/[.03] p-[clamp(1.4rem,3vw,2.6rem)] backdrop-blur-xl">
+      <div data-reveal class="rounded-[28px] border border-white/10 bg-white/[.03] p-[clamp(1.4rem,3vw,2.6rem)] backdrop-blur-xl">
         <ContactForm />
       </div>
     </section>

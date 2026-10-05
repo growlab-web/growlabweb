@@ -1,0 +1,51 @@
+---
+// Cabecera de las páginas interiores: mismo lenguaje que el inicio (objeto 3D de partículas,
+// degradados que se mueven y texto que sale del desenfoque), pero con una sola forma fija.
+interface Props {
+  eyebrow: string;
+  lines: string[];
+  text: string;
+  shape?: 'sphere' | 'galaxy' | 'brain';
+  compact?: boolean;
+}
+const { eyebrow, lines, text, shape = 'sphere', compact = false } = Astro.props;
+---
+
+<section
+  data-hero
+  data-shape={shape}
+  class:list={[
+    'relative flex items-center overflow-hidden border-b border-white/10 bg-[linear-gradient(175deg,#030814_0%,#000_55%,#000_100%)] [--gx:1.8vw]',
+    compact ? 'min-h-[72vh]' : 'min-h-[88vh]',
+  ]}
+>
+  <!-- degradados del fondo (derivan solos) -->
+  <div
+    data-aurora="a"
+    class="pointer-events-none absolute -left-[16vw] -top-[10vw] z-0 h-[26vw] w-[62vw] rotate-[-16deg] rounded-full bg-[radial-gradient(closest-side,#386fde,#1d3f94_55%,transparent)] opacity-50 blur-[80px] will-change-transform"
+  >
+  </div>
+  <div
+    data-aurora="b"
+    class="pointer-events-none absolute -bottom-[8vw] -right-[14vw] z-0 h-[20vw] w-[78vw] rounded-full bg-[radial-gradient(closest-side,#5b8fe6,#26509f_55%,transparent)] opacity-40 blur-[80px] will-change-transform"
+  >
+  </div>
+  <div
+    data-aurora="c"
+    class="pointer-events-none absolute -left-[6vw] top-[2vw] z-0 h-[34vw] w-[46vw] rounded-full bg-[radial-gradient(closest-side,#abe155,#4f7a1c_55%,transparent)] opacity-20 blur-[80px] will-change-transform"
+  >
+  </div>
+
+  <!-- objeto 3D -->
+  <canvas id="hero3d" class="absolute inset-0 z-[1] block h-full w-full max-md:opacity-40" aria-hidden="true"></canvas>
+
+  <div class="pointer-events-none relative z-[2] w-full px-(--pad) pb-[8vh] pt-[22vh]">
+    <p data-foot class="eyebrow">{eyebrow}</p>
+    <h1 class="display-xl max-w-[12em]">
+      {lines.map((l) => <span data-line class="block">{l}</span>)}
+    </h1>
+    <p data-foot class="mt-8 max-w-[40ch] font-body text-[clamp(.95rem,1.15vw,1.1rem)] leading-relaxed text-[#d4d8e0]">
+      {text}
+    </p>
+  </div>
+</section>

@@ -286,16 +286,18 @@ export function initHero3D() {
 
   /* ---- Tamaño ---- */
   const base = { scale: 0.82 };
-  const state = { scale: 1, morph: 0 };
+  const pinned = hero.hasAttribute('data-pin');                       // inicio: secuencia completa con scroll
+  const SHAPES = { sphere: 0, galaxy: 1, brain: 2 };                // páginas interiores: una forma fija
+  const state = { scale: 1, morph: pinned ? 0 : (SHAPES[hero.dataset.shape] ?? 0) };
   function resize() {
     const w = hero.clientWidth, h = hero.clientHeight;
     renderer.setSize(w, h, false);
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
     const mobile = isMobile();
-    group.position.x = 0;
+    group.position.x = pinned || mobile ? 0 : 1.8;   // en las páginas interiores el objeto queda a la derecha del texto
     group.position.y = mobile ? -0.2 : -0.15;
-    base.scale = mobile ? 0.55 : 0.82;
+    base.scale = mobile ? 0.55 : pinned ? 0.82 : hero.dataset.shape === 'galaxy' ? 0.46 : 0.7;
     group.scale.setScalar(base.scale * state.scale);
   }
 
@@ -365,6 +367,8 @@ export function initHero3D() {
     // Degradados del fondo: deriva constante (posición); el resto lo controla el scroll
     [['a', 9, -5, 9], ['b', -12, 4, 11], ['c', 10, 8, 13]].forEach(([k, x, y, d]) =>
       gsap.to(`[data-aurora="${k}"]`, { x: x + 'vw', y: y + 'vw', duration: d, ease: 'sine.inOut', yoyo: true, repeat: -1 }));
+
+    if (!pinned) return;
 
     // Secuencia de scroll con el hero fijo: casi-esfera → galaxia → cerebro
     const A = '[data-aurora="a"]', B = '[data-aurora="b"]', C = '[data-aurora="c"]';

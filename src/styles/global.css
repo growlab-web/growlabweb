@@ -94,6 +94,8 @@ html.lenis body {
 }
 .page-in { animation: page-in 0.6s ease-out both; }
 
+.intro-seen #loader { display: none; }
+
 @media (prefers-reduced-motion: reduce) {
   * {
     animation-duration: 0.01ms !important;

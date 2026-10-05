@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import Loader from '../components/Loader.astro';
 
 interface Props {
   title: string;
@@ -26,6 +27,10 @@ const { title, description } = Astro.props;
       rel="stylesheet"
     />
     <title>{title}</title>
+    <!-- evita el parpadeo de la pantalla de carga si ya se vio en esta sesión -->
+    <script is:inline>
+      try { if (sessionStorage.getItem('gl-intro') === '1') document.documentElement.classList.add('intro-seen'); } catch (e) {}
+    </script>
   </head>
   <body class="overflow-x-hidden bg-black font-body text-white antialiased">
     <!-- barra de progreso de scroll -->
@@ -35,6 +40,7 @@ const { title, description } = Astro.props;
       aria-hidden="true"
     >
     </div>
+    <Loader />
     <slot />
     <script>
       import '../scripts/main.js';

@@ -1,14 +1,19 @@
 ---
 // Las palabras se separan en JS (scripts/main.js) y se iluminan con el scroll.
+interface Props { eyebrow?: string; text?: string }
+const {
+  eyebrow = 'Quiénes somos',
+  text = 'No vendemos likes ni métricas vanidosas. Combinamos creatividad y datos para construir marcas memorables y campañas que generan ingresos reales. Cada decisión se mide, cada idea se prueba y cada euro invertido trabaja para tu crecimiento.',
+} = Astro.props;
 ---
 
 <section class="mx-auto max-w-[1400px] px-(--pad) py-[14vh]">
-  <p class="eyebrow">Quiénes somos</p>
+  <p class="eyebrow">{eyebrow}</p>
   <p
     data-manifesto
     class="font-display text-[clamp(1.8rem,4.2vw,3.8rem)] font-medium leading-[1.2] tracking-[-0.03em]"
   >
-    No vendemos likes ni métricas vanidosas. Combinamos creatividad y datos para construir marcas memorables y campañas que generan ingresos reales. Cada decisión se mide, cada idea se prueba y cada euro invertido trabaja para tu crecimiento.
+    {text}
   </p>
 </section>
 

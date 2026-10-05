@@ -1,6 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import Nav from '../components/Nav.astro';
+import PageHero from '../components/PageHero.astro';
 import Services from '../components/Services.astro';
 import Process from '../components/Process.astro';
 import Cta from '../components/Cta.astro';
@@ -13,6 +14,12 @@ import Footer from '../components/Footer.astro';
 >
   <Nav />
   <main class="page-in">
+    <PageHero
+      shape="galaxy"
+      eyebrow="Servicios"
+      lines={['Todo lo que tu marca', 'necesita para crecer.']}
+      text="Performance, datos, desarrollo web y automatización con IA trabajando juntos, en un solo equipo."
+    />
     <Services />
     <Process />
     <Cta />

@@ -7,7 +7,8 @@
  */
 const PALETTE = ['255,255,255', '255,255,255', '140,180,255', '56,111,222', '171,225,85'];
 
-export function startRain(canvas) {
+export function startRain(canvas, opts = {}) {
+  const cxRatio = opts.cx ?? 0.5, cyRatio = opts.cy ?? 0.54;
   const ctx = canvas.getContext('2d');
   if (!ctx) return { setIntensity() {}, setConverge() {}, stop() {} };
 
@@ -44,7 +45,7 @@ export function startRain(canvas) {
     const dt = Math.min((now - last) / 1000, 0.05); last = now;
     ctx.clearRect(0, 0, w, h);
     ctx.lineCap = 'round';
-    const cx = w / 2, cy = h * 0.54;               // centro aproximado de la esfera
+    const cx = w * cxRatio, cy = h * cyRatio;       // centro aproximado del objeto 3D
     const fadeR = Math.min(w, h) * 0.2;             // cerca del centro las líneas se apagan
     for (const d of drops) {
       let vx = dx, vy = dy;

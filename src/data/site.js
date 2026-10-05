@@ -6,6 +6,7 @@ export const site = {
     { href: '/', label: 'Inicio' },
     { href: '/servicios', label: 'Servicios' },
     { href: '/portafolio', label: 'Portafolio' },
+    { href: '/nosotros', label: 'Nosotros' },
   ],
   contact: { href: '/contacto', label: 'Contacto' },
   social: [
