@@ -1,9 +1,8 @@
 ---
-const email = 'hola@nova.agency';
+import { site } from '../data/site.js';
 ---
 
 <section
-  id="contacto"
   data-cta
   class="relative flex min-h-screen flex-col items-center justify-center gap-12 overflow-hidden p-(--pad) text-center"
 >
@@ -24,9 +23,9 @@ const email = 'hola@nova.agency';
   </h2>
 
   <a
-    href={`mailto:${email}`}
+    href={site.contact.href}
     class="btn relative z-[2] !px-12 !py-[1.4rem] text-[clamp(1.2rem,3.5vw,2.6rem)]"
   >
-    {email}
+    Hablemos <b class="font-normal">→</b>
   </a>
 </section>

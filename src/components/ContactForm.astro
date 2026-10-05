@@ -1,0 +1,76 @@
+---
+import { site } from '../data/site.js';
+
+const field =
+  'w-full rounded-xl border border-white/15 bg-white/[.04] px-4 py-3.5 font-body text-[1rem] text-white outline-none transition placeholder:text-white/35 focus:border-secondary focus:bg-white/[.07]';
+const label = 'mb-2 block font-display text-[.8rem] uppercase tracking-[.14em] text-white/60';
+const services = ['Performance & Ads', 'SEO & Contenido', 'Branding & Diseño', 'Social Media', 'Email & Automatización', 'Todavía no lo sé'];
+---
+
+<!-- Formulario: al enviar abre el correo del visitante con el mensaje listo (sin servidor). -->
+<form data-contact-form data-email={site.email} class="grid gap-6" novalidate>
+  <div class="grid gap-6 sm:grid-cols-2">
+    <div>
+      <label class={label} for="nombre">Nombre</label>
+      <input class={field} id="nombre" name="nombre" type="text" placeholder="Tu nombre" autocomplete="name" required />
+    </div>
+    <div>
+      <label class={label} for="email">Correo</label>
+      <input class={field} id="email" name="email" type="email" placeholder="tu@correo.com" autocomplete="email" required />
+    </div>
+  </div>
+
+  <div class="grid gap-6 sm:grid-cols-2">
+    <div>
+      <label class={label} for="empresa">Empresa</label>
+      <input class={field} id="empresa" name="empresa" type="text" placeholder="Nombre de tu marca" autocomplete="organization" />
+    </div>
+    <div>
+      <label class={label} for="servicio">Servicio</label>
+      <select class={field + ' appearance-none'} id="servicio" name="servicio">
+        {services.map((s) => <option class="bg-black" value={s}>{s}</option>)}
+      </select>
+    </div>
+  </div>
+
+  <div>
+    <label class={label} for="mensaje">Cuéntanos tu proyecto</label>
+    <textarea class={field + ' min-h-[160px] resize-y'} id="mensaje" name="mensaje" placeholder="Objetivos, plazos, presupuesto aproximado…" required></textarea>
+  </div>
+
+  <div class="flex flex-wrap items-center gap-5">
+    <button type="submit" class="btn cursor-pointer !px-9 !py-4">Enviar mensaje <b class="font-normal">→</b></button>
+    <p data-form-note class="min-h-[1.5em] max-w-[34ch] font-body text-[.85rem] text-muted" role="status" aria-live="polite"></p>
+  </div>
+</form>
+
+<script>
+  const form = document.querySelector('[data-contact-form]');
+  if (form) {
+    const note = form.querySelector('[data-form-note]');
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const f = new FormData(form);
+      const nombre = String(f.get('nombre') || '').trim();
+      const email = String(f.get('email') || '').trim();
+      const mensaje = String(f.get('mensaje') || '').trim();
+      if (!nombre || !/^\S+@\S+\.\S+$/.test(email) || !mensaje) {
+        note.textContent = 'Completa tu nombre, un correo válido y el mensaje.';
+        note.style.color = '#ff9a9a';
+        return;
+      }
+      const body = [
+        `Nombre: ${nombre}`,
+        `Correo: ${email}`,
+        `Empresa: ${f.get('empresa') || '-'}`,
+        `Servicio: ${f.get('servicio')}`,
+        '',
+        mensaje,
+      ].join('\n');
+      const subject = `Nuevo proyecto: ${nombre}`;
+      note.textContent = 'Se abrirá tu correo con el mensaje listo para enviar.';
+      note.style.color = '';
+      window.location.href = `mailto:${form.dataset.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    });
+  }
+</script>

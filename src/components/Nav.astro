@@ -1,24 +1,31 @@
 ---
-const links = [
-  { href: '#top', label: 'Inicio' },
-  { href: '#servicios', label: 'Servicios' },
-  { href: '#casos', label: 'Casos' },
-  { href: '#proceso', label: 'Proceso' },
-];
+import { site } from '../data/site.js';
+
+const path = Astro.url.pathname.replace(/\/$/, '') || '/';
+const isActive = (href) => (href === '/' ? path === '/' : path === href || path.startsWith(href + '/'));
+const contactActive = isActive(site.contact.href);
 ---
 
+<!-- Menú con efecto cristal (glass) -->
 <header
   data-nav
   class="fixed inset-x-0 top-[17px] z-[70] mx-auto flex h-[46px] w-[min(650px,calc(100%-24px))] items-center justify-between gap-4 rounded-[18px] border border-white/[.18] bg-white/[.07] px-[22px] shadow-[inset_0_1px_0_rgba(255,255,255,.35),inset_0_-1px_0_rgba(255,255,255,.05),0_10px_34px_rgba(0,0,0,.4)] backdrop-blur-2xl backdrop-saturate-[1.8] before:pointer-events-none before:absolute before:inset-0 before:-z-10 before:rounded-[inherit] before:bg-gradient-to-b before:from-white/[.14] before:to-transparent"
 >
-  <a href="#top" aria-label="GrowLab, ir al inicio" class="flex items-center">
+  <a href="/" aria-label="GrowLab, ir al inicio" class="flex items-center">
     <img src="/logo.png" alt="GrowLab" width="815" height="170" class="h-[19px] w-auto" />
   </a>
 
   <nav class="hidden gap-7 font-display text-[.92rem] font-light sm:flex" aria-label="Principal">
     {
-      links.map((l) => (
-        <a href={l.href} class="opacity-90 transition hover:text-secondary hover:opacity-100">
+      site.nav.map((l) => (
+        <a
+          href={l.href}
+          aria-current={isActive(l.href) ? 'page' : undefined}
+          class:list={[
+            'transition hover:text-secondary',
+            isActive(l.href) ? 'text-secondary' : 'opacity-90 hover:opacity-100',
+          ]}
+        >
           {l.label}
         </a>
       ))
@@ -26,9 +33,13 @@ const links = [
   </nav>
 
   <a
-    href="#contacto"
-    class="inline-flex h-[30px] items-center gap-[.7rem] rounded-[10px] border border-white/60 px-3 font-display text-[.92rem] font-light transition-colors hover:bg-white hover:text-black"
+    href={site.contact.href}
+    aria-current={contactActive ? 'page' : undefined}
+    class:list={[
+      'inline-flex h-[30px] items-center gap-[.7rem] rounded-[10px] border px-3 font-display text-[.92rem] font-light transition-colors hover:bg-white hover:text-black',
+      contactActive ? 'border-secondary text-secondary' : 'border-white/60',
+    ]}
   >
-    Contacto <i class="h-[3px] w-[3px] rounded-full bg-current"></i>
+    {site.contact.label} <i class="h-[3px] w-[3px] rounded-full bg-current"></i>
   </a>
 </header>

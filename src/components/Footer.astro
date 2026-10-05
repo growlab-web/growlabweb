@@ -1,12 +1,24 @@
 ---
+import { site } from '../data/site.js';
 const year = new Date().getFullYear();
+const links = [...site.nav, site.contact];
 ---
 
-<footer class="flex flex-wrap justify-between gap-4 border-t border-white/10 px-(--pad) py-8 text-[.9rem] text-muted">
-  <span>© {year} GrowLab® Agencia de marketing digital</span>
+<footer class="flex flex-wrap items-center justify-between gap-x-8 gap-y-4 border-t border-white/10 px-(--pad) py-8 text-[.9rem] text-muted">
+  <span>© {year} {site.name}® Agencia de marketing digital</span>
+
+  <nav class="flex flex-wrap gap-x-6 gap-y-2" aria-label="Pie de página">
+    {links.map((l) => <a href={l.href} class="transition-colors hover:text-secondary">{l.label}</a>)}
+  </nav>
+
   <span>
-    <a href="#" class="transition-colors hover:text-secondary">Instagram</a> ·
-    <a href="#" class="transition-colors hover:text-secondary">LinkedIn</a> ·
-    <a href="#" class="transition-colors hover:text-secondary">TikTok</a>
+    {
+      site.social.map((s, i) => (
+        <>
+          <a href={s.href} class="transition-colors hover:text-secondary">{s.label}</a>
+          {i < site.social.length - 1 && ' · '}
+        </>
+      ))
+    }
   </span>
 </footer>
