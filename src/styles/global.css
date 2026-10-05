@@ -2,7 +2,8 @@
 
 /* ───────── Tokens de diseño (Tailwind v4) ───────── */
 @theme {
-  --font-display: "Host Grotesk", system-ui, sans-serif;
+  --font-display: "Syne", "Host Grotesk", system-ui, sans-serif;
+  --font-ui: "Host Grotesk", system-ui, sans-serif;
   --font-body: "Nunito Sans", system-ui, sans-serif;
   /* tipografía de acento: ancha y pesada, cercana a la del logo */
   --font-accent: "Syne", "Host Grotesk", system-ui, sans-serif;
@@ -54,7 +55,19 @@ html.lenis body {
   }
 }
 
+/* títulos en Syne: sólo con peso grueso tiene el aspecto ancho del logo */
+h1, h2, h3 { font-weight: 700 !important; letter-spacing: -0.02em !important; }
+
 @layer components {
+  /* menú, botones y formularios conservan la letra de interfaz (más estrecha) */
+  [data-nav],
+  .btn,
+  .hbtn,
+  form,
+  footer {
+    font-family: var(--font-ui);
+  }
+
   /* Texto con degradado de la marca */
   .grad-text {
     background: linear-gradient(90deg, var(--color-secondary), var(--color-primary), var(--color-sky));
@@ -80,7 +93,7 @@ html.lenis body {
   /* Titulares grandes del hero y paneles */
   .display-xl {
     @apply font-display font-light leading-[.96] tracking-[-0.035em];
-    font-size: clamp(2.8rem, 6.2vw, 8rem);
+    font-size: clamp(2rem, 3.9vw, 4.8rem);
   }
 
   .cap {
