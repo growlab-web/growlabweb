@@ -102,31 +102,6 @@ function initTypewriter() {
   });
 }
 
-/* ---------- «En vivo»: rota entre las 5 marcas y hace subir su contador ---------- */
-function initLive() {
-  const box = $('[data-live]');
-  if (!box) return;
-  let clients = [];
-  try { clients = JSON.parse(box.dataset.clients || '[]'); } catch (e) { /* sin datos */ }
-  if (!clients.length) return;
-  const avatars = $$('[data-live-avatar]', box);
-  const nameEl = $('[data-live-name]', box), countEl = $('[data-live-count]', box), metricEl = $('[data-live-metric]', box);
-  const counts = clients.map((c) => c.base);
-  let i = 0;
-  const show = () => {
-    const c = clients[i];
-    nameEl.textContent = c.name;
-    countEl.textContent = counts[i];
-    metricEl.textContent = c.metric;
-    avatars.forEach((a, k) => { a.style.transform = k === i ? 'scale(1.18)' : 'scale(1)'; a.style.opacity = k === i ? '1' : '0.55'; });
-  };
-  show();
-  if (reduceMotion) return;
-  // cada 1,8 s el contador de la marca activa sube un poco
-  setInterval(() => { counts[i] += 1 + ((Math.random() * 3) | 0); countEl.textContent = counts[i]; }, 1800);
-  setInterval(() => { i = (i + 1) % clients.length; gsap.fromTo(box.lastElementChild, { opacity: 0, y: 6 }, { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out' }); show(); }, 3600);
-}
-
 /* ---------- Página ---------- */
 function initPage() {
   lenis.start();
@@ -139,7 +114,6 @@ function initPage() {
     gsap.from('[data-foot], [data-actions]', { autoAlpha: 0, y: 20, filter: 'blur(8px)', duration: 1.1, stagger: 0.12, delay: 0.35, ease: 'power3.out' });
     hero3d.start(reduceMotion);
     initTypewriter();
-    initLive();
   }
 
   if (reduceMotion) return;

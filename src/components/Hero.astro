@@ -1,5 +1,4 @@
 ---
-import { site } from '../data/site.js';
 import { services } from '../data/services.js';
 const words = JSON.stringify(services.map((s) => s.name));
 const stats = [
@@ -62,36 +61,12 @@ const stats = [
     data-foot-wrap
     class="pointer-events-none absolute inset-x-0 top-[77.7%] z-[2] flex items-start justify-between gap-8 px-(--gx) before:absolute before:left-0 before:top-0 before:h-px before:w-[33.3%] before:bg-white/25 after:absolute after:right-0 after:top-0 after:h-px after:w-[31%] after:bg-white/25 max-md:before:w-full max-md:after:hidden"
   >
-    <div data-foot class="max-w-[32em]">
-      <p class="cap pt-7 tracking-[.01em]">
-        Agencia especializada en ecommerce. Diseño, desarrollo y gestión de tiendas Shopify para marcas que crecen en LATAM y el mundo.
-      </p>
-
-      <!-- en vivo: 5 marcas trabajando con nosotros -->
-      <div data-live data-clients={JSON.stringify(site.clients)} class="mt-5 flex items-center gap-4" aria-label="Marcas que trabajan con nosotros en este momento">
-        <span class="inline-flex items-center gap-2 rounded-full border border-secondary/40 bg-secondary/10 px-3 py-1.5 font-accent text-[.62rem] font-bold uppercase tracking-[.16em] text-secondary">
-          <i class="live-dot relative inline-block h-2 w-2 rounded-full bg-secondary"></i>En vivo
-        </span>
-        <div class="flex items-center">
-          {
-            site.clients.map((c, i) => (
-              <span
-                data-live-avatar
-                title={c.name}
-                class="-ml-2 first:ml-0 grid h-8 w-8 place-items-center rounded-full border-2 border-black font-accent text-[.68rem] font-bold text-black transition-transform duration-300"
-                style={`background:${c.color};z-index:${10 - i}`}
-              >
-                {c.name[0]}
-              </span>
-            ))
-          }
-        </div>
-        <p class="min-w-0 font-body text-[.72rem] normal-case leading-tight tracking-normal">
-          <span data-live-name class="block font-semibold text-white">{site.clients[0].name}</span>
-          <span class="block text-white/60"><b data-live-count class="font-semibold text-secondary">{site.clients[0].base}</b> <span data-live-metric>{site.clients[0].metric}</span></span>
-        </p>
-      </div>
-    </div>
+    <p data-foot class="cap flex items-center gap-4 pt-7 tracking-[.01em]">
+      <span class="inline-flex items-center gap-2 rounded-full border border-secondary/40 bg-secondary/10 px-3 py-1.5 font-accent text-[.62rem] font-bold uppercase tracking-[.16em] text-secondary">
+        <i class="live-dot relative inline-block h-2 w-2 rounded-full bg-secondary"></i>En vivo
+      </span>
+      <span>5 marcas trabajando con nosotros</span>
+    </p>
     <p data-foot class="max-w-[19.5em] pt-7 font-body text-[clamp(.75rem,.95vw,.95rem)] leading-snug text-[#eef0f4] max-md:hidden">
       Estrategia, performance y contenido que convierten tu presencia digital en clientes, afinados para sentirse vivos en cada clic.
     </p>
