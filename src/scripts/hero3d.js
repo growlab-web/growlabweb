@@ -311,7 +311,7 @@ export function initHero3D() {
     camera.updateProjectionMatrix();
     const mobile = isMobile();
     group.position.x = pinned || mobile ? 0 : serviceShape ? 1.55 : 1.8;   // en las páginas interiores el objeto queda a la derecha del texto
-    group.position.y = mobile ? -0.2 : pinned ? -0.27 : -0.15;
+    group.position.y = mobile ? -0.2 : -0.15;
     base.scale = mobile ? 0.55 : pinned ? 0.82 : serviceShape ? 0.68 : hero.dataset.shape === 'galaxy' ? 0.46 : 0.7;
     group.scale.setScalar(base.scale * state.scale);
   }
