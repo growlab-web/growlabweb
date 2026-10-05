@@ -1,6 +1,6 @@
 /**
  * Hero 3D: un único sistema de partículas que cambia de forma con el scroll
- *   casi-esfera  →  (explosión)  →  galaxia espiral  →  (explosión)  →  cerebro
+ *   esfera cerrada  →  (explosión)  →  galaxia espiral  →  (explosión)  →  cerebro
  * El cursor deja un orbe luminoso y aparta/ilumina las partículas de forma sutil.
  * El cerebro se construye con la silueta y los surcos de data/brainData.js.
  * Los degradados del fondo ([data-aurora]) derivan solos y cambian con cada etapa.
@@ -55,13 +55,13 @@ export function initHero3D() {
     set3(VIS, i, 1, i < N1 ? 1 : 0, i < N2 ? 1 : 0);
   }
 
-  /* --- 1) Casi-esfera: toroide grueso de puntos --- */
-  const R = 0.78, r = 0.62;
+  /* --- 1) Esfera cerrada de puntos (sin hueco central) --- */
+  const SR = 1.32;
   for (let i = 0; i < N0; i++) {
-    const u = Math.random() * Math.PI * 2, v = Math.random() * Math.PI * 2;
-    const cu = Math.cos(u), su = Math.sin(u), cv = Math.cos(v), sv = Math.sin(v);
-    set3(P0, i, (R + r * cv) * cu, r * sv, (R + r * cv) * su);
-    set3(NR0, i, cv * cu, sv, cv * su);
+    const u = Math.random() * 2 - 1, th = Math.random() * Math.PI * 2, s = Math.sqrt(1 - u * u);
+    const x = s * Math.cos(th), y = u, z = s * Math.sin(th);
+    set3(P0, i, SR * x, SR * y, SR * z);
+    set3(NR0, i, x, y, z);
   }
 
   /* --- 2) Galaxia: núcleo morado con espiral + 3 anillos + polvo (denso) --- */
