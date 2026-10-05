@@ -1,4 +1,6 @@
 ---
+import { services } from '../data/services.js';
+const words = JSON.stringify(services.map((s) => s.name));
 const stats = [
   { n: '250+', l: 'Proyectos entregados' },
   { n: '4,8x', l: 'ROAS medio en campañas' },
@@ -43,6 +45,15 @@ const stats = [
       <span data-line class="block">Agencia de marketing</span>
       <span data-line class="block">digital.</span>
     </h1>
+    <!-- servicios que se escriben y se borran uno tras otro -->
+    <p data-foot class="mt-7 font-display font-light">
+      <span class="mb-1 block font-body text-[.78rem] uppercase tracking-[.2em] text-white/50">Especialistas en</span>
+      <span class="inline-flex items-center text-[clamp(1.2rem,2vw,1.9rem)] text-secondary">
+        <span data-typewriter data-words={words} aria-hidden="true">Performance &amp; Ads</span>
+        <i class="caret ml-[3px] inline-block h-[1.05em] w-[2px] bg-secondary"></i>
+      </span>
+      <span class="sr-only">{services.map((s) => s.name).join(', ')}</span>
+    </p>
   </div>
 
   <!-- etapa 1: textos inferiores -->

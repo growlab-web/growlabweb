@@ -87,6 +87,13 @@ html.lenis body {
   }
 }
 
+/* cursor de la escritura de servicios */
+@keyframes caret-blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+.caret { animation: caret-blink 1s steps(1) infinite; }
+
 /* entrada suave de las páginas interiores */
 @keyframes page-in {
   from { opacity: 0; }

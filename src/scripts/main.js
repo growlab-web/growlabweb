@@ -79,6 +79,29 @@ if (loader) {
   Promise.all([heroReady, fontsReady]).then(reveal);
 }
 
+/* ---------- Escritura de servicios (inicio): se teclea, se pausa, se borra y sigue con el siguiente ---------- */
+function initTypewriter() {
+  $$('[data-typewriter]').forEach((el) => {
+    let words = [];
+    try { words = JSON.parse(el.dataset.words || '[]'); } catch (e) { /* sin datos */ }
+    if (!words.length || reduceMotion) return;        // con "reducir movimiento" queda el primer servicio fijo
+    let w = 0, i = 0, deleting = false;
+    el.textContent = '';
+    const tick = () => {
+      const word = words[w];
+      if (!deleting) {
+        i++; el.textContent = word.slice(0, i);
+        if (i === word.length) { deleting = true; return setTimeout(tick, 1800); }   // pausa con la palabra completa
+        return setTimeout(tick, 70 + Math.random() * 55);
+      }
+      i--; el.textContent = word.slice(0, i);
+      if (i === 0) { deleting = false; w = (w + 1) % words.length; return setTimeout(tick, 380); }
+      return setTimeout(tick, 32);
+    };
+    setTimeout(tick, 900);
+  });
+}
+
 /* ---------- Página ---------- */
 function initPage() {
   lenis.start();
@@ -90,6 +113,7 @@ function initPage() {
     gsap.from('[data-line]', { autoAlpha: 0, y: 26, filter: 'blur(14px)', duration: 1.3, stagger: 0.14, ease: 'power3.out' });
     gsap.from('[data-foot], [data-actions]', { autoAlpha: 0, y: 20, filter: 'blur(8px)', duration: 1.1, stagger: 0.12, delay: 0.35, ease: 'power3.out' });
     hero3d.start(reduceMotion);
+    initTypewriter();
   }
 
   if (reduceMotion) return;
