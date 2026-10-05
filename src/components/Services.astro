@@ -1,10 +1,11 @@
 ---
 const services = [
   { n: '01', t: 'Performance & Ads', d: 'Campañas en Meta, Google y TikTok optimizadas al céntimo para maximizar tu ROAS.', art: 'bars' },
-  { n: '02', t: 'SEO & Contenido', d: 'Posicionamiento orgánico y contenido que atrae tráfico cualificado mes tras mes.', art: 'rings' },
-  { n: '03', t: 'Branding & Diseño', d: 'Identidades visuales y webs con identidad propia que se recuerdan.', art: 'shapes' },
-  { n: '04', t: 'Social Media', d: 'Comunidad, vídeo corto y estrategia orgánica que convierte seguidores en clientes.', art: 'dots' },
-  { n: '05', t: 'Email & Automatización', d: 'Flujos que nutren leads y recuperan ventas mientras duermes.', art: 'bars-rev' },
+  { n: '02', t: 'Data Analytics', d: 'Convertimos tus datos en decisiones: análisis de audiencias, embudos y rentabilidad.', art: 'rings' },
+  { n: '03', t: 'Data Tracking', d: 'Medición fiable con píxeles, GA4 y API de conversiones para que cada clic cuente.', art: 'dots' },
+  { n: '04', t: 'Reporting', d: 'Dashboards y reportes claros, en tiempo real, con las métricas que importan a tu negocio.', art: 'bars-rev' },
+  { n: '05', t: 'Desarrollo web & Ecommerce', d: 'Webs y tiendas rápidas, pensadas para convertir y listas para escalar.', art: 'shapes' },
+  { n: '06', t: 'Automatizaciones con IA', d: 'Flujos con IA que atienden, califican leads y recuperan ventas sin intervención manual.', art: 'chips' },
 ];
 ---
 
@@ -93,4 +94,16 @@ const services = [
   .art-dots i:nth-child(3) { background: var(--color-sky); }
   .art-dots i:nth-child(4) { background: #fff; }
   .art-dots i:nth-child(5) { display: none; }
+  /* chips (automatizaciones) */
+  .art-chips i {
+    width: 38px;
+    height: 38px;
+    border-radius: 11px;
+    border: 2px solid var(--color-secondary);
+  }
+  .art-chips i:nth-child(1) { transform: translateY(-4px); }
+  .art-chips i:nth-child(2) { transform: translateY(-22px); border-color: var(--color-primary); }
+  .art-chips i:nth-child(3) { transform: translateY(-40px); background: var(--color-secondary); }
+  .art-chips i:nth-child(4) { transform: translateY(-22px); border-color: var(--color-sky); }
+  .art-chips i:nth-child(5) { transform: translateY(-4px); background: var(--color-primary); border-color: var(--color-primary); }
 </style>
