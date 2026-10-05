@@ -1,12 +1,5 @@
 ---
-const services = [
-  { n: '01', t: 'Performance & Ads', d: 'Campañas en Meta, Google y TikTok optimizadas al céntimo para maximizar tu ROAS.', art: 'bars' },
-  { n: '02', t: 'Data Analytics', d: 'Convertimos tus datos en decisiones: análisis de audiencias, embudos y rentabilidad.', art: 'rings' },
-  { n: '03', t: 'Data Tracking', d: 'Medición fiable con píxeles, GA4 y API de conversiones para que cada clic cuente.', art: 'dots' },
-  { n: '04', t: 'Reporting', d: 'Dashboards y reportes claros, en tiempo real, con las métricas que importan a tu negocio.', art: 'bars-rev' },
-  { n: '05', t: 'Desarrollo web & Ecommerce', d: 'Webs y tiendas rápidas, pensadas para convertir y listas para escalar.', art: 'shapes' },
-  { n: '06', t: 'Automatizaciones con IA', d: 'Flujos con IA que atienden, califican leads y recuperan ventas sin intervención manual.', art: 'chips' },
-];
+import { services } from '../data/services.js';
 ---
 
 <!-- Scroll horizontal con pin (GSAP ScrollTrigger) -->
@@ -22,10 +15,11 @@ const services = [
     <div data-services-track class="flex w-max gap-8 px-(--pad) will-change-transform">
       {
         services.map((s) => (
-          <article class="card relative flex h-[clamp(340px,48vh,460px)] w-[clamp(280px,32vw,440px)] flex-col gap-4 overflow-hidden rounded-[28px] border border-white/10 bg-panel p-8 transition-colors duration-300 hover:border-secondary">
+          <a href={`/servicios/${s.slug}`} class="card group relative flex h-[clamp(340px,48vh,460px)] w-[clamp(280px,32vw,440px)] flex-col gap-4 overflow-hidden rounded-[28px] border border-white/10 bg-panel p-8 transition-colors duration-300 hover:border-secondary">
             <span class="font-display text-[.9rem] font-medium text-secondary">{s.n}</span>
-            <h3 class="text-[1.8rem] font-medium tracking-[-0.03em]">{s.t}</h3>
-            <p class="max-w-[30ch] text-muted">{s.d}</p>
+            <h3 class="text-[1.8rem] font-medium leading-[1.1] tracking-[-0.03em]">{s.name}</h3>
+            <p class="max-w-[30ch] text-muted">{s.short}</p>
+            <span class="absolute right-7 top-7 font-display text-[1.3rem] text-white/40 transition-all duration-300 group-hover:-translate-y-1 group-hover:translate-x-1 group-hover:text-secondary" aria-hidden="true">↗</span>
             <div class={`art art-${s.art}`} aria-hidden="true">
               <i />
               <i />
@@ -33,7 +27,7 @@ const services = [
               <i />
               <i />
             </div>
-          </article>
+          </a>
         ))
       }
     </div>

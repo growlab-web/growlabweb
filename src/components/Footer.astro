@@ -1,5 +1,6 @@
 ---
 import { site } from '../data/site.js';
+import { services } from '../data/services.js';
 const year = new Date().getFullYear();
 const links = [...site.nav, site.contact];
 ---
@@ -21,4 +22,7 @@ const links = [...site.nav, site.contact];
       ))
     }
   </span>
+  <nav class="flex w-full flex-wrap gap-x-6 gap-y-2 border-t border-white/10 pt-6" aria-label="Servicios">
+    {services.map((s) => <a href={`/servicios/${s.slug}`} class="transition-colors hover:text-secondary">{s.name}</a>)}
+  </nav>
 </footer>

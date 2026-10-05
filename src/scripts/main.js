@@ -8,12 +8,16 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Lenis from 'lenis';
 import { startRain } from './loaderRain.js';
+import { initDataFlow } from './dataflow.js';
 
 gsap.registerPlugin(ScrollTrigger);
 
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const $ = (s, root = document) => root.querySelector(s);
 const $$ = (s, root = document) => Array.from(root.querySelectorAll(s));
+
+/* ---------- Red de datos del panel de contacto ---------- */
+$$('[data-flow]').forEach((c) => initDataFlow(c));
 
 /* ---------- Scroll suave (Lenis) sincronizado con GSAP ---------- */
 const lenis = new Lenis({ lerp: 0.14, smoothWheel: !reduceMotion });

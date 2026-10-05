@@ -1,52 +1,60 @@
 ---
 import { site } from '../data/site.js';
 
-const field =
-  'w-full rounded-xl border border-white/15 bg-white/[.04] px-4 py-3.5 font-body text-[1rem] text-white outline-none transition placeholder:text-white/35 focus:border-secondary focus:bg-white/[.07]';
-const label = 'mb-2 block font-display text-[.8rem] uppercase tracking-[.14em] text-white/60';
-const services = ['Performance & Ads', 'Data Analytics', 'Data Tracking', 'Reporting', 'Desarrollo web & Ecommerce', 'Automatizaciones con IA', 'Todavía no lo sé'];
+// Campos con línea inferior e icono, como un formulario editorial
+const wrap = 'group relative flex items-center gap-3 border-b border-white/20 transition-colors focus-within:border-secondary';
+const icon = 'h-[22px] w-[22px] shrink-0 text-white/45 transition-colors group-focus-within:text-secondary';
+const input = 'w-full bg-transparent py-4 font-body text-[1rem] text-white outline-none placeholder:text-white/40';
 ---
 
-<!-- Formulario: al enviar abre el correo del visitante con el mensaje listo (sin servidor). -->
-<form data-contact-form data-email={site.email} class="grid gap-6" novalidate>
-  <div class="grid gap-6 sm:grid-cols-2">
-    <div>
-      <label class={label} for="nombre">Nombre</label>
-      <input class={field} id="nombre" name="nombre" type="text" placeholder="Tu nombre" autocomplete="name" required />
-    </div>
-    <div>
-      <label class={label} for="email">Correo</label>
-      <input class={field} id="email" name="email" type="email" placeholder="tu@correo.com" autocomplete="email" required />
-    </div>
+<!-- Al enviar abre el correo del visitante con el mensaje listo (sin servidor). -->
+<form data-contact-form data-email={site.email} class="grid gap-x-10 gap-y-7 sm:grid-cols-2" novalidate>
+  <label class={wrap}>
+    <svg class={icon} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"></path></svg>
+    <span class="sr-only">Nombre</span>
+    <input class={input} name="nombre" type="text" placeholder="Nombre" autocomplete="name" required />
+  </label>
+
+  <label class={wrap}>
+    <svg class={icon} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="1.5"></rect><path d="m3.5 6.5 8.5 7 8.5-7"></path></svg>
+    <span class="sr-only">Email</span>
+    <input class={input} name="email" type="email" placeholder="Email" autocomplete="email" required />
+  </label>
+
+  <label class={wrap}>
+    <svg class={icon} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2Z"></path></svg>
+    <span class="sr-only">Teléfono</span>
+    <input class={input} name="telefono" type="tel" placeholder="Teléfono" autocomplete="tel" />
+  </label>
+
+  <label class={wrap}>
+    <svg class={icon} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v5M12 8v.01"></path></svg>
+    <span class="sr-only">Asunto</span>
+    <input class={input} name="asunto" type="text" placeholder="Asunto" />
+  </label>
+
+  <label class={wrap + ' items-start sm:col-span-2'}>
+    <svg class={icon + ' mt-4'} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20l1-4L16.5 4.5a2 2 0 0 1 3 0l0 0a2 2 0 0 1 0 3L8 19l-4 1Z"></path><path d="m14 7 3 3"></path></svg>
+    <span class="sr-only">Mensaje</span>
+    <textarea class={input + ' min-h-[110px] resize-none'} name="mensaje" placeholder="¿Cómo podemos ayudar? ¡No dudes en ponerte en contacto con nosotros!" required></textarea>
+  </label>
+
+  <div class="flex flex-wrap items-center gap-x-8 gap-y-4 pt-3 sm:col-span-2">
+    <button type="submit" class="inline-flex h-[54px] cursor-pointer items-center gap-3 bg-secondary px-8 font-display text-[.85rem] font-semibold uppercase tracking-[.12em] text-black transition-colors hover:bg-white">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21 3-9.5 18-2.5-7.5L1.5 11 21 3Z"></path><path d="M21 3 9 13.5"></path></svg>
+      Enviar
+    </button>
+    <label class="flex cursor-pointer items-center gap-3 font-body text-[.9rem] text-white/60">
+      <input type="checkbox" name="consent" class="h-[18px] w-[18px] shrink-0 cursor-pointer accent-secondary" />
+      <span>Acepto que se recopilen mis <a href="#" class="underline underline-offset-2 transition-colors hover:text-secondary">datos</a>.</span>
+    </label>
   </div>
 
-  <div class="grid gap-6 sm:grid-cols-2">
-    <div>
-      <label class={label} for="empresa">Empresa</label>
-      <input class={field} id="empresa" name="empresa" type="text" placeholder="Nombre de tu marca" autocomplete="organization" />
-    </div>
-    <div>
-      <label class={label} for="servicio">Servicio</label>
-      <select class={field + ' appearance-none'} id="servicio" name="servicio">
-        {services.map((s) => <option class="bg-black" value={s}>{s}</option>)}
-      </select>
-    </div>
-  </div>
-
-  <div>
-    <label class={label} for="mensaje">Cuéntanos tu proyecto</label>
-    <textarea class={field + ' min-h-[160px] resize-y'} id="mensaje" name="mensaje" placeholder="Objetivos, plazos, presupuesto aproximado…" required></textarea>
-  </div>
-
-  <div class="flex flex-wrap items-center gap-5">
-    <button type="submit" class="btn cursor-pointer !px-9 !py-4">Enviar mensaje <b class="font-normal">→</b></button>
-    <p data-form-note class="min-h-[1.5em] max-w-[34ch] font-body text-[.85rem] text-muted" role="status" aria-live="polite"></p>
-  </div>
+  <p data-form-note class="min-h-[1.4em] font-body text-[.85rem] text-muted sm:col-span-2" role="status" aria-live="polite"></p>
 </form>
 
 <script>
-  const form = document.querySelector('[data-contact-form]');
-  if (form) {
+  document.querySelectorAll('[data-contact-form]').forEach((form) => {
     const note = form.querySelector('[data-form-note]');
     form.addEventListener('submit', (e) => {
       e.preventDefault();
@@ -54,23 +62,16 @@ const services = ['Performance & Ads', 'Data Analytics', 'Data Tracking', 'Repor
       const nombre = String(f.get('nombre') || '').trim();
       const email = String(f.get('email') || '').trim();
       const mensaje = String(f.get('mensaje') || '').trim();
-      if (!nombre || !/^\S+@\S+\.\S+$/.test(email) || !mensaje) {
-        note.textContent = 'Completa tu nombre, un correo válido y el mensaje.';
-        note.style.color = '#ff9a9a';
-        return;
-      }
+      const fail = (msg) => { note.textContent = msg; note.style.color = '#ff9a9a'; };
+      if (!nombre || !/^\S+@\S+\.\S+$/.test(email) || !mensaje) return fail('Completa tu nombre, un correo válido y el mensaje.');
+      if (!f.get('consent')) return fail('Para enviar el mensaje debes aceptar que se recopilen tus datos.');
       const body = [
-        `Nombre: ${nombre}`,
-        `Correo: ${email}`,
-        `Empresa: ${f.get('empresa') || '-'}`,
-        `Servicio: ${f.get('servicio')}`,
-        '',
-        mensaje,
+        `Nombre: ${nombre}`, `Correo: ${email}`, `Teléfono: ${f.get('telefono') || '-'}`, `Asunto: ${f.get('asunto') || '-'}`, '', mensaje,
       ].join('\n');
-      const subject = `Nuevo proyecto: ${nombre}`;
+      const subject = String(f.get('asunto') || '').trim() || `Nuevo contacto: ${nombre}`;
       note.textContent = 'Se abrirá tu correo con el mensaje listo para enviar.';
       note.style.color = '';
       window.location.href = `mailto:${form.dataset.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     });
-  }
+  });
 </script>

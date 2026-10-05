@@ -9,6 +9,7 @@ import * as THREE from 'three';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import BRAIN_DATA from '../data/brainData.js';
+import { buildShape, isServiceShape } from './shapes.js';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -44,6 +45,8 @@ export function initHero3D() {
   const mk = () => new Float32Array(COUNT * 3);
   const P0 = mk(), NR0 = mk(), P1 = mk(), C1 = mk(), P2 = mk(), N2v = mk();
   const SC = mk(), VIS = mk(), RN = new Float32Array(COUNT);
+  const PATH = new Float32Array(COUNT).fill(-1);          // posición a lo largo de una línea (pulsos de datos), -1 = estática
+  const serviceShape = isServiceShape(hero.dataset.shape || ''); // páginas de servicio: la forma 2 es su estructura propia
   const set3 = (arr, i, x, y, z) => { arr[i * 3] = x; arr[i * 3 + 1] = y; arr[i * 3 + 2] = z; };
   const copy3 = (arr, to, from) => { arr[to * 3] = arr[from * 3]; arr[to * 3 + 1] = arr[from * 3 + 1]; arr[to * 3 + 2] = arr[from * 3 + 2]; };
   const fill = (n, arrs) => { for (let i = n; i < COUNT; i++) { const s = (Math.random() * n) | 0; arrs.forEach((a) => copy3(a, i, s)); } };
@@ -65,7 +68,7 @@ export function initHero3D() {
   }
 
   /* --- 2) Galaxia: núcleo morado con espiral + 3 anillos + polvo (denso) --- */
-  for (let i = 0; i < N1; i++) {
+  if (!serviceShape) for (let i = 0; i < N1; i++) {
     const q = Math.random();
     let rr, th = Math.random() * Math.PI * 2, y = 0, col;
     if (q < 0.28) {                          // núcleo en espiral (denso, morado, centro blanco)
@@ -87,7 +90,16 @@ export function initHero3D() {
     set3(P1, i, Math.cos(th) * rr, y, Math.sin(th) * rr);
     set3(C1, i, col[0], col[1], col[2]);
   }
+  if (serviceShape) {                      // estructura propia del servicio (embudo, red, panel…)
+    const sh = buildShape(hero.dataset.shape, N1);
+    for (let i = 0; i < N1; i++) {
+      set3(P1, i, sh.pos[i * 3], sh.pos[i * 3 + 1], sh.pos[i * 3 + 2]);
+      set3(C1, i, sh.col[i * 3], sh.col[i * 3 + 1], sh.col[i * 3 + 2]);
+      PATH[i] = sh.path[i];
+    }
+  }
   fill(N1, [P1, C1]);
+  for (let i = N1; i < COUNT; i++) PATH[i] = PATH[(Math.random() * N1) | 0];
 
   /* --- 3) Cerebro: silueta + surcos reales de la referencia, inflados en 3D --- */
   (function buildBrain() {
@@ -127,7 +139,7 @@ export function initHero3D() {
   const attr = (name, arr, n) => geo.setAttribute(name, new THREE.BufferAttribute(arr, n || 3));
   attr('position', P0); attr('normal', NR0);
   attr('aP1', P1); attr('aC1', C1); attr('aP2', P2); attr('aN2', N2v);
-  attr('aScatter', SC); attr('aVis', VIS); attr('aRand', RN, 1);
+  attr('aScatter', SC); attr('aVis', VIS); attr('aRand', RN, 1); attr('aPath', PATH, 1);
 
   const noiseGLSL = `
     vec3 mod289(vec3 x){return x-floor(x*(1.0/289.0))*289.0;}
@@ -167,7 +179,7 @@ export function initHero3D() {
     vertexShader: `
       uniform float uTime, uIntro, uPR, uSize, uPush, uRadius, uMorph;
       uniform vec3 uMouse, uTilt, uYaw, uRoll;
-      attribute vec3 aP1, aP2, aN2, aC1, aScatter, aVis; attribute float aRand;
+      attribute vec3 aP1, aP2, aN2, aC1, aScatter, aVis; attribute float aRand, aPath;
       varying vec3 vColor; varying float vAlpha;
       ${noiseGLSL}
       vec3 rotY(vec3 p,float a){float c=cos(a),s=sin(a);return vec3(c*p.x+s*p.z,p.y,-s*p.x+c*p.z);}
@@ -223,8 +235,11 @@ export function initHero3D() {
         float colD  = mix(1.0, 0.45 + 0.75*depth, dm);
         float alphD = mix(1.0, 0.5 + 0.5*depth, dm);
 
+        // paquetes de datos que viajan por las líneas de las estructuras de servicio
+        float pulse = aPath >= 0.0 ? pow(0.5 + 0.5*sin(aPath*16.0 - uTime*2.6), 10.0) : 0.0;
+        float line = step(0.0, aPath) * w1;
         float sm = w0*1.0 + w1*1.15 + w2*1.1;
-        float sz = uSize * uPR * (5.0 / max(-mv.z, 0.3)) * (0.6 + aRand*0.7) * sm * sizeD * (1.0 + f*0.8);
+        float sz = uSize * uPR * (5.0 / max(-mv.z, 0.3)) * (0.6 + aRand*0.7) * sm * sizeD * (1.0 + f*0.8) * (1.0 + pulse*0.9*line);
         sz = min(sz, 40.0 * uPR);
         gl_PointSize = sz;
 
@@ -243,9 +258,9 @@ export function initHero3D() {
         vec3 col = mix(aC1, grad, dm);
         col = mix(col, vec3(1.0), step(0.95, aRand) * 0.5 * w2);
 
-        vColor = col * colD * (1.0 + burst*0.25) + f*0.12;
+        vColor = col * colD * (1.0 + burst*0.25) + f*0.12 + vec3(0.55,0.95,0.6) * pulse * line;
         float base = 0.9*w0 + 0.95*w1 + 1.0*w2;
-        vAlpha = base * (0.45 + 0.55*smoothstep(-0.2,0.8,n+0.4)) * e * vis * alive * alphD / (1.0 + max(sz/uPR - 7.0, 0.0)*0.08);
+        vAlpha = base * mix(1.0, 0.5 + 0.9*pulse, line) * (0.45 + 0.55*smoothstep(-0.2,0.8,n+0.4)) * e * vis * alive * alphD / (1.0 + max(sz/uPR - 7.0, 0.0)*0.08);
       }`,
     fragmentShader: `
       varying vec3 vColor; varying float vAlpha;
@@ -288,16 +303,16 @@ export function initHero3D() {
   const base = { scale: 0.82 };
   const pinned = hero.hasAttribute('data-pin');                       // inicio: secuencia completa con scroll
   const SHAPES = { sphere: 0, galaxy: 1, brain: 2 };                // páginas interiores: una forma fija
-  const state = { scale: 1, morph: pinned ? 0 : (SHAPES[hero.dataset.shape] ?? 0) };
+  const state = { scale: 1, morph: pinned ? 0 : serviceShape ? 1 : (SHAPES[hero.dataset.shape] ?? 0) };
   function resize() {
     const w = hero.clientWidth, h = hero.clientHeight;
     renderer.setSize(w, h, false);
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
     const mobile = isMobile();
-    group.position.x = pinned || mobile ? 0 : 1.8;   // en las páginas interiores el objeto queda a la derecha del texto
+    group.position.x = pinned || mobile ? 0 : serviceShape ? 1.55 : 1.8;   // en las páginas interiores el objeto queda a la derecha del texto
     group.position.y = mobile ? -0.2 : -0.15;
-    base.scale = mobile ? 0.55 : pinned ? 0.82 : hero.dataset.shape === 'galaxy' ? 0.46 : 0.7;
+    base.scale = mobile ? 0.55 : pinned ? 0.82 : serviceShape ? 0.68 : hero.dataset.shape === 'galaxy' ? 0.46 : 0.7;
     group.scale.setScalar(base.scale * state.scale);
   }
 
@@ -342,8 +357,8 @@ export function initHero3D() {
     orb.material.opacity += ((mouse.inside ? 0.7 : 0) - orb.material.opacity) * 0.08;
 
     // orientación de cada forma (inclinación mínima hacia el cursor)
-    mat.uniforms.uTilt.value.set(1.2 - mouse.y * 0.1, 0.26 - mouse.y * 0.05, -0.05 - mouse.y * 0.05);
-    mat.uniforms.uYaw.value.set(mouse.x * 0.14 + t * 0.12, mouse.x * 0.1 + t * 0.08, 0.25 + Math.sin(t * 0.35) * 0.22 + mouse.x * 0.3);
+    mat.uniforms.uTilt.value.set(1.2 - mouse.y * 0.1, serviceShape ? 0.12 - mouse.y * 0.06 : 0.26 - mouse.y * 0.05, -0.05 - mouse.y * 0.05);
+    mat.uniforms.uYaw.value.set(mouse.x * 0.14 + t * 0.12, serviceShape ? Math.sin(t * 0.32) * 0.5 + mouse.x * 0.25 : mouse.x * 0.1 + t * 0.08, 0.25 + Math.sin(t * 0.35) * 0.22 + mouse.x * 0.3);
 
     dust.rotation.y = t * 0.02;
     dust.position.y = Math.sin(t * 0.3) * 0.1;
