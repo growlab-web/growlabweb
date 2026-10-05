@@ -374,7 +374,11 @@ export function initHero3D() {
     const E = 'power1.inOut';
     const tl = gsap.timeline({
       defaults: { ease: 'none' },
-      scrollTrigger: { trigger: hero, start: 'top top', end: '+=420%', pin: true, scrub: 0.6, anticipatePin: 1 },
+      scrollTrigger: {
+        trigger: hero, start: 'top top', end: '+=260%', pin: true, scrub: 0.35, anticipatePin: 1,
+        // cada etapa se engancha sola: un gesto de scroll basta para pasar a la siguiente
+        snap: { snapTo: 'labelsDirectional', duration: { min: 0.15, max: 0.5 }, delay: 0.05, ease: 'power1.inOut' },
+      },
     });
     tl.to(state, { morph: 1, duration: 1.7, ease: E }, 0.6)                                   // → galaxia
       .to(p1, hide, 0.7)
@@ -392,7 +396,8 @@ export function initHero3D() {
       .to(C, { opacity: 0.4, xPercent: 0, yPercent: 0, duration: 0.9, ease: E }, 4.6)
       .to(A, { opacity: 0.7, rotation: -24, scale: 1.2, xPercent: 8, yPercent: 14, duration: 1.7, ease: E }, 3.7)
       .to(B, { opacity: 0.3, yPercent: -30, scale: 0.95, duration: 1.7, ease: E }, 3.7)
-      .to({}, { duration: 1.2 }, 5.4);                                                       // pausa final
+      .to({}, { duration: 1.2 }, 5.4)                                                        // pausa final
+      .addLabel('esfera', 0).addLabel('galaxia', 2.75).addLabel('cerebro', 5.95);
   }
 
   return { start };

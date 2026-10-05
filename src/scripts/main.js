@@ -13,7 +13,7 @@ const $ = (s, root = document) => root.querySelector(s);
 const $$ = (s, root = document) => Array.from(root.querySelectorAll(s));
 
 /* ---------- Scroll suave (Lenis) sincronizado con GSAP ---------- */
-const lenis = new Lenis({ lerp: 0.12, smoothWheel: !reduceMotion });
+const lenis = new Lenis({ lerp: 0.14, smoothWheel: !reduceMotion });
 lenis.on('scroll', ScrollTrigger.update);
 gsap.ticker.add((t) => lenis.raf(t * 1000));
 gsap.ticker.lagSmoothing(0);
@@ -25,7 +25,7 @@ $$('a[href^="#"]').forEach((a) => {
     const target = id && id.length > 1 ? $(id) : document.body;
     if (!target) return;
     e.preventDefault();
-    lenis.scrollTo(id === '#top' ? 0 : target, { duration: 1.6 });
+    lenis.scrollTo(id === '#top' ? 0 : target, { duration: 1.1 });
   });
 });
 
