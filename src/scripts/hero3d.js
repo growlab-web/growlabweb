@@ -359,8 +359,8 @@ export function initHero3D() {
   function start(reduce) {
     if (started) return; started = true;
     if (reduce) { mat.uniforms.uIntro.value = 1; return; }
-    gsap.to(mat.uniforms.uIntro, { value: 1, duration: 2.6, ease: 'power3.out' });
-    gsap.from(state, { scale: 0.6, duration: 2.6, ease: 'expo.out', onUpdate: () => group.scale.setScalar(base.scale * state.scale) });
+    gsap.to(mat.uniforms.uIntro, { value: 1, duration: 2, ease: 'power3.out' });
+    gsap.from(state, { scale: 0.6, duration: 2, ease: 'expo.out', onUpdate: () => group.scale.setScalar(base.scale * state.scale) });
 
     // Degradados del fondo: deriva constante (posición); el resto lo controla el scroll
     [['a', 9, -5, 9], ['b', -12, 4, 11], ['c', 10, 8, 13]].forEach(([k, x, y, d]) =>

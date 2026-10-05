@@ -55,10 +55,13 @@ function reveal() {
 
 if (loader) {
   const rain = startRain($('[data-rain]', loader));
-  gsap.to({ v: 0 }, { v: 1, duration: 0.7, ease: 'power1.in', onUpdate() { rain.setIntensity(this.targets()[0].v); } });
-  const minTime = new Promise((r) => setTimeout(r, reduceMotion ? 200 : 2100));
+  gsap.to({ v: 0 }, { v: 1, duration: 0.4, ease: 'power1.in', onUpdate() { rain.setIntensity(this.targets()[0].v); } });
+  const minTime = new Promise((r) => setTimeout(r, reduceMotion ? 200 : 1100));
   Promise.all([minTime, heroReady, fontsReady]).then(() => {
-    gsap.to(loader, { opacity: 0, duration: 0.8, ease: 'power2.out', onComplete: () => { rain.stop(); loader.remove(); } });
+    // la lluvia se encoge y viaja hacia el centro mientras la esfera se ensambla detrás
+    const c = { v: 0 };
+    gsap.to(c, { v: 1, duration: 1, ease: 'power2.in', onUpdate: () => rain.setConverge(c.v) });
+    gsap.to(loader, { opacity: 0, duration: 0.7, delay: 0.45, ease: 'power1.out', onComplete: () => { rain.stop(); loader.remove(); } });
     reveal();
   });
 } else {
