@@ -9,6 +9,7 @@ export const site = {
     { href: '/nosotros', label: 'Nosotros' },
   ],
   contact: { href: '/contacto', label: 'Contacto' },
+  cta: 'Agendar reunión', // texto del botón del menú (lleva a la página de contacto)
   social: [
     { label: 'Instagram', href: '#' },
     { label: 'LinkedIn', href: '#' },
