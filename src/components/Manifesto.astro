@@ -7,11 +7,11 @@ const {
 } = Astro.props;
 ---
 
-<section class="mx-auto max-w-[1400px] px-(--pad) py-[14vh]">
+<section class="mx-auto max-w-[1100px] px-(--pad) py-[11vh]">
   <p class="eyebrow">{eyebrow}</p>
   <p
     data-manifesto
-    class="font-display text-[clamp(1.8rem,4.2vw,3.8rem)] font-medium leading-[1.2] tracking-[-0.03em]"
+    class="text-left font-display text-[clamp(1.35rem,2.5vw,2.3rem)] font-medium leading-[1.3] tracking-[-0.02em]"
   >
     {text}
   </p>
@@ -20,7 +20,6 @@ const {
 <style>
   [data-manifesto] :global(.w) {
     display: inline-block;
-    margin-right: 0.25em;
     opacity: 0.14;
   }
 </style>
