@@ -18,7 +18,7 @@ import Icon from './Icon.astro';
         services.map((s) => (
           <a href={`/servicios/${s.slug}`} class="card group relative flex h-[clamp(340px,48vh,460px)] w-[clamp(280px,32vw,440px)] flex-col gap-4 overflow-hidden rounded-[28px] border border-white/10 bg-panel p-8 transition-colors duration-300 hover:border-secondary">
             <span class="font-display text-[.9rem] font-medium text-secondary">{s.n}</span>
-            <h3 class="text-[1.8rem] font-medium leading-[1.1] tracking-[-0.03em]">{s.name}</h3>
+            <h3 class="font-accent text-[1.3rem] font-bold leading-[1.15] tracking-[-0.01em]">{s.name}</h3>
             <p class="max-w-[30ch] text-muted">{s.short}</p>
             <span class="absolute right-6 top-6 grid h-12 w-12 place-items-center rounded-2xl border border-white/15 bg-white/[.04] text-secondary transition-colors duration-300 group-hover:border-secondary group-hover:bg-secondary group-hover:text-black"><Icon name={s.icon} size={22} /></span>
             <div class={`art art-${s.art}`} aria-hidden="true">

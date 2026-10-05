@@ -4,6 +4,8 @@
 @theme {
   --font-display: "Host Grotesk", system-ui, sans-serif;
   --font-body: "Nunito Sans", system-ui, sans-serif;
+  /* tipografía de acento: ancha y pesada, cercana a la del logo */
+  --font-accent: "Syne", "Host Grotesk", system-ui, sans-serif;
 
   --color-ink: #000000;
   --color-panel: #0e0e15;
@@ -62,7 +64,7 @@ html.lenis body {
   }
 
   .eyebrow {
-    @apply mb-6 font-display text-[.8rem] uppercase tracking-[.2em] text-secondary;
+    @apply mb-6 font-accent text-[.74rem] font-bold uppercase tracking-[.18em] text-secondary;
   }
 
   /* Botón principal (secciones) */
