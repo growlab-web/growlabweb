@@ -1,10 +1,11 @@
 ---
+import Icon from './Icon.astro';
 // Cifras con contador animado (GSAP): data-count / data-dec / data-suffix.
 const stats = [
-  { v: 250, s: '+', l: 'Proyectos entregados' },
-  { v: 4.8, s: 'x', d: 1, l: 'ROAS medio en campañas' },
-  { v: 12, s: 'M€', l: 'Facturación generada' },
-  { v: 98, s: '%', l: 'Clientes que repiten' },
+  { i: 'folder-check', v: 250, s: '+', l: 'Proyectos entregados' },
+  { i: 'trending-up', v: 4.8, s: 'x', d: 1, l: 'ROAS medio en campañas' },
+  { i: 'coins', v: 12, s: 'M€', l: 'Facturación generada' },
+  { i: 'repeat', v: 98, s: '%', l: 'Clientes que repiten' },
 ];
 ---
 
@@ -12,6 +13,7 @@ const stats = [
   {
     stats.map((s) => (
       <div data-reveal>
+        <span class="mb-5 grid h-11 w-11 place-items-center rounded-xl border border-white/15 bg-white/[.04] text-secondary"><Icon name={s.i} size={20} /></span>
         <b
           data-count={s.v}
           data-dec={s.d ?? 0}

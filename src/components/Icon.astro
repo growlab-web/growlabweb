@@ -1,0 +1,62 @@
+---
+/**
+ * Iconografía del sitio (Lucide, trazo fino). Uso: <Icon name="target" size={22} class="text-secondary" />
+ * Para añadir uno nuevo: importarlo abajo y agregarlo al mapa `icons`.
+ */
+import Target from '@lucide/astro/icons/target';
+import ChartColumn from '@lucide/astro/icons/chart-column';
+import TrendingUp from '@lucide/astro/icons/trending-up';
+import Radar from '@lucide/astro/icons/radar';
+import LayoutDashboard from '@lucide/astro/icons/layout-dashboard';
+import AppWindow from '@lucide/astro/icons/app-window';
+import Bot from '@lucide/astro/icons/bot';
+import Compass from '@lucide/astro/icons/compass';
+import Palette from '@lucide/astro/icons/palette';
+import Funnel from '@lucide/astro/icons/funnel';
+import Megaphone from '@lucide/astro/icons/megaphone';
+import Search from '@lucide/astro/icons/search';
+import ChartPie from '@lucide/astro/icons/chart-pie';
+import Coins from '@lucide/astro/icons/coins';
+import Lightbulb from '@lucide/astro/icons/lightbulb';
+import Tag from '@lucide/astro/icons/tag';
+import Plug from '@lucide/astro/icons/plug';
+import Link from '@lucide/astro/icons/link';
+import ShieldCheck from '@lucide/astro/icons/shield-check';
+import FileText from '@lucide/astro/icons/file-text';
+import Crosshair from '@lucide/astro/icons/crosshair';
+import Users from '@lucide/astro/icons/users';
+import PenTool from '@lucide/astro/icons/pen-tool';
+import ShoppingCart from '@lucide/astro/icons/shopping-cart';
+import FlaskConical from '@lucide/astro/icons/flask-conical';
+import Gauge from '@lucide/astro/icons/gauge';
+import MessageCircle from '@lucide/astro/icons/message-circle';
+import Database from '@lucide/astro/icons/database';
+import RotateCcw from '@lucide/astro/icons/rotate-ccw';
+import Workflow from '@lucide/astro/icons/workflow';
+import Rocket from '@lucide/astro/icons/rocket';
+import Eye from '@lucide/astro/icons/eye';
+import Sparkles from '@lucide/astro/icons/sparkles';
+import Mail from '@lucide/astro/icons/mail';
+import Clock from '@lucide/astro/icons/clock';
+import Share2 from '@lucide/astro/icons/share-2';
+import FolderCheck from '@lucide/astro/icons/folder-check';
+import Repeat from '@lucide/astro/icons/repeat';
+import BadgeCheck from '@lucide/astro/icons/badge-check';
+import ArrowUpRight from '@lucide/astro/icons/arrow-up-right';
+
+const icons = {
+  target: Target, 'chart-column': ChartColumn, 'trending-up': TrendingUp, radar: Radar, 'layout-dashboard': LayoutDashboard,
+  'app-window': AppWindow, bot: Bot, compass: Compass, palette: Palette, funnel: Funnel, megaphone: Megaphone, search: Search,
+  'chart-pie': ChartPie, coins: Coins, lightbulb: Lightbulb, tag: Tag, plug: Plug, link: Link, 'shield-check': ShieldCheck,
+  'file-text': FileText, crosshair: Crosshair, users: Users, 'pen-tool': PenTool, 'shopping-cart': ShoppingCart,
+  'flask-conical': FlaskConical, gauge: Gauge, 'message-circle': MessageCircle, database: Database, 'rotate-ccw': RotateCcw,
+  workflow: Workflow, rocket: Rocket, eye: Eye, sparkles: Sparkles, mail: Mail, clock: Clock, 'share-2': Share2,
+  'folder-check': FolderCheck, repeat: Repeat, 'badge-check': BadgeCheck, 'arrow-up-right': ArrowUpRight,
+};
+
+interface Props { name: keyof typeof icons; size?: number; strokeWidth?: number; class?: string }
+const { name, size = 24, strokeWidth = 1.5, class: className = '' } = Astro.props;
+const Component = icons[name];
+---
+
+{Component && <Component size={size} strokeWidth={strokeWidth} class={className} aria-hidden="true" />}

@@ -7,6 +7,7 @@ import Process from '../../components/Process.astro';
 import ContactSection from '../../components/ContactSection.astro';
 import Footer from '../../components/Footer.astro';
 import { services } from '../../data/services.js';
+import Icon from '../../components/Icon.astro';
 
 export function getStaticPaths() {
   return services.map((service) => ({ params: { slug: service.slug }, props: { service } }));
@@ -40,8 +41,11 @@ const others = services.filter((s) => s.slug !== service.slug);
         {
           service.includes.map((item, i) => (
             <article data-reveal class="rounded-[28px] border border-white/10 bg-panel p-8 transition-colors duration-300 hover:border-secondary">
-              <span class="font-display text-[.9rem] font-medium text-secondary">0{i + 1}</span>
-              <h3 class="mb-3 mt-3 text-[1.6rem] font-medium tracking-[-0.03em]">{item.t}</h3>
+              <div class="flex items-center justify-between">
+                <span class="grid h-12 w-12 place-items-center rounded-2xl border border-white/15 bg-white/[.04] text-secondary"><Icon name={item.i} size={22} /></span>
+                <span class="font-display text-[.85rem] font-medium text-white/30">0{i + 1}</span>
+              </div>
+              <h3 class="mb-3 mt-6 text-[1.6rem] font-medium tracking-[-0.03em]">{item.t}</h3>
               <p class="max-w-[46ch] text-muted">{item.d}</p>
             </article>
           ))
@@ -54,7 +58,7 @@ const others = services.filter((s) => s.slug !== service.slug);
       {
         service.benefits.map((b) => (
           <div data-reveal class="flex items-start gap-4 border-t border-white/15 pt-6">
-            <i class="mt-[.55rem] h-2 w-2 shrink-0 rounded-full bg-secondary"></i>
+            <Icon name="badge-check" size={26} class="mt-[.1rem] shrink-0 text-secondary" />
             <p class="font-display text-[1.35rem] font-medium leading-snug tracking-[-0.02em]">{b}</p>
           </div>
         ))
@@ -70,7 +74,7 @@ const others = services.filter((s) => s.slug !== service.slug);
         {
           others.map((s) => (
             <a data-reveal href={`/servicios/${s.slug}`} class="group flex items-center justify-between gap-4 rounded-2xl border border-white/10 px-6 py-5 transition-colors hover:border-secondary">
-              <span class="font-display text-[1.15rem] tracking-[-0.02em]">{s.name}</span>
+              <span class="flex items-center gap-3 font-display text-[1.15rem] tracking-[-0.02em]"><Icon name={s.icon} size={20} class="text-secondary" />{s.name}</span>
               <span class="text-white/40 transition-all group-hover:translate-x-1 group-hover:text-secondary" aria-hidden="true">→</span>
             </a>
           ))

@@ -1,9 +1,10 @@
 ---
+import Icon from './Icon.astro';
 const steps = [
-  { n: '01', t: 'Descubrimiento', d: 'Auditamos tu negocio, tu mercado y tu competencia para encontrar oportunidades reales.' },
-  { n: '02', t: 'Estrategia', d: 'Definimos objetivos, canales y presupuesto con un plan claro y KPIs acordados.' },
-  { n: '03', t: 'Ejecución', d: 'Lanzamos campañas y contenidos con ciclos cortos de prueba y aprendizaje.' },
-  { n: '04', t: 'Optimización', d: 'Analizamos datos cada semana y escalamos lo que funciona.' },
+  { i: 'search', n: '01', t: 'Descubrimiento', d: 'Auditamos tu negocio, tu mercado y tu competencia para encontrar oportunidades reales.' },
+  { i: 'compass', n: '02', t: 'Estrategia', d: 'Definimos objetivos, canales y presupuesto con un plan claro y KPIs acordados.' },
+  { i: 'rocket', n: '03', t: 'Ejecución', d: 'Lanzamos campañas y contenidos con ciclos cortos de prueba y aprendizaje.' },
+  { i: 'trending-up', n: '04', t: 'Optimización', d: 'Analizamos datos cada semana y escalamos lo que funciona.' },
 ];
 ---
 
@@ -22,7 +23,7 @@ const steps = [
     {
       steps.map((s) => (
         <li class="border-t border-white/15 py-8">
-          <span class="font-display text-[.9rem] font-medium text-secondary">{s.n}</span>
+          <div class="flex items-center gap-4"><span class="grid h-11 w-11 place-items-center rounded-xl border border-white/15 bg-white/[.04] text-secondary"><Icon name={s.i} size={20} /></span><span class="font-display text-[.85rem] font-medium text-white/30">{s.n}</span></div>
           <h3 class="mb-4 mt-2 text-[clamp(1.8rem,3.5vw,3rem)] tracking-[-0.03em]">{s.t}</h3>
           <p class="max-w-[40ch] text-muted">{s.d}</p>
         </li>
