@@ -8,10 +8,9 @@
   --color-ink: #000000;
   --color-panel: #0e0e15;
   --color-muted: #8b8b9c;
-  --color-lime: #b6ff3b;
-  --color-mint: #42f0a0;
-  --color-iris: #7a5cff;
-  --color-rose: #ff4fa3;
+  --color-secondary: #abe155;
+    --color-primary: #386fde;
+  --color-sky: #7ba5f0;
 }
 
 :root {
@@ -56,24 +55,24 @@ html.lenis body {
 @layer components {
   /* Texto con degradado de la marca */
   .grad-text {
-    background: linear-gradient(90deg, var(--color-lime), var(--color-iris), var(--color-rose));
+    background: linear-gradient(90deg, var(--color-secondary), var(--color-primary), var(--color-sky));
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
   }
 
   .eyebrow {
-    @apply mb-6 font-display text-[.8rem] uppercase tracking-[.2em] text-lime;
+    @apply mb-6 font-display text-[.8rem] uppercase tracking-[.2em] text-secondary;
   }
 
   /* Botón principal (secciones) */
   .btn {
-    @apply inline-flex items-center gap-3 rounded-full bg-lime px-7 py-4 font-display font-medium text-black transition-colors duration-300 hover:bg-white;
+    @apply inline-flex items-center gap-3 rounded-full bg-secondary px-7 py-4 font-display font-medium text-black transition-colors duration-300 hover:bg-white;
   }
 
   /* Botones rectos del hero */
   .hbtn {
-    @apply inline-flex h-12 items-center justify-center rounded-[2px] bg-white px-6 font-display text-[.95rem] font-medium text-black transition-colors duration-300 hover:bg-mint;
+    @apply inline-flex h-12 items-center justify-center rounded-[2px] bg-white px-6 font-display text-[.95rem] font-medium text-black transition-colors duration-300 hover:bg-secondary;
   }
 
   /* Titulares grandes del hero y paneles */

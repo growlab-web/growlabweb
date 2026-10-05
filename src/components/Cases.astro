@@ -1,8 +1,8 @@
 ---
 const cases = [
-  { tag: 'E-commerce · Moda', name: 'Aurora Studio', text: 'Reestructuramos su embudo de Meta Ads y email.', kpi: '+312%', kpiText: 'ventas online en 6 meses', bg: 'from-[#17102e]', visual: 'v1' },
-  { tag: 'SaaS · B2B', name: 'Flowly', text: 'Estrategia SEO + LinkedIn para captar demos cualificadas.', kpi: '-48%', kpiText: 'coste por lead', bg: 'from-[#0f2318]', visual: 'v2' },
-  { tag: 'Restauración', name: 'Casa Brasa', text: 'Contenido en vídeo corto y campañas locales.', kpi: '3,1M', kpiText: 'visualizaciones orgánicas', bg: 'from-[#2a1020]', visual: 'v3' },
+  { tag: 'E-commerce · Moda', name: 'Aurora Studio', text: 'Reestructuramos su embudo de Meta Ads y email.', kpi: '+312%', kpiText: 'ventas online en 6 meses', bg: 'from-[#0e1a3a]', visual: 'v1' },
+  { tag: 'SaaS · B2B', name: 'Flowly', text: 'Estrategia SEO + LinkedIn para captar demos cualificadas.', kpi: '-48%', kpiText: 'coste por lead', bg: 'from-[#15210b]', visual: 'v2' },
+  { tag: 'Restauración', name: 'Casa Brasa', text: 'Contenido en vídeo corto y campañas locales.', kpi: '3,1M', kpiText: 'visualizaciones orgánicas', bg: 'from-[#0b1a44]', visual: 'v3' },
 ];
 ---
 
@@ -28,7 +28,7 @@ const cases = [
                 <p class="max-w-[34ch] text-muted">{c.text}</p>
               </div>
               <div class="text-[1.1rem] text-muted">
-                <b class="block font-display text-[clamp(2.5rem,5vw,4.5rem)] font-bold leading-none tracking-[-0.04em] text-lime">{c.kpi}</b>
+                <b class="block font-display text-[clamp(2.5rem,5vw,4.5rem)] font-bold leading-none tracking-[-0.04em] text-secondary">{c.kpi}</b>
                 {c.kpiText}
               </div>
             </div>
@@ -43,17 +43,17 @@ const cases = [
 <style>
   .v1 {
     background:
-      radial-gradient(circle at 30% 30%, var(--color-iris), transparent 55%),
-      radial-gradient(circle at 75% 70%, var(--color-rose), transparent 55%), #120b25;
+      radial-gradient(circle at 30% 30%, var(--color-primary), transparent 55%),
+      radial-gradient(circle at 75% 70%, var(--color-sky), transparent 55%), #0a1228;
   }
   .v2 {
     background:
-      radial-gradient(circle at 70% 30%, var(--color-lime), transparent 50%),
-      radial-gradient(circle at 25% 75%, #1f8a5b, transparent 55%), #08150e;
+      radial-gradient(circle at 70% 30%, var(--color-secondary), transparent 50%),
+      radial-gradient(circle at 25% 75%, #5f8f2a, transparent 55%), #0d1706;
   }
   .v3 {
     background:
-      radial-gradient(circle at 50% 40%, var(--color-rose), transparent 55%),
-      radial-gradient(circle at 20% 80%, #ff9a3b, transparent 50%), #200b17;
+      radial-gradient(circle at 50% 40%, var(--color-sky), transparent 55%),
+      radial-gradient(circle at 20% 80%, var(--color-secondary), transparent 50%), #0a1633;
   }
 </style>

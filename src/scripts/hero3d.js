@@ -36,8 +36,8 @@ export function initHero3D() {
   /* ================= Utilidades ================= */
   const mix3 = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t];
   const g = () => (Math.random() + Math.random() + Math.random() - 1.5) / 1.5;
-  const PURPLE = [0.42, 0.3, 1.0], LILAC = [0.62, 0.45, 1.0], BLUE = [0.3, 0.55, 1.0];
-  const WHITE = [0.95, 0.9, 1.0], CYAN = [0.45, 0.82, 1.0], TEAL = [0.28, 1.0, 0.72], GREEN = [0.26, 0.96, 0.62];
+  const PURPLE = [0.16, 0.32, 0.8], LILAC = [0.5, 0.68, 0.98], BLUE = [0.22, 0.435, 0.87];
+  const WHITE = [0.92, 0.96, 1.0], CYAN = [0.45, 0.72, 0.97], TEAL = [0.5, 0.8, 0.6], GREEN = [0.67, 0.88, 0.33];
   const sparkle = (c, p) => (Math.random() < p ? mix3(c, [1, 1, 1], 0.65) : c);
 
   /* ================= Buffers ================= */
@@ -237,7 +237,7 @@ export function initHero3D() {
 
         // degradado por altura en pantalla (verde arriba → azul → violeta abajo)
         float hh = smoothstep(-1.0, 1.0, wp.y + 0.1);
-        vec3 purple = vec3(0.62,0.35,1.0), blue = vec3(0.25,0.55,1.0), green = vec3(0.25,1.0,0.65);
+        vec3 purple = vec3(0.16,0.32,0.8), blue = vec3(0.22,0.435,0.87), green = vec3(0.67,0.88,0.33);
         vec3 grad = mix(purple, blue, smoothstep(0.0,0.45,hh));
         grad = mix(grad, green, smoothstep(0.45,0.95,hh));
         vec3 col = mix(aC1, grad, dm);
@@ -271,14 +271,14 @@ export function initHero3D() {
   const dgr = dctx.createRadialGradient(32, 32, 0, 32, 32, 32);
   dgr.addColorStop(0, 'rgba(255,255,255,1)'); dgr.addColorStop(0.45, 'rgba(255,255,255,.85)'); dgr.addColorStop(1, 'rgba(255,255,255,0)');
   dctx.fillStyle = dgr; dctx.fillRect(0, 0, 64, 64);
-  const dust = new THREE.Points(dg, new THREE.PointsMaterial({ size: 0.06, map: new THREE.CanvasTexture(dotCanvas), color: 0x8f9bff, transparent: true, opacity: 0.6, depthWrite: false, blending: THREE.AdditiveBlending }));
+  const dust = new THREE.Points(dg, new THREE.PointsMaterial({ size: 0.06, map: new THREE.CanvasTexture(dotCanvas), color: 0x8fb0ff, transparent: true, opacity: 0.6, depthWrite: false, blending: THREE.AdditiveBlending }));
   scene.add(dust);
 
   /* ---- Orbe gris-lila que sigue al cursor ---- */
   const orbCanvas = document.createElement('canvas'); orbCanvas.width = orbCanvas.height = 128;
   const og = orbCanvas.getContext('2d');
   const grd = og.createRadialGradient(64, 64, 0, 64, 64, 64);
-  grd.addColorStop(0, 'rgba(225,220,245,.9)'); grd.addColorStop(0.5, 'rgba(180,175,225,.5)'); grd.addColorStop(1, 'rgba(150,150,220,0)');
+  grd.addColorStop(0, 'rgba(215,228,250,.9)'); grd.addColorStop(0.5, 'rgba(150,180,235,.5)'); grd.addColorStop(1, 'rgba(110,150,230,0)');
   og.fillStyle = grd; og.fillRect(0, 0, 128, 128);
   const orb = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(orbCanvas), transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0 }));
   orb.scale.setScalar(0.22);

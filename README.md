@@ -1,4 +1,4 @@
-# NOVA · Agencia de marketing digital
+# GrowLab · Agencia de marketing digital
 
 Web de una sola página hecha con **Astro 7**, **Tailwind CSS 4** y **GSAP** (ScrollTrigger) + **Lenis** (scroll suave) + **Three.js** (objeto 3D de partículas).
 
@@ -19,8 +19,8 @@ Web de una sola página hecha con **Astro 7**, **Tailwind CSS 4** y **GSAP** (Sc
 ## Estructura
 
 ```
-nova-agencia/
-├── public/                  # archivos estáticos (favicon)
+growlabweb/
+├── public/                  # archivos estáticos (favicon y logo.png)
 ├── src/
 │   ├── components/          # Loader, Nav, Hero, Marquee, Manifesto, Services, Cases, Process, Cta, Footer
 │   ├── data/brainData.js    # mapa de densidad del cerebro 3D (silueta + surcos)
@@ -60,7 +60,7 @@ git init
 git add .
 git commit -m "Primera versión"
 git branch -M main
-git remote add origin https://github.com/TU-USUARIO/nova-agencia.git
+git remote add origin https://github.com/growlab-web/growlabweb.git
 git push -u origin main
 ```
 

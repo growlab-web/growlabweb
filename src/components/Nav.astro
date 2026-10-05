@@ -11,17 +11,14 @@ const links = [
   data-nav
   class="fixed inset-x-0 top-[17px] z-[70] mx-auto flex h-[42px] w-[min(606px,calc(100%-24px))] items-center justify-between gap-4 border border-white/10 bg-[#08080bd9] pl-[10px] pr-[6px] backdrop-blur-md"
 >
-  <a href="#top" class="flex items-center gap-[10px] font-display text-[.95rem] font-light">
-    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true">
-      <path d="M12 2v20M2 12h20M4.9 4.9l14.2 14.2M19.1 4.9L4.9 19.1"></path>
-    </svg>
-    Nova
+  <a href="#top" aria-label="GrowLab, ir al inicio" class="flex items-center">
+    <img src="/logo.png" alt="GrowLab" width="815" height="170" class="h-[27px] w-auto" />
   </a>
 
   <nav class="hidden gap-7 font-display text-[.92rem] font-light sm:flex" aria-label="Principal">
     {
       links.map((l) => (
-        <a href={l.href} class="opacity-90 transition hover:text-lime hover:opacity-100">
+        <a href={l.href} class="opacity-90 transition hover:text-secondary hover:opacity-100">
           {l.label}
         </a>
       ))

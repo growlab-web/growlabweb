@@ -2,7 +2,7 @@
  * Lluvia de líneas diagonales para la pantalla de carga (canvas 2D).
  * Devuelve { setIntensity(v), stop() }.
  */
-const PALETTE = ['255,255,255', '255,255,255', '125,232,255', '150,120,255', '110,240,190'];
+const PALETTE = ['255,255,255', '255,255,255', '140,180,255', '56,111,222', '171,225,85'];
 
 export function startRain(canvas) {
   const ctx = canvas.getContext('2d');
