@@ -27,9 +27,11 @@ gsap.ticker.lagSmoothing(0);
 lenis.stop();
 
 // enlaces internos con ancla (#algo) dentro de la misma página
-$$('a[href^="#"]').forEach((a) => {
+$$('a[href^="#"], a[href^="/#"]').forEach((a) => {
   a.addEventListener('click', (e) => {
-    const id = a.getAttribute('href');
+    const raw = a.getAttribute('href');
+    if (raw.startsWith('/#') && location.pathname !== '/') return;      // desde otra página: navega al inicio y allí se desplaza
+    const id = raw.startsWith('/#') ? raw.slice(1) : raw;
     const target = id && id.length > 1 ? $(id) : document.body;
     if (!target) return;
     e.preventDefault();
@@ -102,6 +104,17 @@ function initTypewriter() {
   });
 }
 
+/* ---------- Si la URL trae #ancla (p. ej. /#servicios), baja hasta esa sección cuando todo está medido ---------- */
+function scrollToHash() {
+  const id = location.hash;
+  if (!id || id.length < 2) return;
+  const target = $(id);
+  if (!target) return;
+  // las posiciones cambian mientras terminan de medirse los pines y las fuentes: se corrige hasta quedar justo en la sección
+  const go = () => { ScrollTrigger.refresh(); lenis.scrollTo(target, { immediate: true, force: true }); };
+  [300, 1100, 2200].forEach((ms) => setTimeout(() => { if (Math.abs(target.getBoundingClientRect().top) > 4) go(); }, ms));
+}
+
 /* ---------- Página ---------- */
 function initPage() {
   lenis.start();
@@ -111,15 +124,12 @@ function initPage() {
   if (hasHero) {
     // entrada del hero: el texto sale del desenfoque
     gsap.from('[data-line]', { autoAlpha: 0, y: 26, filter: 'blur(14px)', duration: 1.3, stagger: 0.14, ease: 'power3.out' });
-    gsap.from('[data-foot], [data-actions]', { autoAlpha: 0, y: 20, filter: 'blur(8px)', duration: 1.1, stagger: 0.12, delay: 0.35, ease: 'power3.out' });
+    gsap.from('[data-foot], [data-actions] > *, [data-logos] > *', { autoAlpha: 0, y: 20, filter: 'blur(8px)', duration: 1.1, stagger: 0.12, delay: 0.35, ease: 'power3.out' });
     hero3d.start(reduceMotion);
     initTypewriter();
   }
 
-  if (reduceMotion) return;
-
-  /* Barra de progreso de scroll */
-  gsap.to('[data-progress]', { scaleX: 1, ease: 'none', scrollTrigger: { start: 0, end: 'max', scrub: 0.3 } });
+  if (reduceMotion) { scrollToHash(); return; }
 
   /* MARQUEE: se mueve según el scroll, en direcciones opuestas */
   if ($('[data-marquee]')) {
@@ -220,4 +230,5 @@ function initPage() {
   });
 
   ScrollTrigger.refresh();
+  scrollToHash();
 }

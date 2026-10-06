@@ -4,7 +4,7 @@ import Icon from './Icon.astro';
 ---
 
 <!-- Scroll horizontal con pin (GSAP ScrollTrigger) -->
-<section data-services class="relative">
+<section id="servicios" data-services class="relative">
   <div class="flex h-screen flex-col justify-center gap-12 overflow-hidden" data-services-pin>
     <div data-services-head class="px-(--pad)">
       <p class="eyebrow">Qué hacemos</p>
@@ -16,7 +16,7 @@ import Icon from './Icon.astro';
     <div data-services-track class="flex w-max gap-8 px-(--pad) will-change-transform">
       {
         services.map((s) => (
-          <a href={`/servicios/${s.slug}`} class="card group relative flex h-[clamp(340px,48vh,460px)] w-[clamp(280px,32vw,440px)] flex-col gap-4 overflow-hidden rounded-[28px] border border-white/10 bg-panel p-8 transition-colors duration-300 hover:border-secondary">
+          <article class="card group relative flex h-[clamp(340px,48vh,460px)] w-[clamp(280px,32vw,440px)] flex-col gap-4 overflow-hidden rounded-[28px] border border-white/10 bg-panel p-8 transition-colors duration-300 hover:border-secondary">
             <span class="font-display text-[.9rem] font-medium text-secondary">{s.n}</span>
             <h3 class="font-accent text-[1.3rem] font-bold leading-[1.15] tracking-[-0.01em]">{s.name}</h3>
             <p class="max-w-[30ch] text-muted">{s.short}</p>
@@ -28,7 +28,7 @@ import Icon from './Icon.astro';
               <i />
               <i />
             </div>
-          </a>
+          </article>
         ))
       }
     </div>

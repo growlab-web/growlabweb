@@ -1,0 +1,27 @@
+---
+// Logos de las plataformas con las que trabajamos (iconos de simple-icons, licencia CC0).
+import { siShopify, siMeta, siGoogleads, siGoogleanalytics } from 'simple-icons';
+
+const partners = [
+  { icon: siShopify, name: 'Shopify' },
+  { icon: siMeta, name: 'Meta' },
+  { icon: siGoogleads, name: 'Google Ads' },
+  { icon: siGoogleanalytics, name: 'GA4' },
+];
+---
+
+<div
+  data-logos
+  class="pointer-events-none absolute right-(--gx) top-[77.7%] z-[2] flex -translate-y-full items-center gap-x-5 gap-y-2 pb-5 max-lg:hidden"
+>
+  {
+    partners.map((p) => (
+      <span class="flex items-center gap-2 text-white/80">
+        <svg viewBox="0 0 24 24" class="h-[22px] w-[22px] fill-current" role="img" aria-label={p.name}>
+          <path d={p.icon.path} />
+        </svg>
+        <span class="font-ui text-[.85rem]">{p.name}</span>
+      </span>
+    ))
+  }
+</div>

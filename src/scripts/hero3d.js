@@ -301,6 +301,7 @@ export function initHero3D() {
 
   /* ---- Tamaño ---- */
   const base = { scale: 0.82 };
+  const HOME_X = 0.3;                                              // el titular grande ocupa la izquierda: la esfera del inicio se corre un poco a la derecha
   const pinned = hero.hasAttribute('data-pin');                       // inicio: secuencia completa con scroll
   const SHAPES = { sphere: 0, galaxy: 1, brain: 2 };                // páginas interiores: una forma fija
   const state = { scale: 1, morph: pinned ? 0 : serviceShape ? 1 : (SHAPES[hero.dataset.shape] ?? 0) };
@@ -310,7 +311,7 @@ export function initHero3D() {
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
     const mobile = isMobile();
-    group.position.x = pinned || mobile ? 0 : serviceShape ? 1.55 : 1.8;   // en las páginas interiores el objeto queda a la derecha del texto
+    group.position.x = mobile ? 0 : pinned ? HOME_X : serviceShape ? 1.55 : 1.8;   // en las páginas interiores el objeto queda a la derecha del texto
     group.position.y = mobile ? -0.2 : -0.15;
     base.scale = mobile ? 0.55 : pinned ? 0.82 : serviceShape ? 0.68 : hero.dataset.shape === 'galaxy' ? 0.46 : 0.7;
     group.scale.setScalar(base.scale * state.scale);
@@ -387,7 +388,7 @@ export function initHero3D() {
 
     // Secuencia de scroll con el hero fijo: casi-esfera → galaxia → cerebro
     const A = '[data-aurora="a"]', B = '[data-aurora="b"]', C = '[data-aurora="c"]';
-    const p1 = ['[data-hero-title]', '[data-foot-wrap]', '[data-actions]'];
+    const p1 = ['[data-hero-title]', '[data-foot-wrap]', '[data-actions]', '[data-logos]'];
     const hide = { autoAlpha: 0, y: -40, duration: 0.7, ease: 'power2.in' };
     const show = { autoAlpha: 1, y: 0, duration: 0.8, ease: 'power2.out' };
     const E = 'power1.inOut';
@@ -399,7 +400,9 @@ export function initHero3D() {
         snap: { snapTo: 'labelsDirectional', duration: { min: 0.15, max: 0.5 }, delay: 0.05, ease: 'power1.inOut' },
       },
     });
+    const homeX = isMobile() ? 0 : HOME_X;
     tl.to(state, { morph: 1, duration: 1.7, ease: E }, 0.6)                                   // → galaxia
+      .to(group.position, { x: 0, duration: 1.7, ease: E }, 0.6)                              // la galaxia va centrada bajo su titular
       .to(p1, hide, 0.7)
       .fromTo('[data-panel="2"]', { autoAlpha: 0, y: 40 }, show, 1.9)
       // fondo: franja teal en diagonal en la explosión, luego banda verde abajo y violeta arriba
@@ -408,6 +411,7 @@ export function initHero3D() {
       .to(B, { opacity: 0.55, yPercent: -90, scale: 1.1, duration: 1.7, ease: E }, 0.6)
       .to(C, { opacity: 0.55, duration: 1.7, ease: E }, 0.6)
       .to(state, { morph: 2, duration: 1.7, ease: E }, 3.7)                                   // → cerebro
+      .to(group.position, { x: homeX, duration: 1.7, ease: E }, 3.7)
       .to('[data-panel="2"]', hide, 3.8)
       .fromTo('[data-panel="3"]', { autoAlpha: 0, y: 40 }, show, 5.0)
       .fromTo('[data-hero-title]', { autoAlpha: 0, y: 30 }, { ...show, immediateRender: false }, 5.0)

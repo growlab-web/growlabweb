@@ -4,7 +4,7 @@ export const site = {
   email: 'hola@nova.agency', // TODO: cambiar por el correo real de GrowLab
   nav: [
     { href: '/', label: 'Inicio' },
-    { href: '/servicios', label: 'Servicios' },
+    { href: '/#servicios', label: 'Servicios' },
     { href: '/portafolio', label: 'Portafolio' },
     { href: '/nosotros', label: 'Nosotros' },
   ],

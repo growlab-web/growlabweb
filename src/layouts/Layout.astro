@@ -33,13 +33,6 @@ const { title, description } = Astro.props;
     </script>
   </head>
   <body class="overflow-x-hidden bg-black font-body text-white antialiased">
-    <!-- barra de progreso de scroll -->
-    <div
-      data-progress
-      class="fixed inset-x-0 top-0 z-[80] h-[3px] origin-left scale-x-0 bg-gradient-to-r from-secondary via-primary to-sky"
-      aria-hidden="true"
-    >
-    </div>
     <Loader />
     <slot />
     <script>

@@ -1,5 +1,6 @@
 ---
 import { services } from '../data/services.js';
+import Partners from './Partners.astro';
 const words = JSON.stringify(services.map((s) => s.name));
 const stats = [
   { n: '250+', l: 'Proyectos entregados' },
@@ -41,7 +42,7 @@ const stats = [
 
   <!-- etapa 1: titular -->
   <div data-hero-title class="pointer-events-none relative z-[2] px-(--gx) pt-24">
-    <h1 class="max-w-[min(36vw,38rem)] font-accent text-[clamp(2.2rem,3.9vw,4.7rem)] font-bold leading-[1.04] tracking-[-0.02em] max-md:max-w-none">
+    <h1 class="max-w-[min(44vw,46rem)] font-accent text-[clamp(2.5rem,4.9vw,5.9rem)] font-bold leading-[1.04] tracking-[-0.02em] max-md:max-w-none">
       <span data-line class="block">Crecimiento</span>
       <span data-line class="block">digital, medible</span>
       <span data-line class="block">y <span class="text-secondary">escalable.</span></span>
@@ -57,16 +58,16 @@ const stats = [
     </p>
   </div>
 
+  <!-- etapa 1: logos de las plataformas con las que trabajamos (sobre la línea, a la derecha) -->
+  <Partners />
+
   <!-- etapa 1: textos inferiores -->
   <div
     data-foot-wrap
     class="pointer-events-none absolute inset-x-0 top-[77.7%] z-[2] flex items-start justify-between gap-8 px-(--gx) before:absolute before:left-0 before:top-0 before:h-px before:w-[33.3%] before:bg-white/25 after:absolute after:right-0 after:top-0 after:h-px after:w-[31%] after:bg-white/25 max-md:before:w-full max-md:after:hidden"
   >
-    <p data-foot class="cap flex items-center gap-4 pt-7 tracking-[.01em]">
-      <span class="inline-flex items-center gap-2 rounded-full border border-secondary/40 bg-secondary/10 px-3 py-1.5 font-accent text-[.62rem] font-bold uppercase tracking-[.16em] text-secondary">
-        <i class="live-dot relative inline-block h-2 w-2 rounded-full bg-secondary"></i>En vivo
-      </span>
-      <span>5 marcas trabajando con nosotros</span>
+    <p data-foot class="max-w-[30em] pt-7 font-body text-[clamp(.9rem,1.1vw,1.1rem)] leading-snug text-[#eef0f4]">
+      Agencia de marketing digital especializada en ecommerce. Combinamos performance, analítica y desarrollo web para escalar tiendas Shopify de marcas en LATAM y el mundo.
     </p>
     <p data-foot class="max-w-[19.5em] pt-7 font-body text-[clamp(.75rem,.95vw,.95rem)] leading-snug text-[#eef0f4] max-md:hidden">
       Estrategia, performance y contenido que convierten tu presencia digital en clientes, afinados para sentirse vivos en cada clic.
