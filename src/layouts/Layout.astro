@@ -5,8 +5,9 @@ import Loader from '../components/Loader.astro';
 interface Props {
   title: string;
   description: string;
+  app?: boolean; // página a pantalla completa (portafolio 3D): sin scroll de documento ni Lenis
 }
-const { title, description } = Astro.props;
+const { title, description, app = false } = Astro.props;
 ---
 
 <!doctype html>
@@ -32,7 +33,7 @@ const { title, description } = Astro.props;
       try { if (sessionStorage.getItem('gl-intro') === '1') document.documentElement.classList.add('intro-seen'); } catch (e) {}
     </script>
   </head>
-  <body class="overflow-x-hidden bg-black font-body text-white antialiased">
+  <body class:list={['bg-black font-body text-white antialiased', app ? 'h-screen overflow-hidden' : 'overflow-x-hidden']} data-app={app ? '' : undefined}>
     <Loader />
     <slot />
     <script>

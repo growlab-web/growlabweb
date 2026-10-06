@@ -20,9 +20,14 @@ const $$ = (s, root = document) => Array.from(root.querySelectorAll(s));
 $$('[data-flow]').forEach((c) => initDataFlow(c));
 
 /* ---------- Scroll suave (Lenis) sincronizado con GSAP ---------- */
-const lenis = new Lenis({ lerp: 0.14, smoothWheel: !reduceMotion });
-lenis.on('scroll', ScrollTrigger.update);
-gsap.ticker.add((t) => lenis.raf(t * 1000));
+const isApp = document.body.hasAttribute('data-app');       // portafolio 3D: maneja su propia rueda/arrastre
+const lenis = isApp
+  ? { on() {}, raf() {}, stop() {}, start() {}, scrollTo() {} }
+  : new Lenis({ lerp: 0.14, smoothWheel: !reduceMotion });
+if (!isApp) {
+  lenis.on('scroll', ScrollTrigger.update);
+  gsap.ticker.add((t) => lenis.raf(t * 1000));
+}
 gsap.ticker.lagSmoothing(0);
 lenis.stop();
 
@@ -48,6 +53,16 @@ const heroReady = hasHero
       .catch((err) => console.warn('WebGL no disponible, se omite el objeto 3D.', err))
   : Promise.resolve();
 
+/* ---------- Portafolio 3D (sólo en /portafolio): también se carga mientras llueve ---------- */
+const pfEl = $('[data-portfolio]');
+let pf = { start() {} };
+const pfReady = pfEl
+  ? import('./portfolio.js')
+      .then(async (m) => { pf = await m.initPortfolio(pfEl); })
+      .catch((err) => { console.warn('No se pudo iniciar el portafolio 3D.', err); const l = $('[data-pf-loader]'); if (l) l.remove(); })
+  : Promise.resolve();
+const sceneReady = Promise.all([heroReady, pfReady]);
+
 /* ---------- Pantalla de carga con lluvia (sólo en el inicio) ---------- */
 let introSeen = false;
 try { introSeen = sessionStorage.getItem('gl-intro') === '1'; } catch (e) { /* sin sessionStorage */ }
@@ -70,7 +85,7 @@ if (loader) {
   const rain = startRain($('[data-rain]', loader), { cx: objectOnRight ? 0.7 : 0.5, cy: objectOnRight ? 0.5 : 0.54 });
   gsap.to({ v: 0 }, { v: 1, duration: 0.4, ease: 'power1.in', onUpdate() { rain.setIntensity(this.targets()[0].v); } });
   const minTime = new Promise((r) => setTimeout(r, reduceMotion ? 200 : 1100));
-  Promise.all([minTime, heroReady, fontsReady]).then(() => {
+  Promise.all([minTime, sceneReady, fontsReady]).then(() => {
     // la lluvia se encoge y viaja hacia el centro mientras la esfera se ensambla detrás
     const c = { v: 0 };
     gsap.to(c, { v: 1, duration: 1, ease: 'power2.in', onUpdate: () => rain.setConverge(c.v) });
@@ -78,7 +93,7 @@ if (loader) {
     reveal();
   });
 } else {
-  Promise.all([heroReady, fontsReady]).then(reveal);
+  Promise.all([sceneReady, fontsReady]).then(reveal);
 }
 
 /* ---------- Escritura de servicios (inicio): se teclea, se pausa, se borra y sigue con el siguiente ---------- */
@@ -120,6 +135,8 @@ function initPage() {
   lenis.start();
 
   gsap.from('[data-nav]', { yPercent: -100, opacity: 0, duration: 1, ease: 'expo.out' });
+
+  pf.start();
 
   if (hasHero) {
     // entrada del hero: el texto sale del desenfoque

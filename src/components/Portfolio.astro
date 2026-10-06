@@ -1,0 +1,84 @@
+---
+// Portafolio 3D: escena WebGL a pantalla completa + vista «Todos» + panel de proyecto. La lógica está en scripts/portfolio.js
+import { projects } from '../data/projects.js';
+interface Props { open?: string }
+const { open } = Astro.props;
+---
+
+<main data-portfolio data-open={open} class="fixed inset-0 z-[1] overflow-hidden bg-black">
+  <!-- degradados del fondo (se mueven despacio) -->
+  <div class="pf-aurora pf-aurora--a" aria-hidden="true"></div>
+  <div class="pf-aurora pf-aurora--b" aria-hidden="true"></div>
+
+  <canvas data-pf-canvas class="absolute inset-0 h-full w-full touch-none" aria-hidden="true"></canvas>
+  <div data-pf-labels class="pointer-events-none absolute inset-0 z-[2] overflow-hidden"></div>
+
+  <!-- vista «Todos» -->
+  <div data-pf-full hidden class="absolute inset-0 z-[3] grid place-items-center px-[8vw]">
+    <ul class="flex max-w-[1000px] flex-wrap items-center justify-center gap-x-3 gap-y-3 text-center font-ui text-[clamp(1.15rem,2.2vw,1.9rem)] font-normal leading-tight">
+      {
+        projects.map((p, i) => (
+          <li data-pf-full-item class="flex items-center gap-3">
+            <a href={`/portafolio/${p.slug}`} data-slug={p.slug} class="transition-opacity hover:text-secondary">{p.name}</a>
+            {i < projects.length - 1 && <span class="text-white/35" aria-hidden="true">·</span>}
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+
+  <!-- barra inferior -->
+  <div data-pf-ui class="pointer-events-none absolute inset-x-0 bottom-0 z-[4] flex items-end justify-between px-[1.8vw] pb-5 opacity-0">
+    <div class="pf-modes pointer-events-auto flex items-center gap-2">
+      <button type="button" data-pf-mode="featured" class="is-on">Destacados</button>
+      <span aria-hidden="true">/</span>
+      <button type="button" data-pf-mode="full">Todos</button>
+    </div>
+    <p class="pf-hint max-md:hidden">Arrastra o usa la rueda</p>
+    <a href="/contacto" class="pf-modes pointer-events-auto is-link">Agendar reunión</a>
+  </div>
+
+  <!-- cargador: tres rayas -->
+  <div data-pf-loader class="absolute inset-0 z-[6] grid place-items-center bg-black" aria-hidden="true">
+    <span class="pf-dashes"><i></i><i></i><i></i></span>
+  </div>
+
+  <!-- lista accesible para buscadores y lectores de pantalla -->
+  <ul class="sr-only">
+    {projects.map((p) => <li><a href={`/portafolio/${p.slug}`}>{p.name}</a>: {p.desc}</li>)}
+  </ul>
+
+  <!-- página de proyecto -->
+  <div data-pf-modal hidden role="dialog" aria-modal="true" aria-label="Proyecto" class="pf-modal">
+    <button type="button" data-pf-prev class="pf-side pf-side--l" aria-label="Proyecto anterior"><span class="sr-only" data-pf-prev-name></span></button>
+
+    <div data-pf-panel class="pf-panel">
+      <button type="button" data-pf-close class="pf-close" aria-label="Cerrar proyecto">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" /></svg>
+      </button>
+
+      <div class="pf-left">
+        <p data-pf-count data-pf-reveal class="pf-count"></p>
+        <h2 data-pf-title data-pf-reveal class="pf-title"></h2>
+        <p data-pf-desc data-pf-reveal class="pf-desc"></p>
+        <div data-pf-chips data-pf-reveal class="pf-chips"></div>
+        <div data-pf-reveal class="pf-block">
+          <p class="pf-label-s">Servicios</p>
+          <ul data-pf-services class="pf-services"></ul>
+        </div>
+        <a data-pf-reveal href="/contacto" class="pf-cta">Quiero un proyecto así <b>→</b></a>
+      </div>
+
+      <div data-pf-scroll class="pf-right">
+        <div data-pf-images class="pf-images"></div>
+      </div>
+
+      <svg class="pf-ring" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+        <circle cx="12" cy="12" r="9" fill="none" stroke="rgba(0,0,0,.15)" stroke-width="2" />
+        <circle data-pf-ring cx="12" cy="12" r="9" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-dasharray="56.55" stroke-dashoffset="56.55" transform="rotate(-90 12 12)" />
+      </svg>
+    </div>
+
+    <button type="button" data-pf-next class="pf-side pf-side--r" aria-label="Proyecto siguiente"><span class="sr-only" data-pf-next-name></span></button>
+  </div>
+</main>
