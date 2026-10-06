@@ -60,14 +60,14 @@ export async function initPortfolio(root) {
       float a = p.x / uBend;
       p.x = uBend * sin(a);
       p.z += uBend * (1.0 - cos(a));
-      // UN SOLO EFECTO para toda la tira: el proyecto del frente sale hacia adelante y arrastra a sus vecinos
-      // (una protuberancia suave y continua; la tira entera se curva alrededor, sin ondas por panel)
+      // UNA SOLA HOJA: una esfera invisible, fija en el centro de la pantalla, empuja la tela hacia adelante.
+      // Los paneles que pasan por el medio se abomban y los de la derecha quedan más al fondo (efecto bandera).
       vec4 wp = modelMatrix * vec4(p, 1.0);
       float xl = wp.x - uLean;
-      float bump = exp(-(xl * xl) / 9.0);
-      wp.z += uFlag * 0.8 * bump;
-      slope += -uFlag * 0.8 * bump * 2.0 * xl / 9.0 * 0.9;   // pendiente → luz y sombra en los flancos
-      vShade = slope;
+      float yl = wp.y + 0.1;
+      float push = (1.15 + uFlag * 0.55) * exp(-(xl * xl) / 5.5 - (yl * yl) / 3.2);
+      wp.z += push - 0.1 * wp.x;
+      vShade = (-2.0 * xl / 5.5) * push * 0.55;
       gl_Position = projectionMatrix * viewMatrix * wp;
     }`;
   const cardFrag = `
@@ -288,14 +288,11 @@ export async function initPortfolio(root) {
       // posición sobre el cilindro (el centro del cilindro queda delante del panel central)
       const th = d * DTH * (1 + (1 - e) * 0.18);
       m.position.set(RC * Math.sin(th), Math.sin(time * 0.6 + i) * 0.04 - (1 - e) * 0.9, RC * (1 - Math.cos(th)) - (1 - e) * 4.5);
-      m.rotation.y = -th + S.mx * 0.09 * c.hover;
-      m.rotation.x = -S.my * 0.1 * c.hover;
-      m.scale.setScalar(1 + focus * 0.045 + c.hover * 0.02);
+      m.rotation.y = -th;
+      m.scale.setScalar(1 + focus * 0.045);
       const fade = 1 - clamp((ad - 2.4) / 2.2, 0, 1);
-      c.mat.uniforms.uBright.value = (0.28 + 0.72 * Math.pow(focus, 0.6)) * (1 - S.dim * 0.65) * (1 + c.hover * 0.1);
+      c.mat.uniforms.uBright.value = (0.28 + 0.72 * Math.pow(focus, 0.6)) * (1 - S.dim * 0.65);
       c.mat.uniforms.uOpacity.value = e * fade * S.mode;
-      c.mat.uniforms.uHover.value = c.hover;
-      c.mat.uniforms.uBend.value = BEND_R / (1 + c.hover * 0.45);
       c.mat.uniforms.uTime.value = time;
       c.mat.uniforms.uFlag.value = S.flag;
       c.mat.uniforms.uPhase.value = S.phase;
@@ -308,8 +305,8 @@ export async function initPortfolio(root) {
       const place = (el, lx, ly, off) => {
         const lz = BEND_R * (1 - Math.cos(lx / BEND_R));
         v3.set(Math.sin(lx / BEND_R) * BEND_R, ly, lz).applyMatrix4(m.matrixWorld);
-        const xl = v3.x - S.lean;
-        v3.z += S.flag * 0.8 * Math.exp(-(xl * xl) / 9);
+        const xl = v3.x - S.lean, yl = v3.y + 0.1;
+        v3.z += (1.15 + S.flag * 0.55) * Math.exp(-(xl * xl) / 5.5 - (yl * yl) / 3.2) - 0.1 * v3.x;
         const sc = clamp((camZ / camera.position.distanceTo(v3)) * m.scale.x, 0.4, 1.35);
         v3.project(camera);
         const x = (v3.x * 0.5 + 0.5) * width, y = (-v3.y * 0.5 + 0.5) * height;
