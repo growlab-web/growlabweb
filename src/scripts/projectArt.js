@@ -19,11 +19,11 @@ function wrap(ctx, text, x, y, maxW, lh) {
 }
 const hexA = (hex, a) => { const n = parseInt(hex.slice(1), 16); return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${a})`; };
 
-function nav(ctx, w, p, s) {
+function nav(ctx, w, p, s, h = 0) {
   ctx.fillStyle = p.palette.fg; ctx.font = `700 ${22 * s}px ${DISPLAY}`; ctx.textBaseline = 'middle';
   ctx.fillText(p.name, 44 * s, 52 * s);
   ctx.font = `500 ${13 * s}px ${SANS}`; ctx.globalAlpha = 0.7;
-  ['Tienda', 'Colecciones', 'Nosotros', 'Contacto'].forEach((t, i) => ctx.fillText(t, w - (420 - i * 100) * s, 52 * s));
+  if (!h || w >= h) ['Tienda', 'Colecciones', 'Nosotros', 'Contacto'].forEach((t, i) => ctx.fillText(t, w - (420 - i * 100) * s, 52 * s));
   ctx.globalAlpha = 1;
   ctx.fillStyle = p.palette.accent; rr(ctx, w - 118 * s, 36 * s, 74 * s, 32 * s, 16 * s); ctx.fill();
 }
@@ -36,7 +36,7 @@ function drawHero(ctx, w, h, p) {
   ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
   ctx.strokeStyle = hexA(fg, 0.25); ctx.lineWidth = 2 * s;
   for (let i = 1; i < 4; i++) { ctx.beginPath(); ctx.arc(w * 0.72, h * 0.55, w * 0.1 * i, 0, Math.PI * 2); ctx.stroke(); }
-  nav(ctx, w, p, s);
+  nav(ctx, w, p, s, h);
   ctx.fillStyle = fg; ctx.textBaseline = 'alphabetic';
   ctx.font = `800 ${76 * s}px ${DISPLAY}`;
   const words = p.name.split(' ');
@@ -50,19 +50,20 @@ function drawHero(ctx, w, h, p) {
 }
 
 function drawCatalog(ctx, w, h, p) {
-  const s = w / 1200, { bg, fg, accent } = p.palette;
+  const s = w / 1200, { bg, fg, accent } = p.palette, portrait = h > w;
   ctx.fillStyle = bg; ctx.fillRect(0, 0, w, h);
-  nav(ctx, w, p, s);
+  nav(ctx, w, p, s, h);
   ctx.fillStyle = fg; ctx.font = `700 ${40 * s}px ${DISPLAY}`; ctx.textBaseline = 'alphabetic';
   ctx.fillText('Nueva colección', 44 * s, 150 * s);
-  const cols = 4, gap = 20 * s, cw = (w - 88 * s - gap * (cols - 1)) / cols, ch = h - 250 * s;
-  for (let i = 0; i < cols; i++) {
-    const x = 44 * s + i * (cw + gap), y = 190 * s;
+  const cols = portrait ? 2 : 4, rows = portrait ? 2 : 1, gap = 20 * s;
+  const cw = (w - 88 * s - gap * (cols - 1)) / cols, top = 190 * s, ch = (h - top - 60 * s - gap * (rows - 1)) / rows;
+  for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) {
+    const i = r * cols + c, x = 44 * s + c * (cw + gap), y = top + r * (ch + gap);
     ctx.fillStyle = hexA(fg, 0.08 + (i % 2) * 0.05); rr(ctx, x, y, cw, ch * 0.74, 14 * s); ctx.fill();
     const gg = ctx.createLinearGradient(x, y, x + cw, y + ch * 0.74);
     gg.addColorStop(0, hexA(accent, 0.9 - i * 0.12)); gg.addColorStop(1, hexA(fg, 0.25));
-    ctx.fillStyle = gg; ctx.beginPath(); ctx.arc(x + cw / 2, y + ch * 0.37, cw * 0.28, 0, Math.PI * 2); ctx.fill();
-    ctx.fillStyle = fg; ctx.font = `600 ${15 * s}px ${SANS}`; ctx.fillText(['Edición 01', 'Classic', 'Studio', 'Limited'][i], x, y + ch * 0.74 + 30 * s);
+    ctx.fillStyle = gg; ctx.beginPath(); ctx.arc(x + cw / 2, y + ch * 0.37, Math.min(cw, ch) * 0.28, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = fg; ctx.font = `600 ${15 * s}px ${SANS}`; ctx.fillText(['Edición 01', 'Classic', 'Studio', 'Limited'][i % 4], x, y + ch * 0.74 + 30 * s);
     ctx.globalAlpha = 0.6; ctx.font = `400 ${14 * s}px ${SANS}`; ctx.fillText(`S/ ${(89 + i * 30)}.00`, x, y + ch * 0.74 + 54 * s); ctx.globalAlpha = 1;
   }
 }
@@ -70,7 +71,7 @@ function drawCatalog(ctx, w, h, p) {
 function drawEditorial(ctx, w, h, p) {
   const s = w / 1200, { bg, fg, accent } = p.palette;
   ctx.fillStyle = bg; ctx.fillRect(0, 0, w, h);
-  nav(ctx, w, p, s);
+  nav(ctx, w, p, s, h);
   ctx.fillStyle = hexA(accent, 0.18); rr(ctx, w * 0.62, h * 0.2, w * 0.3, h * 0.66, 200 * s); ctx.fill();
   ctx.fillStyle = hexA(accent, 0.5); ctx.beginPath(); ctx.arc(w * 0.77, h * 0.52, w * 0.09, 0, Math.PI * 2); ctx.fill();
   ctx.fillStyle = fg; ctx.textBaseline = 'alphabetic';
@@ -95,7 +96,12 @@ function drawStats(ctx, w, h, p) {
   // mini gráfico
   ctx.strokeStyle = accent; ctx.lineWidth = 5 * s; ctx.lineJoin = 'round'; ctx.beginPath();
   const pts = [0.9, 0.82, 0.86, 0.7, 0.62, 0.55, 0.38, 0.3, 0.16];
-  pts.forEach((v, i) => { const x = w * 0.52 + (i / 8) * w * 0.4, y = h * (0.2 + v * 0.55); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); });
+  const portrait = h > w;
+  pts.forEach((v, i) => {
+    const x = portrait ? w * 0.1 + (i / 8) * w * 0.8 : w * 0.52 + (i / 8) * w * 0.4;
+    const y = portrait ? h * (0.7 + v * 0.22) : h * (0.2 + v * 0.55);
+    i ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
+  });
   ctx.stroke();
 }
 
@@ -103,8 +109,8 @@ function drawMobile(ctx, w, h, p) {
   const s = w / 1200, { bg, fg, accent } = p.palette;
   ctx.fillStyle = hexA(fg, 0.07); ctx.fillRect(0, 0, w, h);
   ctx.fillStyle = bg; ctx.fillRect(0, 0, w, h); ctx.fillStyle = hexA(fg, 0.06); ctx.fillRect(0, 0, w, h);
-  const pw = w * 0.22, ph = h * 0.86;
-  [0.14, 0.39, 0.64].forEach((fx, i) => {
+  const pw = w >= h ? w * 0.22 : w * 0.28, ph = w >= h ? h * 0.86 : h * 0.6;
+  (w >= h ? [0.14, 0.39, 0.64] : [0.06, 0.36, 0.66]).forEach((fx, i) => {
     const x = w * fx, y = h * 0.07 + (i === 1 ? -12 * s : 14 * s);
     ctx.fillStyle = bg; rr(ctx, x, y, pw, ph, 26 * s); ctx.fill();
     ctx.strokeStyle = hexA(fg, 0.35); ctx.lineWidth = 2 * s; ctx.stroke();

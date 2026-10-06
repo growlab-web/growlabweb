@@ -11,11 +11,12 @@ import { projects, getProject } from '../data/projects.js';
 import { makeArt, projectImageKinds } from './projectArt.js';
 
 const N = projects.length;
-const CARD_W = 3.6, CARD_H = 2.25, GAP = 0.2;
+let CARD_W = 3.6, CARD_H = 2.25;                  // en móvil se cambian a un formato vertical (ver initPortfolio)
+const GAP = 0.2;
 const RC = 10;                       // radio del cilindro: los paneles forman una tira continua y curva
 const BEND_R = RC;                   // cada panel se curva con el mismo radio, así encajan sin huecos
-const SPACING = CARD_W + GAP;        // separación entre centros (sobre el arco)
-const DTH = SPACING / RC;            // ángulo entre un panel y el siguiente
+let SPACING = CARD_W + GAP;          // separación entre centros (sobre el arco)
+let DTH = SPACING / RC;              // ángulo entre un panel y el siguiente
 const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
 const mod = (v, n) => ((v % n) + n) % n;
 // diferencia con signo más corta entre dos posiciones de la tira circular (-N/2 … N/2): el último proyecto queda junto al primero
@@ -24,6 +25,9 @@ const $ = (s, r) => r.querySelector(s);
 const $$ = (s, r) => Array.from(r.querySelectorAll(s));
 
 export async function initPortfolio(root) {
+  // móvil (< 700 px): paneles verticales, más grandes en pantalla
+  const PORTRAIT = window.innerWidth < 700;
+  if (PORTRAIT) { CARD_W = 2.4; CARD_H = 3.0; SPACING = CARD_W + GAP; DTH = SPACING / RC; }
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const canvas = $('[data-pf-canvas]', root);
   const labelsEl = $('[data-pf-labels]', root);
@@ -88,7 +92,7 @@ export async function initPortfolio(root) {
   const geo = new THREE.PlaneGeometry(CARD_W, CARD_H, 56, 28);
   const maxAniso = renderer.capabilities.getMaxAnisotropy();
   const cards = projects.map((p, i) => {
-    const tex = new THREE.CanvasTexture(makeArt(p, 'cover', 1280, 800));
+    const tex = new THREE.CanvasTexture(PORTRAIT ? makeArt(p, 'cover', 960, 1200) : makeArt(p, 'cover', 1280, 800));
     tex.anisotropy = maxAniso;
     const mat = new THREE.ShaderMaterial({
       transparent: true, depthWrite: false, vertexShader: cardVert, fragmentShader: cardFrag,
@@ -180,7 +184,7 @@ export async function initPortfolio(root) {
     renderer.setSize(width, height, false);
     const aspect = width / height;
     camera.aspect = aspect; camera.updateProjectionMatrix();
-    cam.baseZ = aspect >= 1.25 ? 8 : 8 + (1.25 - aspect) * 9;
+    cam.baseZ = aspect >= 1.25 ? 8 : PORTRAIT ? 10.6 : 8 + (1.25 - aspect) * 9;
     cam.offX = aspect >= 1.25 ? 0.3 : 0;
   }
   window.addEventListener('resize', resize);

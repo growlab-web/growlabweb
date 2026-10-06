@@ -27,6 +27,7 @@ export function initHero3D() {
   const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 50);
   camera.position.z = 5;
 
+  const clamp01 = (v) => Math.min(1, Math.max(0, v));
   const isMobile = () => window.innerWidth < 800;
   const MOB = isMobile();
   const COUNT = MOB ? 40000 : 90000;     // la casi-esfera usa todas
@@ -304,16 +305,24 @@ export function initHero3D() {
   const HOME_X = 0.3;                                              // el titular grande ocupa la izquierda: la esfera del inicio se corre un poco a la derecha
   const pinned = hero.hasAttribute('data-pin');                       // inicio: secuencia completa con scroll
   const SHAPES = { sphere: 0, galaxy: 1, brain: 2 };                // páginas interiores: una forma fija
+  const galaxyK = () => (window.innerWidth < 520 ? 0.62 : window.innerWidth < 1000 ? 0.78 : 1);
   const state = { scale: 1, morph: pinned ? 0 : serviceShape ? 1 : (SHAPES[hero.dataset.shape] ?? 0) };
   function resize() {
     const w = hero.clientWidth, h = hero.clientHeight;
     renderer.setSize(w, h, false);
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
-    const mobile = isMobile();
-    group.position.x = mobile ? 0 : pinned ? HOME_X : serviceShape ? 1.55 : 1.8;   // en las páginas interiores el objeto queda a la derecha del texto
-    group.position.y = mobile ? -0.2 : -0.15;
-    base.scale = mobile ? 0.55 : pinned ? 0.82 : serviceShape ? 0.68 : hero.dataset.shape === 'galaxy' ? 0.46 : 0.7;
+    const W = window.innerWidth, phone = W < 520, narrow = W < 1000;     // narrow: móvil y tableta → el objeto va bajo el texto
+    const shape = hero.dataset.shape;
+    if (pinned) {                                                          // inicio
+      group.position.x = narrow ? 0 : W < 1400 ? 0.62 : HOME_X;
+      group.position.y = phone ? -0.42 : narrow ? -0.28 : -0.15;
+      base.scale = phone ? 0.44 : narrow ? 0.6 : W < 1400 ? 0.68 : 0.82;
+    } else {                                                               // cabeceras de páginas interiores
+      group.position.x = narrow ? 0 : serviceShape ? 1.55 : 1.8;
+      group.position.y = narrow ? (phone ? -1.05 : -0.95) : -0.15;
+      base.scale = narrow ? (phone ? 0.4 : 0.5) : serviceShape ? 0.68 : shape === 'galaxy' ? 0.46 : 0.7;
+    }
     group.scale.setScalar(base.scale * state.scale);
   }
 
@@ -342,6 +351,10 @@ export function initHero3D() {
     const t = (performance.now() - t0) / 1000;
     mat.uniforms.uTime.value = t;
     mat.uniforms.uMorph.value = state.morph;
+    {
+      const w1 = clamp01(1 - Math.abs(state.morph - 1));                    // 1 cuando la forma es la galaxia
+      group.scale.setScalar(base.scale * state.scale * (1 - (1 - galaxyK()) * w1));
+    }
 
     const px = mouse.x, py = mouse.y;
     mouse.x += (mouse.tx - mouse.x) * 0.06;
