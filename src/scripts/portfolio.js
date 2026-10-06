@@ -51,29 +51,22 @@ export async function initPortfolio(root) {
 
   /* ===================== Paneles (proyectos) ===================== */
   const cardVert = `
-    uniform float uBend, uTime, uHover, uFlag, uPhase; uniform vec2 uMouseUV;
+    uniform float uBend, uTime, uHover, uFlag, uPhase, uLean; uniform vec2 uMouseUV;
     varying vec2 vUv; varying float vShade;
     void main(){
       vUv = uv; vec3 p = position;
-      // onda circular que nace donde pasa el ratón (relieve local del panel)
-      float ar = 1.6;
-      float dm = distance(vec2(uv.x * ar, uv.y), vec2(uMouseUV.x * ar, uMouseUV.y));
-      float rip = sin(dm * 15.0 - uTime * 6.5) * exp(-dm * 2.6) * uHover;
-      p.z += rip * 0.15;
-      float slope = cos(dm * 15.0 - uTime * 6.5) * exp(-dm * 2.6) * uHover * 0.4;
+      float slope = 0.0;
       // curva del cilindro
       float a = p.x / uBend;
       p.x = uBend * sin(a);
       p.z += uBend * (1.0 - cos(a));
-      // BANDERA: una sola onda para toda la tira visible. El panel central (x≈0) no se mueve y queda al frente;
-      // los laterales ondean hacia atrás, como la tela de una bandera sujeta por el centro.
+      // UN SOLO EFECTO para toda la tira: el proyecto del frente sale hacia adelante y arrastra a sus vecinos
+      // (una protuberancia suave y continua; la tira entera se curva alrededor, sin ondas por panel)
       vec4 wp = modelMatrix * vec4(p, 1.0);
-      float env = smoothstep(0.0, 3.6, abs(wp.x));
-      float w1 = 0.5 + 0.5 * sin(wp.x * 0.85 + uPhase);
-      float w2 = 0.5 + 0.5 * sin(wp.x * 1.7 - uPhase * 1.5);
-      wp.z -= uFlag * env * (0.75 * w1 + 0.25 * w2);
-      wp.y += uFlag * 0.12 * env * sin(wp.x * 0.8 + uPhase * 1.2);
-      slope += -uFlag * env * (0.75 * 0.5 * 0.85 * cos(wp.x * 0.85 + uPhase) + 0.25 * 0.5 * 1.7 * cos(wp.x * 1.7 - uPhase * 1.5)) * 0.8;
+      float xl = wp.x - uLean;
+      float bump = exp(-(xl * xl) / 9.0);
+      wp.z += uFlag * 0.8 * bump;
+      slope += -uFlag * 0.8 * bump * 2.0 * xl / 9.0 * 0.9;   // pendiente → luz y sombra en los flancos
       vShade = slope;
       gl_Position = projectionMatrix * viewMatrix * wp;
     }`;
@@ -98,7 +91,7 @@ export async function initPortfolio(root) {
     tex.anisotropy = maxAniso;
     const mat = new THREE.ShaderMaterial({
       transparent: true, depthWrite: false, vertexShader: cardVert, fragmentShader: cardFrag,
-      uniforms: { uMap: { value: tex }, uBend: { value: BEND_R }, uBright: { value: 1 }, uOpacity: { value: 1 }, uHover: { value: 0 }, uSize: { value: new THREE.Vector2(CARD_W, CARD_H) }, uTime: { value: 0 }, uFlag: { value: 0 }, uPhase: { value: 0 }, uMouseUV: { value: new THREE.Vector2(0.5, 0.5) } },
+      uniforms: { uMap: { value: tex }, uBend: { value: BEND_R }, uBright: { value: 1 }, uOpacity: { value: 1 }, uHover: { value: 0 }, uSize: { value: new THREE.Vector2(CARD_W, CARD_H) }, uTime: { value: 0 }, uFlag: { value: 0 }, uPhase: { value: 0 }, uLean: { value: 0 }, uMouseUV: { value: new THREE.Vector2(0.5, 0.5) } },
     });
     const mesh = new THREE.Mesh(geo, mat);
     mesh.userData.i = i;
@@ -177,7 +170,7 @@ export async function initPortfolio(root) {
   });
 
   /* ===================== Estado ===================== */
-  const S = { flag: 0, flagV: 0, phase: 0, dir: 1, vel: 0, pos: 0, target: 0, intro: reduce ? 1 : 0, mode: 1, dim: 0, lastInput: 0, dragging: false, moved: 0, open: null, started: false, mx: 0, my: 0, hover: -1 };
+  const S = { flag: 0, flagV: 0, phase: 0, dir: 1, lean: 0, vel: 0, pos: 0, target: 0, intro: reduce ? 1 : 0, mode: 1, dim: 0, lastInput: 0, dragging: false, moved: 0, open: null, started: false, mx: 0, my: 0, hover: -1 };
   const introCard = projects.map(() => 0);
   let width = 1, height = 1;
 
@@ -266,6 +259,7 @@ export async function initPortfolio(root) {
     S.flag += S.flagV * dt;
     if (Math.abs(S.vel) > 0.05) S.dir += (Math.sign(S.vel) - S.dir) * Math.min(1, dt * 6);   // la onda viaja hacia donde vas
     S.phase += dt * (3.4 + Math.abs(S.vel) * 2.4) * S.dir;
+    S.lean += (S.dir * clamp(Math.abs(S.vel), 0, 2) * 0.55 - S.lean) * Math.min(1, dt * 6);
 
     const camZ = cam.baseZ + S.dim * 0.9;
     camera.position.set(cam.offX - 0.8 + S.mx * 0.35, 0.55 + S.my * 0.18, camZ);
@@ -305,6 +299,7 @@ export async function initPortfolio(root) {
       c.mat.uniforms.uTime.value = time;
       c.mat.uniforms.uFlag.value = S.flag;
       c.mat.uniforms.uPhase.value = S.phase;
+      c.mat.uniforms.uLean.value = S.lean;
       c.mat.uniforms.uMouseUV.value.copy(c.muv);
       m.renderOrder = -Math.round(ad * 10);
 
@@ -313,9 +308,8 @@ export async function initPortfolio(root) {
       const place = (el, lx, ly, off) => {
         const lz = BEND_R * (1 - Math.cos(lx / BEND_R));
         v3.set(Math.sin(lx / BEND_R) * BEND_R, ly, lz).applyMatrix4(m.matrixWorld);
-        const env = smoothstepJS(0, 3.6, Math.abs(v3.x));
-        v3.z -= S.flag * env * (0.75 * (0.5 + 0.5 * Math.sin(v3.x * 0.85 + S.phase)) + 0.25 * (0.5 + 0.5 * Math.sin(v3.x * 1.7 - S.phase * 1.5)));
-        v3.y += S.flag * 0.12 * env * Math.sin(v3.x * 0.8 + S.phase * 1.2);
+        const xl = v3.x - S.lean;
+        v3.z += S.flag * 0.8 * Math.exp(-(xl * xl) / 9);
         const sc = clamp((camZ / camera.position.distanceTo(v3)) * m.scale.x, 0.4, 1.35);
         v3.project(camera);
         const x = (v3.x * 0.5 + 0.5) * width, y = (-v3.y * 0.5 + 0.5) * height;
