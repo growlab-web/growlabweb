@@ -134,7 +134,7 @@ export async function initPortfolio(root) {
         gl_PointSize = clamp(uPR * 34.0 / max(-mv.z, 1.0), 1.8 * uPR, 9.0 * uPR);
         float depthFade = smoothstep(30.0, 7.0, -mv.z);
         vA = depthFade * (0.55 + 0.6 * smoothstep(12.0, 0.0, abs(x - 0.7)));
-        vC = mix(vec3(0.22, 0.435, 0.87), vec3(0.67, 0.88, 0.33), smoothstep(-6.0, -24.0, z) * 0.55);
+        vC = vec3(0.22, 0.435, 0.87);
       }`,
     fragmentShader: `uniform float uFade; varying float vA; varying vec3 vC;
       void main(){ float d = length(gl_PointCoord - 0.5); float a = smoothstep(0.5, 0.1, d); gl_FragColor = vec4(vC, a * vA * uFade); }`,
