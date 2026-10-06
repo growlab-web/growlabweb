@@ -13,6 +13,8 @@ import { makeArt, projectImageKinds } from './projectArt.js';
 const N = projects.length;
 let CARD_W = 3.6, CARD_H = 2.25;                  // en móvil se cambian a un formato vertical (ver initPortfolio)
 const GAP = 0.2;
+// esfera imaginaria que empuja la hoja: radios al cuadrado en x e y, empuje máximo y caída hacia el fondo de la derecha
+let SPH = { rx2: 10, ry2: 5.4, amp: 1.15, back: 0.15 };
 const RC = 10;                       // radio del cilindro: los paneles forman una tira continua y curva
 const BEND_R = RC;                   // cada panel se curva con el mismo radio, así encajan sin huecos
 let SPACING = CARD_W + GAP;          // separación entre centros (sobre el arco)
@@ -28,7 +30,7 @@ const $$ = (s, r) => Array.from(r.querySelectorAll(s));
 export async function initPortfolio(root) {
   // móvil (< 700 px): paneles verticales, más grandes en pantalla
   const PORTRAIT = window.innerWidth < 700;
-  if (PORTRAIT) { CARD_W = 2.4; CARD_H = 3.0; SPACING = CARD_W + GAP; DTH = SPACING / RC; }
+  if (PORTRAIT) { CARD_W = 2.4; CARD_H = 3.0; SPACING = CARD_W + GAP; DTH = SPACING / RC; SPH = { rx2: 4.6, ry2: 5.4, amp: 0.8, back: 0.1 }; }
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const canvas = $('[data-pf-canvas]', root);
   const labelsEl = $('[data-pf-labels]', root);
@@ -51,7 +53,7 @@ export async function initPortfolio(root) {
 
   /* ===================== Paneles (proyectos) ===================== */
   const cardVert = `
-    uniform float uBend, uTime, uHover, uFlag, uPhase, uLean; uniform vec2 uMouseUV;
+    uniform float uBend, uTime, uHover, uFlag, uPhase, uLean; uniform vec2 uMouseUV; uniform vec4 uSph;
     varying vec2 vUv; varying float vShade;
     void main(){
       vUv = uv; vec3 p = position;
@@ -60,18 +62,17 @@ export async function initPortfolio(root) {
       float a = p.x / uBend;
       p.x = uBend * sin(a);
       p.z += uBend * (1.0 - cos(a));
-      // UNA SOLA HOJA sobre una esfera imaginaria grande, fija en el centro de la pantalla.
-      // La tela sigue la superficie de la esfera: a la derecha está al fondo, sube por la curva y pasa por delante en el centro.
+      // UNA SOLA HOJA sobre una esfera imaginaria fija en el centro de la pantalla.
+      // Perfil suave (pendiente cero en el borde): la tela sigue la esfera sin quiebres ni cruces entre paneles.
       vec4 wp = modelMatrix * vec4(p, 1.0);
       float xl = wp.x - uLean;
       float yl = wp.y + 0.1;
-      float h = max(1.0 - (xl * xl) / 23.0 - (yl * yl) / 8.5, 0.0);        // radio ≈ 4,8 en x y 2,9 en y
-      float cap = sqrt(h);
-      float push = (1.9 + uFlag * 0.6) * cap;
-      float back = 0.2 * max(xl, 0.0) + 0.05 * min(xl, 0.0);              // la derecha queda cada vez más al fondo
-      wp.z += push - back;
-      float dcap = -xl / 23.0 / max(cap, 0.25);
-      vShade = dcap * (1.9 + uFlag * 0.6) * 0.5;
+      float h = clamp(1.0 - (xl * xl) / uSph.x - (yl * yl) / uSph.y, 0.0, 1.0);
+      float cap = h * h * (3.0 - 2.0 * h);                                // smoothstep: 0 en el borde, 1 en el centro
+      float amp = uSph.z + uFlag * 0.5;
+      float back = uSph.w * clamp(xl, -3.0, 6.5);                        // la derecha cae al fondo de forma continua
+      wp.z += amp * cap - back;
+      vShade = (-2.0 * xl / uSph.x) * amp * 6.0 * h * (1.0 - h) * 0.35;
       gl_Position = projectionMatrix * viewMatrix * wp;
     }`;
   const cardFrag = `
@@ -95,7 +96,7 @@ export async function initPortfolio(root) {
     tex.anisotropy = maxAniso;
     const mat = new THREE.ShaderMaterial({
       transparent: true, depthWrite: false, vertexShader: cardVert, fragmentShader: cardFrag,
-      uniforms: { uMap: { value: tex }, uBend: { value: BEND_R }, uBright: { value: 1 }, uOpacity: { value: 1 }, uHover: { value: 0 }, uSize: { value: new THREE.Vector2(CARD_W, CARD_H) }, uTime: { value: 0 }, uFlag: { value: 0 }, uPhase: { value: 0 }, uLean: { value: 0 }, uMouseUV: { value: new THREE.Vector2(0.5, 0.5) } },
+      uniforms: { uMap: { value: tex }, uBend: { value: BEND_R }, uBright: { value: 1 }, uOpacity: { value: 1 }, uHover: { value: 0 }, uSize: { value: new THREE.Vector2(CARD_W, CARD_H) }, uTime: { value: 0 }, uFlag: { value: 0 }, uPhase: { value: 0 }, uLean: { value: 0 }, uSph: { value: new THREE.Vector4(SPH.rx2, SPH.ry2, SPH.amp, SPH.back) }, uMouseUV: { value: new THREE.Vector2(0.5, 0.5) } },
     });
     const mesh = new THREE.Mesh(geo, mat);
     mesh.userData.i = i;
@@ -310,8 +311,8 @@ export async function initPortfolio(root) {
         const lz = BEND_R * (1 - Math.cos(lx / BEND_R));
         v3.set(Math.sin(lx / BEND_R) * BEND_R, ly, lz).applyMatrix4(m.matrixWorld);
         const xl = v3.x - S.lean, yl = v3.y + 0.1;
-        const cap = Math.sqrt(Math.max(1 - (xl * xl) / 23 - (yl * yl) / 8.5, 0));
-        v3.z += (1.9 + S.flag * 0.6) * cap - (0.2 * Math.max(xl, 0) + 0.05 * Math.min(xl, 0));
+        const hh = clamp(1 - (xl * xl) / SPH.rx2 - (yl * yl) / SPH.ry2, 0, 1);
+        v3.z += (SPH.amp + S.flag * 0.5) * hh * hh * (3 - 2 * hh) - SPH.back * clamp(xl, -3, 6.5);
         const sc = clamp((camZ / camera.position.distanceTo(v3)) * m.scale.x, 0.4, 1.35);
         v3.project(camera);
         const x = (v3.x * 0.5 + 0.5) * width, y = (-v3.y * 0.5 + 0.5) * height;
