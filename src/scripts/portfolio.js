@@ -60,14 +60,18 @@ export async function initPortfolio(root) {
       float a = p.x / uBend;
       p.x = uBend * sin(a);
       p.z += uBend * (1.0 - cos(a));
-      // UNA SOLA HOJA: una esfera invisible, fija en el centro de la pantalla, empuja la tela hacia adelante.
-      // Los paneles que pasan por el medio se abomban y los de la derecha quedan más al fondo (efecto bandera).
+      // UNA SOLA HOJA sobre una esfera imaginaria grande, fija en el centro de la pantalla.
+      // La tela sigue la superficie de la esfera: a la derecha está al fondo, sube por la curva y pasa por delante en el centro.
       vec4 wp = modelMatrix * vec4(p, 1.0);
       float xl = wp.x - uLean;
       float yl = wp.y + 0.1;
-      float push = (1.15 + uFlag * 0.55) * exp(-(xl * xl) / 5.5 - (yl * yl) / 3.2);
-      wp.z += push - 0.1 * wp.x;
-      vShade = (-2.0 * xl / 5.5) * push * 0.55;
+      float h = max(1.0 - (xl * xl) / 23.0 - (yl * yl) / 8.5, 0.0);        // radio ≈ 4,8 en x y 2,9 en y
+      float cap = sqrt(h);
+      float push = (1.9 + uFlag * 0.6) * cap;
+      float back = 0.2 * max(xl, 0.0) + 0.05 * min(xl, 0.0);              // la derecha queda cada vez más al fondo
+      wp.z += push - back;
+      float dcap = -xl / 23.0 / max(cap, 0.25);
+      vShade = dcap * (1.9 + uFlag * 0.6) * 0.5;
       gl_Position = projectionMatrix * viewMatrix * wp;
     }`;
   const cardFrag = `
@@ -306,7 +310,8 @@ export async function initPortfolio(root) {
         const lz = BEND_R * (1 - Math.cos(lx / BEND_R));
         v3.set(Math.sin(lx / BEND_R) * BEND_R, ly, lz).applyMatrix4(m.matrixWorld);
         const xl = v3.x - S.lean, yl = v3.y + 0.1;
-        v3.z += (1.15 + S.flag * 0.55) * Math.exp(-(xl * xl) / 5.5 - (yl * yl) / 3.2) - 0.1 * v3.x;
+        const cap = Math.sqrt(Math.max(1 - (xl * xl) / 23 - (yl * yl) / 8.5, 0));
+        v3.z += (1.9 + S.flag * 0.6) * cap - (0.2 * Math.max(xl, 0) + 0.05 * Math.min(xl, 0));
         const sc = clamp((camZ / camera.position.distanceTo(v3)) * m.scale.x, 0.4, 1.35);
         v3.project(camera);
         const x = (v3.x * 0.5 + 0.5) * width, y = (-v3.y * 0.5 + 0.5) * height;
