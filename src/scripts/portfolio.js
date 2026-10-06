@@ -39,16 +39,31 @@ export async function initPortfolio(root) {
 
   /* ===================== Paneles (proyectos) ===================== */
   const cardVert = `
-    uniform float uBend; varying vec2 vUv;
+    uniform float uBend, uTime, uWave, uSkew, uHover; uniform vec2 uMouseUV;
+    varying vec2 vUv; varying float vShade;
     void main(){
       vUv = uv; vec3 p = position;
+      // 1) bandera ondeando: la amplitud sigue a la velocidad del scroll y la onda viaja a lo largo del panel
+      float ph = uv.x * 6.5 + uv.y * 1.6 - uTime * 5.5;
+      float flag = sin(ph) * uWave * (0.45 + 0.55 * uv.x);
+      p.z += flag;
+      p.y += sin(uv.x * 4.0 - uTime * 4.2) * uWave * 0.28;
+      p.x += uSkew * (uv.y - 0.5) * 1.4;                         // el panel se inclina en el sentido del movimiento
+      float slope = cos(ph) * uWave * 2.4;
+      // 2) onda circular que nace donde pasa el ratón
+      float ar = 1.6;
+      float dm = distance(vec2(uv.x * ar, uv.y), vec2(uMouseUV.x * ar, uMouseUV.y));
+      float rip = sin(dm * 15.0 - uTime * 6.5) * exp(-dm * 2.6) * uHover;
+      p.z += rip * 0.15;
+      slope += cos(dm * 15.0 - uTime * 6.5) * exp(-dm * 2.6) * uHover * 0.4;
+      vShade = slope;
       float a = p.x / uBend;
       p.x = uBend * sin(a);
       p.z += uBend * (1.0 - cos(a));
       gl_Position = projectionMatrix * modelViewMatrix * vec4(p, 1.0);
     }`;
   const cardFrag = `
-    uniform sampler2D uMap; uniform float uBright, uOpacity, uHover; uniform vec2 uSize; varying vec2 vUv;
+    uniform sampler2D uMap; uniform float uBright, uOpacity, uHover; uniform vec2 uSize; varying vec2 vUv; varying float vShade;
     float sdBox(vec2 p, vec2 b, float r){ vec2 q = abs(p) - b + r; return length(max(q,0.0)) + min(max(q.x,q.y),0.0) - r; }
     void main(){
       vec2 p = (vUv - 0.5) * uSize;
@@ -56,23 +71,24 @@ export async function initPortfolio(root) {
       float mask = 1.0 - smoothstep(-0.012, 0.012, d);
       vec2 uv = (vUv - 0.5) * (1.0 - uHover * 0.04) + 0.5;     // zoom suave al pasar el ratón
       vec3 c = texture2D(uMap, uv).rgb * uBright;
+      c *= 1.0 + clamp(vShade, -1.0, 1.0) * 0.15;                  // luz y sombra de los pliegues de la onda
       c = mix(c, c * 0.3, smoothstep(0.32, 0.0, vUv.y) * 0.6);   // sombra inferior para la etiqueta
       c += smoothstep(-0.06, 0.0, d) * 0.1;                       // borde claro
       gl_FragColor = vec4(c, mask * uOpacity);
     }`;
-  const geo = new THREE.PlaneGeometry(CARD_W, CARD_H, 40, 1);
+  const geo = new THREE.PlaneGeometry(CARD_W, CARD_H, 56, 28);
   const maxAniso = renderer.capabilities.getMaxAnisotropy();
   const cards = projects.map((p, i) => {
     const tex = new THREE.CanvasTexture(makeArt(p, 'cover', 1280, 800));
     tex.anisotropy = maxAniso;
     const mat = new THREE.ShaderMaterial({
       transparent: true, depthWrite: false, vertexShader: cardVert, fragmentShader: cardFrag,
-      uniforms: { uMap: { value: tex }, uBend: { value: BEND_R }, uBright: { value: 1 }, uOpacity: { value: 1 }, uHover: { value: 0 }, uSize: { value: new THREE.Vector2(CARD_W, CARD_H) } },
+      uniforms: { uMap: { value: tex }, uBend: { value: BEND_R }, uBright: { value: 1 }, uOpacity: { value: 1 }, uHover: { value: 0 }, uSize: { value: new THREE.Vector2(CARD_W, CARD_H) }, uTime: { value: 0 }, uWave: { value: 0 }, uSkew: { value: 0 }, uMouseUV: { value: new THREE.Vector2(0.5, 0.5) } },
     });
     const mesh = new THREE.Mesh(geo, mat);
     mesh.userData.i = i;
     scene.add(mesh);
-    return { mesh, mat, hover: 0, p };
+    return { mesh, mat, hover: 0, p, muv: new THREE.Vector2(0.5, 0.5) };
   });
 
   /* ===================== Partículas: suelo en perspectiva + polvo ===================== */
@@ -146,7 +162,7 @@ export async function initPortfolio(root) {
   });
 
   /* ===================== Estado ===================== */
-  const S = { pos: 0, target: 0, intro: reduce ? 1 : 0, mode: 1, dim: 0, lastInput: 0, dragging: false, moved: 0, open: null, started: false, mx: 0, my: 0, hover: -1 };
+  const S = { vel: 0, pos: 0, target: 0, intro: reduce ? 1 : 0, mode: 1, dim: 0, lastInput: 0, dragging: false, moved: 0, open: null, started: false, mx: 0, my: 0, hover: -1 };
   const introCard = projects.map(() => 0);
   let width = 1, height = 1;
 
@@ -222,7 +238,9 @@ export async function initPortfolio(root) {
 
     // inercia + imán al proyecto más cercano cuando no hay entrada
     if (!S.dragging && !S.open && now - S.lastInput > 150) S.target = clamp(Math.round(S.target), 0, N - 1);
+    const prevPos = S.pos;
     S.pos += (S.target - S.pos) * Math.min(1, dt * 6.5);
+    S.vel += ((S.pos - prevPos) / Math.max(dt, 0.001) - S.vel) * Math.min(1, dt * 9);   // cartas/segundo, suavizada
 
     // cámara con ligero paralaje
     const camZ = cam.baseZ + S.dim * 0.9;
@@ -235,6 +253,7 @@ export async function initPortfolio(root) {
     const visible = cards.filter((c) => c.mesh.visible).map((c) => c.mesh);
     const hit = !S.open && S.mode > 0.5 && S.px != null ? raycaster.intersectObjects(visible)[0] : null;
     S.hover = hit ? hit.object.userData.i : -1;
+    if (hit && hit.uv) cards[S.hover].muv.lerp(hit.uv, Math.min(1, dt * 12));
     canvas.style.cursor = S.dragging ? 'grabbing' : S.hover >= 0 ? 'pointer' : 'grab';
 
     cards.forEach((c, i) => {
@@ -255,6 +274,10 @@ export async function initPortfolio(root) {
       c.mat.uniforms.uBright.value = (0.28 + 0.72 * Math.pow(focus, 0.6)) * (1 - S.dim * 0.65) * (1 + c.hover * 0.1);
       c.mat.uniforms.uOpacity.value = e * fade * S.mode;
       c.mat.uniforms.uHover.value = c.hover;
+      c.mat.uniforms.uTime.value = time;
+      c.mat.uniforms.uWave.value = clamp(Math.abs(S.vel) * 0.32, 0, 0.75) * (1 - clamp(ad * 0.12, 0, 0.5));
+      c.mat.uniforms.uSkew.value = clamp(S.vel * 0.09, -0.4, 0.4);
+      c.mat.uniforms.uMouseUV.value.copy(c.muv);
       m.renderOrder = -Math.round(ad * 10);
 
       // etiqueta + botón "+" proyectados a pantalla
