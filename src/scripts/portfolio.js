@@ -18,6 +18,7 @@ const BEND_R = RC;                   // cada panel se curva con el mismo radio, 
 let SPACING = CARD_W + GAP;          // separación entre centros (sobre el arco)
 let DTH = SPACING / RC;              // ángulo entre un panel y el siguiente
 const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+const smoothstepJS = (a, b, x) => { const t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
 const mod = (v, n) => ((v % n) + n) % n;
 // diferencia con signo más corta entre dos posiciones de la tira circular (-N/2 … N/2): el último proyecto queda junto al primero
 const wrapD = (v) => { const d = mod(v, N); return d > N / 2 ? d - N : d; };
@@ -64,14 +65,15 @@ export async function initPortfolio(root) {
       float a = p.x / uBend;
       p.x = uBend * sin(a);
       p.z += uBend * (1.0 - cos(a));
-      // BANDERA: se desplaza la posición en el MUNDO, así todos los paneles forman una sola cinta continua
+      // BANDERA: una sola onda para toda la tira visible. El panel central (x≈0) no se mueve y queda al frente;
+      // los laterales ondean hacia atrás, como la tela de una bandera sujeta por el centro.
       vec4 wp = modelMatrix * vec4(p, 1.0);
-      float k = 0.24;
-      float s1 = wp.x * k + uPhase;
-      float s2 = wp.x * 0.62 + uPhase * 1.8;
-      wp.z += -uFlag * (sin(s1) + 0.34 * sin(s2));                 // un extremo se acerca y el otro se aleja
-      wp.y +=  uFlag * 0.14 * sin(wp.x * 0.4 + uPhase * 0.9);
-      slope += -uFlag * (k * cos(s1) + 0.34 * 0.62 * cos(s2)) * 0.9; // pendiente → luz y sombra de la tela
+      float env = smoothstep(0.0, 3.6, abs(wp.x));
+      float w1 = 0.5 + 0.5 * sin(wp.x * 0.85 + uPhase);
+      float w2 = 0.5 + 0.5 * sin(wp.x * 1.7 - uPhase * 1.5);
+      wp.z -= uFlag * env * (0.75 * w1 + 0.25 * w2);
+      wp.y += uFlag * 0.12 * env * sin(wp.x * 0.8 + uPhase * 1.2);
+      slope += -uFlag * env * (0.75 * 0.5 * 0.85 * cos(wp.x * 0.85 + uPhase) + 0.25 * 0.5 * 1.7 * cos(wp.x * 1.7 - uPhase * 1.5)) * 0.8;
       vShade = slope;
       gl_Position = projectionMatrix * viewMatrix * wp;
     }`;
@@ -175,7 +177,7 @@ export async function initPortfolio(root) {
   });
 
   /* ===================== Estado ===================== */
-  const S = { flag: 0, flagV: 0, phase: 0, vel: 0, pos: 0, target: 0, intro: reduce ? 1 : 0, mode: 1, dim: 0, lastInput: 0, dragging: false, moved: 0, open: null, started: false, mx: 0, my: 0, hover: -1 };
+  const S = { flag: 0, flagV: 0, phase: 0, dir: 1, vel: 0, pos: 0, target: 0, intro: reduce ? 1 : 0, mode: 1, dim: 0, lastInput: 0, dragging: false, moved: 0, open: null, started: false, mx: 0, my: 0, hover: -1 };
   const introCard = projects.map(() => 0);
   let width = 1, height = 1;
 
@@ -259,10 +261,11 @@ export async function initPortfolio(root) {
 
     // cámara con ligero paralaje
     // amplitud de la bandera: muelle subamortiguado hacia la velocidad del scroll (impulso + rebote)
-    const flagTarget = clamp(S.vel * 0.34, -2.5, 2.5) * (S.open ? 0 : 1);
+    const flagTarget = clamp(Math.abs(S.vel) * 0.55, 0, 1.7) * (S.open ? 0 : 1);
     S.flagV += (62 * (flagTarget - S.flag) - 7.5 * S.flagV) * dt;
     S.flag += S.flagV * dt;
-    S.phase = time * 2.6 + S.pos * 0.9;
+    if (Math.abs(S.vel) > 0.05) S.dir += (Math.sign(S.vel) - S.dir) * Math.min(1, dt * 6);   // la onda viaja hacia donde vas
+    S.phase += dt * (3.4 + Math.abs(S.vel) * 2.4) * S.dir;
 
     const camZ = cam.baseZ + S.dim * 0.9;
     camera.position.set(cam.offX - 0.8 + S.mx * 0.35, 0.55 + S.my * 0.18, camZ);
@@ -310,8 +313,9 @@ export async function initPortfolio(root) {
       const place = (el, lx, ly, off) => {
         const lz = BEND_R * (1 - Math.cos(lx / BEND_R));
         v3.set(Math.sin(lx / BEND_R) * BEND_R, ly, lz).applyMatrix4(m.matrixWorld);
-        v3.z += -S.flag * (Math.sin(v3.x * 0.24 + S.phase) + 0.34 * Math.sin(v3.x * 0.62 + S.phase * 1.8));
-        v3.y += S.flag * 0.14 * Math.sin(v3.x * 0.4 + S.phase * 0.9);
+        const env = smoothstepJS(0, 3.6, Math.abs(v3.x));
+        v3.z -= S.flag * env * (0.75 * (0.5 + 0.5 * Math.sin(v3.x * 0.85 + S.phase)) + 0.25 * (0.5 + 0.5 * Math.sin(v3.x * 1.7 - S.phase * 1.5)));
+        v3.y += S.flag * 0.12 * env * Math.sin(v3.x * 0.8 + S.phase * 1.2);
         const sc = clamp((camZ / camera.position.distanceTo(v3)) * m.scale.x, 0.4, 1.35);
         v3.project(camera);
         const x = (v3.x * 0.5 + 0.5) * width, y = (-v3.y * 0.5 + 0.5) * height;
