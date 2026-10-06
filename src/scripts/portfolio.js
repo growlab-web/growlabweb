@@ -43,28 +43,30 @@ export async function initPortfolio(root) {
 
   /* ===================== Paneles (proyectos) ===================== */
   const cardVert = `
-    uniform float uBend, uTime, uWave, uSkew, uHover; uniform vec2 uMouseUV;
+    uniform float uBend, uTime, uHover, uFlag, uPhase; uniform vec2 uMouseUV;
     varying vec2 vUv; varying float vShade;
     void main(){
       vUv = uv; vec3 p = position;
-      // 1) bandera ondeando: la amplitud sigue a la velocidad del scroll y la onda viaja a lo largo del panel
-      float ph = uv.x * 6.5 + uv.y * 1.6 - uTime * 5.5;
-      float flag = sin(ph) * uWave * (0.45 + 0.55 * uv.x);
-      p.z += flag;
-      p.y += sin(uv.x * 4.0 - uTime * 4.2) * uWave * 0.28;
-      p.x += uSkew * (uv.y - 0.5) * 1.4;                         // el panel se inclina en el sentido del movimiento
-      float slope = cos(ph) * uWave * 2.4;
-      // 2) onda circular que nace donde pasa el ratón
+      // onda circular que nace donde pasa el ratón (relieve local del panel)
       float ar = 1.6;
       float dm = distance(vec2(uv.x * ar, uv.y), vec2(uMouseUV.x * ar, uMouseUV.y));
       float rip = sin(dm * 15.0 - uTime * 6.5) * exp(-dm * 2.6) * uHover;
       p.z += rip * 0.15;
-      slope += cos(dm * 15.0 - uTime * 6.5) * exp(-dm * 2.6) * uHover * 0.4;
-      vShade = slope;
+      float slope = cos(dm * 15.0 - uTime * 6.5) * exp(-dm * 2.6) * uHover * 0.4;
+      // curva del cilindro
       float a = p.x / uBend;
       p.x = uBend * sin(a);
       p.z += uBend * (1.0 - cos(a));
-      gl_Position = projectionMatrix * modelViewMatrix * vec4(p, 1.0);
+      // BANDERA: se desplaza la posición en el MUNDO, así todos los paneles forman una sola cinta continua
+      vec4 wp = modelMatrix * vec4(p, 1.0);
+      float k = 0.24;
+      float s1 = wp.x * k + uPhase;
+      float s2 = wp.x * 0.62 + uPhase * 1.8;
+      wp.z += -uFlag * (sin(s1) + 0.34 * sin(s2));                 // un extremo se acerca y el otro se aleja
+      wp.y +=  uFlag * 0.14 * sin(wp.x * 0.4 + uPhase * 0.9);
+      slope += -uFlag * (k * cos(s1) + 0.34 * 0.62 * cos(s2)) * 0.9; // pendiente → luz y sombra de la tela
+      vShade = slope;
+      gl_Position = projectionMatrix * viewMatrix * wp;
     }`;
   const cardFrag = `
     uniform sampler2D uMap; uniform float uBright, uOpacity, uHover; uniform vec2 uSize; varying vec2 vUv; varying float vShade;
@@ -87,7 +89,7 @@ export async function initPortfolio(root) {
     tex.anisotropy = maxAniso;
     const mat = new THREE.ShaderMaterial({
       transparent: true, depthWrite: false, vertexShader: cardVert, fragmentShader: cardFrag,
-      uniforms: { uMap: { value: tex }, uBend: { value: BEND_R }, uBright: { value: 1 }, uOpacity: { value: 1 }, uHover: { value: 0 }, uSize: { value: new THREE.Vector2(CARD_W, CARD_H) }, uTime: { value: 0 }, uWave: { value: 0 }, uSkew: { value: 0 }, uMouseUV: { value: new THREE.Vector2(0.5, 0.5) } },
+      uniforms: { uMap: { value: tex }, uBend: { value: BEND_R }, uBright: { value: 1 }, uOpacity: { value: 1 }, uHover: { value: 0 }, uSize: { value: new THREE.Vector2(CARD_W, CARD_H) }, uTime: { value: 0 }, uFlag: { value: 0 }, uPhase: { value: 0 }, uMouseUV: { value: new THREE.Vector2(0.5, 0.5) } },
     });
     const mesh = new THREE.Mesh(geo, mat);
     mesh.userData.i = i;
@@ -166,7 +168,7 @@ export async function initPortfolio(root) {
   });
 
   /* ===================== Estado ===================== */
-  const S = { vel: 0, pos: 0, target: 0, intro: reduce ? 1 : 0, mode: 1, dim: 0, lastInput: 0, dragging: false, moved: 0, open: null, started: false, mx: 0, my: 0, hover: -1 };
+  const S = { flag: 0, flagV: 0, phase: 0, vel: 0, pos: 0, target: 0, intro: reduce ? 1 : 0, mode: 1, dim: 0, lastInput: 0, dragging: false, moved: 0, open: null, started: false, mx: 0, my: 0, hover: -1 };
   const introCard = projects.map(() => 0);
   let width = 1, height = 1;
 
@@ -247,8 +249,14 @@ export async function initPortfolio(root) {
     S.vel += ((S.pos - prevPos) / Math.max(dt, 0.001) - S.vel) * Math.min(1, dt * 9);   // cartas/segundo, suavizada
 
     // cámara con ligero paralaje
+    // amplitud de la bandera: muelle subamortiguado hacia la velocidad del scroll (impulso + rebote)
+    const flagTarget = clamp(S.vel * 0.34, -2.5, 2.5) * (S.open ? 0 : 1);
+    S.flagV += (62 * (flagTarget - S.flag) - 7.5 * S.flagV) * dt;
+    S.flag += S.flagV * dt;
+    S.phase = time * 2.6 + S.pos * 0.9;
+
     const camZ = cam.baseZ + S.dim * 0.9;
-    camera.position.set(cam.offX + S.mx * 0.35, 0.55 + S.my * 0.18, camZ);
+    camera.position.set(cam.offX - 0.8 + S.mx * 0.35, 0.55 + S.my * 0.18, camZ);
     camera.lookAt(cam.offX, -0.08, 0);
 
     // hover
@@ -274,15 +282,17 @@ export async function initPortfolio(root) {
       // posición sobre el cilindro (el centro del cilindro queda delante del panel central)
       const th = d * DTH * (1 + (1 - e) * 0.18);
       m.position.set(RC * Math.sin(th), Math.sin(time * 0.6 + i) * 0.04 - (1 - e) * 0.9, RC * (1 - Math.cos(th)) - (1 - e) * 4.5);
-      m.rotation.y = -th;
+      m.rotation.y = -th + S.mx * 0.09 * c.hover;
+      m.rotation.x = -S.my * 0.1 * c.hover;
       m.scale.setScalar(1 + focus * 0.045 + c.hover * 0.02);
       const fade = 1 - clamp((ad - 2.4) / 2.2, 0, 1);
       c.mat.uniforms.uBright.value = (0.28 + 0.72 * Math.pow(focus, 0.6)) * (1 - S.dim * 0.65) * (1 + c.hover * 0.1);
       c.mat.uniforms.uOpacity.value = e * fade * S.mode;
       c.mat.uniforms.uHover.value = c.hover;
+      c.mat.uniforms.uBend.value = BEND_R / (1 + c.hover * 0.45);
       c.mat.uniforms.uTime.value = time;
-      c.mat.uniforms.uWave.value = clamp(Math.abs(S.vel) * 0.32, 0, 0.75) * (1 - clamp(ad * 0.12, 0, 0.5));
-      c.mat.uniforms.uSkew.value = clamp(S.vel * 0.09, -0.4, 0.4);
+      c.mat.uniforms.uFlag.value = S.flag;
+      c.mat.uniforms.uPhase.value = S.phase;
       c.mat.uniforms.uMouseUV.value.copy(c.muv);
       m.renderOrder = -Math.round(ad * 10);
 
@@ -291,6 +301,8 @@ export async function initPortfolio(root) {
       const place = (el, lx, ly, off) => {
         const lz = BEND_R * (1 - Math.cos(lx / BEND_R));
         v3.set(Math.sin(lx / BEND_R) * BEND_R, ly, lz).applyMatrix4(m.matrixWorld);
+        v3.z += -S.flag * (Math.sin(v3.x * 0.24 + S.phase) + 0.34 * Math.sin(v3.x * 0.62 + S.phase * 1.8));
+        v3.y += S.flag * 0.14 * Math.sin(v3.x * 0.4 + S.phase * 0.9);
         const sc = clamp((camZ / camera.position.distanceTo(v3)) * m.scale.x, 0.4, 1.35);
         v3.project(camera);
         const x = (v3.x * 0.5 + 0.5) * width, y = (-v3.y * 0.5 + 0.5) * height;

@@ -15,6 +15,7 @@ function wrap(ctx, text, x, y, maxW, lh) {
     if (ctx.measureText(t).width > maxW && line) { ctx.fillText(line, x, y); y += lh; line = word; } else line = t;
   }
   if (line) ctx.fillText(line, x, y);
+  return y;
 }
 const hexA = (hex, a) => { const n = parseInt(hex.slice(1), 16); return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${a})`; };
 
@@ -37,13 +38,13 @@ function drawHero(ctx, w, h, p) {
   for (let i = 1; i < 4; i++) { ctx.beginPath(); ctx.arc(w * 0.72, h * 0.55, w * 0.1 * i, 0, Math.PI * 2); ctx.stroke(); }
   nav(ctx, w, p, s);
   ctx.fillStyle = fg; ctx.textBaseline = 'alphabetic';
-  ctx.font = `800 ${88 * s}px ${DISPLAY}`;
+  ctx.font = `800 ${76 * s}px ${DISPLAY}`;
   const words = p.name.split(' ');
-  words.forEach((t, i) => ctx.fillText(t.toUpperCase(), 44 * s, (300 + i * 96) * s));
+  words.forEach((t, i) => ctx.fillText(t.toUpperCase(), 44 * s, (250 + i * 84) * s));
   ctx.font = `400 ${18 * s}px ${SANS}`; ctx.globalAlpha = 0.8;
-  wrap(ctx, p.desc.length > 84 ? p.desc.slice(0, p.desc.lastIndexOf(' ', 84)) + '…' : p.desc, 44 * s, (words.length * 96 + 330) * s, 430 * s, 26 * s);
+  const endY = wrap(ctx, p.desc.length > 84 ? p.desc.slice(0, p.desc.lastIndexOf(' ', 84)) + '…' : p.desc, 44 * s, (words.length * 84 + 290) * s, 430 * s, 26 * s);
   ctx.globalAlpha = 1;
-  const by = (words.length * 96 + 330 + 3 * 26 + 28) * s;      // el botón va bajo el texto, lejos de la etiqueta de la tarjeta
+  const by = endY + 26 * s;                                       // el botón va bajo el texto, lejos de la etiqueta de la tarjeta
   ctx.fillStyle = fg; rr(ctx, 44 * s, by, 170 * s, 50 * s, 25 * s); ctx.fill();
   ctx.fillStyle = bg; ctx.font = `600 ${15 * s}px ${SANS}`; ctx.textBaseline = 'middle'; ctx.fillText('Comprar ahora  →', 70 * s, by + 25 * s);
 }
