@@ -17,6 +17,9 @@ const BEND_R = RC;                   // cada panel se curva con el mismo radio, 
 const SPACING = CARD_W + GAP;        // separación entre centros (sobre el arco)
 const DTH = SPACING / RC;            // ángulo entre un panel y el siguiente
 const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+const mod = (v, n) => ((v % n) + n) % n;
+// diferencia con signo más corta entre dos posiciones de la tira circular (-N/2 … N/2): el último proyecto queda junto al primero
+const wrapD = (v) => { const d = mod(v, N); return d > N / 2 ? d - N : d; };
 const $ = (s, r) => r.querySelector(s);
 const $$ = (s, r) => Array.from(r.querySelectorAll(s));
 
@@ -184,7 +187,7 @@ export async function initPortfolio(root) {
   resize();
 
   /* ===================== Entrada: rueda, arrastre, teclado ===================== */
-  const touch = (dv) => { S.target = clamp(S.target + dv, -0.35, N - 1 + 0.35); S.lastInput = performance.now(); };
+  const touch = (dv) => { S.target += dv; S.lastInput = performance.now(); };
   const canNav = () => !S.open && S.mode > 0.5;
   window.addEventListener('wheel', (e) => {
     if (!canNav()) return;
@@ -204,8 +207,9 @@ export async function initPortfolio(root) {
     if (!S.dragging) return;
     S.dragging = false; canvas.classList.remove('pf-grabbing');
     if (S.moved < 6 && S.hover >= 0) {
-      if (Math.abs(S.hover - S.pos) < 0.5) openProject(projects[S.hover].slug);
-      else { S.target = S.hover; S.lastInput = performance.now(); }
+      const off = wrapD(S.hover - S.pos);
+      if (Math.abs(off) < 0.5) openProject(projects[S.hover].slug);
+      else { S.target = Math.round(S.pos + off); S.lastInput = performance.now(); }
     }
   };
   canvas.addEventListener('pointerup', endDrag);
@@ -220,15 +224,16 @@ export async function initPortfolio(root) {
       return;
     }
     if (S.mode < 0.5) return;
-    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { S.target = clamp(Math.round(S.target) + 1, 0, N - 1); S.lastInput = performance.now(); }
-    else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { S.target = clamp(Math.round(S.target) - 1, 0, N - 1); S.lastInput = performance.now(); }
-    else if (e.key === 'Enter') openProject(projects[clamp(Math.round(S.pos), 0, N - 1)].slug);
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { S.target = Math.round(S.target) + 1; S.lastInput = performance.now(); }
+    else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { S.target = Math.round(S.target) - 1; S.lastInput = performance.now(); }
+    else if (e.key === 'Enter') openProject(projects[mod(Math.round(S.pos), N)].slug);
   });
 
   labelsEl.addEventListener('click', (e) => {
     const b = e.target.closest('button'); if (!b) return;
     const i = Number(b.dataset.i);
-    if (Math.abs(i - S.pos) < 0.6) openProject(projects[i].slug); else { S.target = i; S.lastInput = performance.now(); }
+    const off = wrapD(i - S.pos);
+    if (Math.abs(off) < 0.6) openProject(projects[i].slug); else { S.target = Math.round(S.pos + off); S.lastInput = performance.now(); }
   });
 
   /* ===================== Bucle de render ===================== */
@@ -243,7 +248,7 @@ export async function initPortfolio(root) {
     const dt = Math.min((now - last) / 1000, 0.05); last = now; time += dt;
 
     // inercia + imán al proyecto más cercano cuando no hay entrada
-    if (!S.dragging && !S.open && now - S.lastInput > 150) S.target = clamp(Math.round(S.target), 0, N - 1);
+    if (!S.dragging && !S.open && now - S.lastInput > 150) S.target = Math.round(S.target);
     const prevPos = S.pos;
     S.pos += (S.target - S.pos) * Math.min(1, dt * 6.5);
     S.vel += ((S.pos - prevPos) / Math.max(dt, 0.001) - S.vel) * Math.min(1, dt * 9);   // cartas/segundo, suavizada
@@ -269,9 +274,9 @@ export async function initPortfolio(root) {
     canvas.style.cursor = S.dragging ? 'grabbing' : S.hover >= 0 ? 'pointer' : 'grab';
 
     cards.forEach((c, i) => {
-      const d = i - S.pos, ad = Math.abs(d), focus = Math.max(0, 1 - ad);
+      const d = wrapD(i - S.pos), ad = Math.abs(d), focus = Math.max(0, 1 - ad);   // distancia con signo por el camino más corto
       // entrada escalonada desde el panel central hacia fuera
-      const t = reduce ? 1 : clamp(S.intro * 2.2 - Math.abs(i - S.target) * 0.22, 0, 1);
+      const t = reduce ? 1 : clamp(S.intro * 2.2 - Math.abs(wrapD(i - S.target)) * 0.22, 0, 1);
       const e = 1 - Math.pow(1 - t, 3);
       introCard[i] = e;
       c.hover += ((S.hover === i ? 1 : 0) - c.hover) * Math.min(1, dt * 8);
@@ -382,7 +387,7 @@ export async function initPortfolio(root) {
     const wasOpen = !!S.open;
     S.open = slug;
     document.body.classList.add('pf-open');
-    S.target = projects.indexOf(p); S.lastInput = performance.now();
+    S.target = Math.round(S.pos) + wrapD(projects.indexOf(p) - Math.round(S.pos)); S.lastInput = performance.now();
     document.title = `${p.name} · Portafolio · GrowLab`;
     if (push && location.pathname !== `/portafolio/${slug}`) { try { history.pushState({ slug }, '', `/portafolio/${slug}`); } catch (e) { /* entorno sin historial (vista previa) */ } }
     if (wasOpen) {
