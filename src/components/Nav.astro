@@ -6,7 +6,7 @@ const isActive = (href) => (href === '/' ? path === '/' : path === href || path.
 const contactActive = isActive(site.contact.href);
 ---
 
-<!-- Menú con efecto cristal (glass) -->
+<!-- Menú con efecto cristal (glass). En pantallas pequeñas los enlaces van en un desplegable. -->
 <header
   data-nav
   class="fixed inset-x-0 top-[17px] z-[70] mx-auto flex h-[46px] w-[min(740px,calc(100%-24px))] items-center justify-between gap-4 rounded-[18px] border border-white/[.18] bg-white/[.07] px-[22px] shadow-[inset_0_1px_0_rgba(255,255,255,.35),inset_0_-1px_0_rgba(255,255,255,.05),0_10px_34px_rgba(0,0,0,.4)] backdrop-blur-2xl backdrop-saturate-[1.8] before:pointer-events-none before:absolute before:inset-0 before:-z-10 before:rounded-[inherit] before:bg-gradient-to-b before:from-white/[.14] before:to-transparent"
@@ -32,14 +32,74 @@ const contactActive = isActive(site.contact.href);
     }
   </nav>
 
-  <a
-    href={site.contact.href}
-    aria-current={contactActive ? 'page' : undefined}
-    class:list={[
-      'inline-flex h-[30px] items-center gap-[.7rem] rounded-[10px] border px-3 font-display text-[.92rem] font-light transition-colors hover:bg-white hover:text-black',
-      contactActive ? 'border-secondary text-secondary' : 'border-white/60',
-    ]}
+  <div class="flex items-center gap-2">
+    <a
+      href={site.contact.href}
+      aria-current={contactActive ? 'page' : undefined}
+      class:list={[
+        'inline-flex h-[30px] items-center gap-[.7rem] rounded-[10px] border px-3 font-display text-[.92rem] font-light transition-colors hover:bg-white hover:text-black max-[480px]:hidden',
+        contactActive ? 'border-secondary text-secondary' : 'border-white/60',
+      ]}
+    >
+      {site.cta} <i class="h-[3px] w-[3px] rounded-full bg-current"></i>
+    </a>
+
+    <!-- botón del menú desplegable (móvil) -->
+    <button
+      type="button"
+      data-nav-toggle
+      aria-expanded="false"
+      aria-controls="nav-sheet"
+      aria-label="Abrir menú"
+      class="grid h-[30px] w-[30px] place-items-center rounded-[10px] border border-white/40 sm:hidden"
+    >
+      <span class="relative block h-[10px] w-[14px]">
+        <i class="absolute inset-x-0 top-0 h-[1.5px] bg-white transition-transform duration-300"></i>
+        <i class="absolute inset-x-0 bottom-0 h-[1.5px] bg-white transition-transform duration-300"></i>
+      </span>
+    </button>
+  </div>
+
+  <!-- desplegable móvil -->
+  <div
+    id="nav-sheet"
+    hidden
+    class="absolute inset-x-0 top-[calc(100%+8px)] rounded-[18px] border border-white/[.18] bg-black/70 p-3 shadow-[0_18px_40px_rgba(0,0,0,.5)] backdrop-blur-2xl sm:hidden"
   >
-    {site.cta} <i class="h-[3px] w-[3px] rounded-full bg-current"></i>
-  </a>
+    <nav class="grid gap-1 font-display text-[1rem]" aria-label="Menú móvil">
+      {
+        [...site.nav, site.contact].map((l) => (
+          <a
+            href={l.href}
+            class:list={[
+              'rounded-xl px-4 py-3 transition-colors hover:bg-white/10',
+              isActive(l.href) ? 'text-secondary' : 'text-white',
+            ]}
+          >
+            {l.label}
+          </a>
+        ))
+      }
+      <a href={site.contact.href} class="mt-1 rounded-xl bg-secondary px-4 py-3 text-center font-medium text-black">{site.cta}</a>
+    </nav>
+  </div>
 </header>
+
+<script>
+  const nav = document.querySelector('[data-nav]');
+  const btn = nav && nav.querySelector('[data-nav-toggle]');
+  const sheet = nav && nav.querySelector('#nav-sheet');
+  if (btn && sheet) {
+    const set = (open) => {
+      sheet.hidden = !open;
+      btn.setAttribute('aria-expanded', String(open));
+      btn.setAttribute('aria-label', open ? 'Cerrar menú' : 'Abrir menú');
+      const bars = btn.querySelectorAll('i');
+      bars[0].style.transform = open ? 'translateY(4.25px) rotate(45deg)' : '';
+      bars[1].style.transform = open ? 'translateY(-4.25px) rotate(-45deg)' : '';
+    };
+    btn.addEventListener('click', () => set(sheet.hidden));
+    sheet.addEventListener('click', (e) => { if (e.target.closest('a')) set(false); });
+    window.addEventListener('keydown', (e) => { if (e.key === 'Escape') set(false); });
+  }
+</script>

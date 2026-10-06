@@ -11,7 +11,11 @@ import { projects, getProject } from '../data/projects.js';
 import { makeArt, projectImageKinds } from './projectArt.js';
 
 const N = projects.length;
-const CARD_W = 3.6, CARD_H = 2.25, SPACING = 3.9, BEND_R = 6.5;
+const CARD_W = 3.6, CARD_H = 2.25, GAP = 0.2;
+const RC = 10;                       // radio del cilindro: los paneles forman una tira continua y curva
+const BEND_R = RC;                   // cada panel se curva con el mismo radio, así encajan sin huecos
+const SPACING = CARD_W + GAP;        // separación entre centros (sobre el arco)
+const DTH = SPACING / RC;            // ángulo entre un panel y el siguiente
 const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
 const $ = (s, r) => r.querySelector(s);
 const $$ = (s, r) => Array.from(r.querySelectorAll(s));
@@ -30,7 +34,7 @@ export async function initPortfolio(root) {
   renderer.setClearColor(0x000000, 0);
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 80);
-  const cam = { baseZ: 8, offX: 0.7 };
+  const cam = { baseZ: 8, offX: 0.3 };
 
   /* ===================== Fuentes (para dibujar las imágenes) ===================== */
   try {
@@ -172,7 +176,7 @@ export async function initPortfolio(root) {
     const aspect = width / height;
     camera.aspect = aspect; camera.updateProjectionMatrix();
     cam.baseZ = aspect >= 1.25 ? 8 : 8 + (1.25 - aspect) * 9;
-    cam.offX = aspect >= 1.25 ? 0.7 : 0;
+    cam.offX = aspect >= 1.25 ? 0.3 : 0;
   }
   window.addEventListener('resize', resize);
   resize();
@@ -265,11 +269,13 @@ export async function initPortfolio(root) {
       c.hover += ((S.hover === i ? 1 : 0) - c.hover) * Math.min(1, dt * 8);
 
       const m = c.mesh;
-      m.visible = ad < 4.6 && e > 0.001 && S.mode > 0.01;
+      m.visible = ad < 3.4 && e > 0.001 && S.mode > 0.01;
       if (!m.visible) { tags[i].label.style.opacity = 0; tags[i].plus.style.opacity = 0; tags[i].label.style.pointerEvents = tags[i].plus.style.pointerEvents = 'none'; return; }
-      m.position.set(d * SPACING * (1 + (1 - e) * 0.25), Math.sin(time * 0.6 + i) * 0.05 - (1 - e) * 0.9, -ad * 1.5 - (1 - e) * 4.5);
-      m.rotation.y = clamp(-d * 0.46, -0.85, 0.85);
-      m.scale.setScalar(1 + focus * 0.13 + c.hover * 0.025);
+      // posición sobre el cilindro (el centro del cilindro queda delante del panel central)
+      const th = d * DTH * (1 + (1 - e) * 0.18);
+      m.position.set(RC * Math.sin(th), Math.sin(time * 0.6 + i) * 0.04 - (1 - e) * 0.9, RC * (1 - Math.cos(th)) - (1 - e) * 4.5);
+      m.rotation.y = -th;
+      m.scale.setScalar(1 + focus * 0.045 + c.hover * 0.02);
       const fade = 1 - clamp((ad - 2.4) / 2.2, 0, 1);
       c.mat.uniforms.uBright.value = (0.28 + 0.72 * Math.pow(focus, 0.6)) * (1 - S.dim * 0.65) * (1 + c.hover * 0.1);
       c.mat.uniforms.uOpacity.value = e * fade * S.mode;
