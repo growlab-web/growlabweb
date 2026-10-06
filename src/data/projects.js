@@ -4,17 +4,18 @@
  * ⚠ PROYECTOS DE EJEMPLO. Los nombres, textos, años y resultados son inventados para mostrar el diseño.
  *   Hay que reemplazarlos por los casos reales de GrowLab.
  *
- * Imágenes: mientras no haya capturas reales, cada proyecto genera sus imágenes por código
- * (ver scripts/projectArt.js) a partir de `palette` y `art`. Para usar capturas reales basta añadir:
- *   cover:  '/projects/aurora/cover.jpg'          → imagen de la tarjeta 3D
- *   images: ['/projects/aurora/1.jpg', '…']        → imágenes de la página del proyecto
- * (los archivos van en la carpeta /public).
+ * Imágenes: cada proyecto usa MAQUETAS de sitios web (marcas ficticias) guardadas en /public/projects/<slug>/
+ *   cover.jpg → imagen del panel 3D;  1.jpg, 2.jpg, 3.jpg → imágenes de la página del proyecto.
+ * Para usar las capturas reales de tus clientes, reemplaza esos archivos (1440×900 recomendado) con el mismo nombre.
+ * Si faltan, se dibuja una imagen por código a partir de `palette` y `art` (ver scripts/projectArt.js).
  *
  * art: 'hero' | 'catalog' | 'editorial'  → estilo de la imagen generada.
  */
 export const projects = [
   {
     slug: 'aurora-studio',
+    cover: '/projects/aurora-studio/cover.jpg',
+    images: ['/projects/aurora-studio/cover.jpg', '/projects/aurora-studio/1.jpg', '/projects/aurora-studio/2.jpg', '/projects/aurora-studio/3.jpg'],
     name: 'Aurora Studio',
     desc: 'Rediseño completo de la tienda Shopify y embudo de Meta Ads con email automatizado para una marca de moda sostenible.',
     category: 'Moda · Shopify',
@@ -26,6 +27,8 @@ export const projects = [
   },
   {
     slug: 'nordika',
+    cover: '/projects/nordika/cover.jpg',
+    images: ['/projects/nordika/cover.jpg', '/projects/nordika/1.jpg', '/projects/nordika/2.jpg', '/projects/nordika/3.jpg'],
     name: 'Nórdika',
     desc: 'Tienda de mobiliario escandinavo: arquitectura de catálogo, fichas de producto y checkout optimizados para conversión.',
     category: 'Hogar · Shopify',
@@ -37,6 +40,8 @@ export const projects = [
   },
   {
     slug: 'flowly',
+    cover: '/projects/flowly/cover.jpg',
+    images: ['/projects/flowly/cover.jpg', '/projects/flowly/1.jpg', '/projects/flowly/2.jpg', '/projects/flowly/3.jpg'],
     name: 'Flowly',
     desc: 'Medición de punta a punta y campañas de captación de demos para un SaaS B2B, con atribución real por canal.',
     category: 'SaaS · B2B',
@@ -48,6 +53,8 @@ export const projects = [
   },
   {
     slug: 'casa-brasa',
+    cover: '/projects/casa-brasa/cover.jpg',
+    images: ['/projects/casa-brasa/cover.jpg', '/projects/casa-brasa/1.jpg', '/projects/casa-brasa/2.jpg', '/projects/casa-brasa/3.jpg'],
     name: 'Casa Brasa',
     desc: 'Restaurante con delivery propio: pedidos online, campañas locales y automatización de reservas y reactivación de clientes.',
     category: 'Restauración',
@@ -59,6 +66,8 @@ export const projects = [
   },
   {
     slug: 'vertice-fit',
+    cover: '/projects/vertice-fit/cover.jpg',
+    images: ['/projects/vertice-fit/cover.jpg', '/projects/vertice-fit/1.jpg', '/projects/vertice-fit/2.jpg', '/projects/vertice-fit/3.jpg'],
     name: 'Vértice Fit',
     desc: 'Ecommerce de suplementación deportiva con suscripciones, dashboards de rentabilidad y flujos automáticos de recompra.',
     category: 'Salud · Ecommerce',
@@ -70,6 +79,8 @@ export const projects = [
   },
   {
     slug: 'lumen-joyas',
+    cover: '/projects/lumen-joyas/cover.jpg',
+    images: ['/projects/lumen-joyas/cover.jpg', '/projects/lumen-joyas/1.jpg', '/projects/lumen-joyas/2.jpg', '/projects/lumen-joyas/3.jpg'],
     name: 'Lumen Joyas',
     desc: 'Joyería de autor: tienda con narrativa visual, catálogo de colecciones y campañas de remarketing dinámico.',
     category: 'Joyería · Shopify',
@@ -81,6 +92,8 @@ export const projects = [
   },
   {
     slug: 'terra-cafe',
+    cover: '/projects/terra-cafe/cover.jpg',
+    images: ['/projects/terra-cafe/cover.jpg', '/projects/terra-cafe/1.jpg', '/projects/terra-cafe/2.jpg', '/projects/terra-cafe/3.jpg'],
     name: 'Terra Café',
     desc: 'Café de especialidad directo al consumidor: tienda de suscripción, medición de cohortes y campañas de adquisición.',
     category: 'Café · DTC',
@@ -92,6 +105,8 @@ export const projects = [
   },
   {
     slug: 'kodo-tech',
+    cover: '/projects/kodo-tech/cover.jpg',
+    images: ['/projects/kodo-tech/cover.jpg', '/projects/kodo-tech/1.jpg', '/projects/kodo-tech/2.jpg', '/projects/kodo-tech/3.jpg'],
     name: 'Kodo Tech',
     desc: 'Retail de electrónica: feeds de producto, campañas de Google Ads y Meta y un panel único de resultados en tiempo real.',
     category: 'Electrónica · Ecommerce',

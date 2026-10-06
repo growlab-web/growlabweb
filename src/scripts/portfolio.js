@@ -53,7 +53,7 @@ export async function initPortfolio(root) {
 
   /* ===================== Paneles (proyectos) ===================== */
   const cardVert = `
-    uniform float uBend, uTime, uHover, uFlag, uPhase, uLean; uniform vec2 uMouseUV; uniform vec4 uSph;
+    uniform float uBend, uTime, uHover, uFlag, uPhase, uLean; uniform vec2 uMouseUV; uniform vec4 uSph; uniform float uCy;
     varying vec2 vUv; varying float vShade;
     void main(){
       vUv = uv; vec3 p = position;
@@ -66,7 +66,7 @@ export async function initPortfolio(root) {
       // Perfil suave (pendiente cero en el borde): la tela sigue la esfera sin quiebres ni cruces entre paneles.
       vec4 wp = modelMatrix * vec4(p, 1.0);
       float xl = wp.x - uLean;
-      float yl = wp.y + 0.1;
+      float yl = wp.y + 0.1 - uCy;
       float h = clamp(1.0 - (xl * xl) / uSph.x - (yl * yl) / uSph.y, 0.0, 1.0);
       float cap = h * h * (3.0 - 2.0 * h);                                // smoothstep: 0 en el borde, 1 en el centro
       float amp = uSph.z + uFlag * 0.5;
@@ -92,11 +92,19 @@ export async function initPortfolio(root) {
   const geo = new THREE.PlaneGeometry(CARD_W, CARD_H, 56, 28);
   const maxAniso = renderer.capabilities.getMaxAnisotropy();
   const cards = projects.map((p, i) => {
-    const tex = new THREE.CanvasTexture(PORTRAIT ? makeArt(p, 'cover', 960, 1200) : makeArt(p, 'cover', 1280, 800));
+    const tex = new THREE.CanvasTexture(PORTRAIT ? makeArt(p, 'cover', 960, 1200) : makeArt(p, 'cover', 1280, 800));   // provisional hasta que cargue la imagen
     tex.anisotropy = maxAniso;
+    if (p.cover) {
+      new THREE.TextureLoader().load(p.cover, (img) => {
+        img.anisotropy = maxAniso;
+        if (PORTRAIT) { img.repeat.set(CARD_W / CARD_H / (img.image.width / img.image.height), 1); img.offset.set((1 - img.repeat.x) / 2, 0); }   // recorte centrado
+        img.colorSpace = THREE.SRGBColorSpace || img.colorSpace;
+        mat.uniforms.uMap.value = img;
+      });
+    }
     const mat = new THREE.ShaderMaterial({
       transparent: true, depthWrite: false, vertexShader: cardVert, fragmentShader: cardFrag,
-      uniforms: { uMap: { value: tex }, uBend: { value: BEND_R }, uBright: { value: 1 }, uOpacity: { value: 1 }, uHover: { value: 0 }, uSize: { value: new THREE.Vector2(CARD_W, CARD_H) }, uTime: { value: 0 }, uFlag: { value: 0 }, uPhase: { value: 0 }, uLean: { value: 0 }, uSph: { value: new THREE.Vector4(SPH.rx2, SPH.ry2, SPH.amp, SPH.back) }, uMouseUV: { value: new THREE.Vector2(0.5, 0.5) } },
+      uniforms: { uMap: { value: tex }, uBend: { value: BEND_R }, uBright: { value: 1 }, uOpacity: { value: 1 }, uHover: { value: 0 }, uSize: { value: new THREE.Vector2(CARD_W, CARD_H) }, uTime: { value: 0 }, uFlag: { value: 0 }, uPhase: { value: 0 }, uLean: { value: 0 }, uSph: { value: new THREE.Vector4(SPH.rx2, SPH.ry2, SPH.amp, SPH.back) }, uCy: { value: 0 }, uMouseUV: { value: new THREE.Vector2(0.5, 0.5) } },
     });
     const mesh = new THREE.Mesh(geo, mat);
     mesh.userData.i = i;
@@ -175,7 +183,7 @@ export async function initPortfolio(root) {
   });
 
   /* ===================== Estado ===================== */
-  const S = { flag: 0, flagV: 0, phase: 0, dir: 1, lean: 0, vel: 0, pos: 0, target: 0, intro: reduce ? 1 : 0, mode: 1, dim: 0, lastInput: 0, dragging: false, moved: 0, open: null, started: false, mx: 0, my: 0, hover: -1 };
+  const S = { sx: 0, sy: 0, flag: 0, flagV: 0, phase: 0, dir: 1, lean: 0, vel: 0, pos: 0, target: 0, intro: reduce ? 1 : 0, mode: 1, dim: 0, lastInput: 0, dragging: false, moved: 0, open: null, started: false, mx: 0, my: 0, hover: -1 };
   const introCard = projects.map(() => 0);
   let width = 1, height = 1;
 
@@ -201,6 +209,7 @@ export async function initPortfolio(root) {
   let dragX = 0;
   canvas.addEventListener('pointerdown', (e) => { if (!canNav()) return; S.dragging = true; S.moved = 0; dragX = e.clientX; canvas.setPointerCapture(e.pointerId); canvas.classList.add('pf-grabbing'); });
   canvas.addEventListener('pointermove', (e) => {
+    S.touchOnly = e.pointerType === 'touch';
     S.mx = (e.clientX / width) * 2 - 1; S.my = -((e.clientY / height) * 2 - 1);
     S.px = e.clientX; S.py = e.clientY;
     if (!S.dragging) return;
@@ -266,6 +275,10 @@ export async function initPortfolio(root) {
     S.phase += dt * (3.4 + Math.abs(S.vel) * 2.4) * S.dir;
     S.lean += (S.dir * clamp(Math.abs(S.vel), 0, 2) * 0.55 - S.lean) * Math.min(1, dt * 6);
 
+    // esfera invisible: sigue al puntero con retraso; sin puntero (móvil) queda en el centro
+    const tx = S.px != null && !S.touchOnly ? S.mx * 3.6 : 0, ty = S.px != null && !S.touchOnly ? S.my * 1.5 : 0;
+    S.sx += (tx - S.sx) * Math.min(1, dt * 5.5); S.sy += (ty - S.sy) * Math.min(1, dt * 5.5);
+
     const camZ = cam.baseZ + S.dim * 0.9;
     camera.position.set(cam.offX - 0.8 + S.mx * 0.35, 0.55 + S.my * 0.18, camZ);
     camera.lookAt(cam.offX, -0.08, 0);
@@ -301,7 +314,9 @@ export async function initPortfolio(root) {
       c.mat.uniforms.uTime.value = time;
       c.mat.uniforms.uFlag.value = S.flag;
       c.mat.uniforms.uPhase.value = S.phase;
-      c.mat.uniforms.uLean.value = S.lean;
+      c.mat.uniforms.uLean.value = S.lean + S.sx;
+      c.mat.uniforms.uSph.value.set(SPH.rx2, SPH.ry2, SPH.amp, SPH.back);
+      c.mat.uniforms.uCy.value = S.sy;
       c.mat.uniforms.uMouseUV.value.copy(c.muv);
       m.renderOrder = -Math.round(ad * 10);
 
@@ -310,7 +325,7 @@ export async function initPortfolio(root) {
       const place = (el, lx, ly, off) => {
         const lz = BEND_R * (1 - Math.cos(lx / BEND_R));
         v3.set(Math.sin(lx / BEND_R) * BEND_R, ly, lz).applyMatrix4(m.matrixWorld);
-        const xl = v3.x - S.lean, yl = v3.y + 0.1;
+        const xl = v3.x - S.lean - S.sx, yl = v3.y + 0.1 - S.sy;
         const hh = clamp(1 - (xl * xl) / SPH.rx2 - (yl * yl) / SPH.ry2, 0, 1);
         v3.z += (SPH.amp + S.flag * 0.5) * hh * hh * (3 - 2 * hh) - SPH.back * clamp(xl, -3, 6.5);
         const sc = clamp((camZ / camera.position.distanceTo(v3)) * m.scale.x, 0.4, 1.35);
