@@ -238,18 +238,18 @@ export function initHero3D() {
         float dist = length(d.xy);
         float sw = clamp(w0 + w1 * uGal, 0.0, 1.0);                      // esfera y galaxia: el cursor dispersa las partículas en una zona pequeña
         // el borde de la zona afectada es irregular y cambia con el tiempo (no se nota una "bola" pasando)
-        float jit = snoise(vec3(wp.xy * 2.6, uTime * 0.55 + aRand * 3.0));
-        float rm = (1.0 - sw) + w0 * 0.48 + w1 * uGal * 0.28;
+        float jit = snoise(vec3(wp.xy * 2.6, uTime * 0.18 + aRand * 3.0));
+        float rm = (1.0 - sw) + w0 * 0.8 + w1 * uGal * 0.46;
         float f = smoothstep(uRadius * rm, 0.0, dist * (1.0 + 0.45 * jit * sw));
         vec2 dir = normalize(d.xy + 1e-4);
         vec3 push = vec3(dir * f * (0.06 + 0.05*uPush), f * (0.1 + 0.12*uPush) * (n*0.6+0.4));
         // galaxia: las partículas cercanas se dispersan en todas las direcciones (sin dejar un hueco limpio)
         // cada partícula sale en su propia dirección (azar + remolino), unas mucho y otras casi nada
-        vec3 swirl = vec3(snoise(wp.xyz * 2.2 + uTime * 0.6), snoise(wp.yzx * 2.2 - uTime * 0.5), snoise(wp.zxy * 2.2 + uTime * 0.4));
+        vec3 swirl = vec3(snoise(wp.xyz * 2.2 + uTime * 0.16), snoise(wp.yzx * 2.2 - uTime * 0.13), snoise(wp.zxy * 2.2 + uTime * 0.11));
         vec3 rdir = normalize(normalize(aScatter) + swirl * 1.3);
         rdir.z *= 0.35;                                                  // casi sin acercarse a la cámara: se dispersan pero no crecen
         float amp = 0.04 + 1.9 * pow(fract(aRand * 13.7 + 0.31), 2.6);
-        vec3 spray = rdir * f * (0.4 + 0.6 * f) * (0.13 + 0.16*uPush) * amp * (1.0 + w0 * 0.7) * (0.75 + 0.25*sin(uTime*2.5 + aRand*50.0));
+        vec3 spray = rdir * f * (0.4 + 0.6 * f) * (0.13 + 0.16*uPush) * amp * (1.0 + w0 * 0.7) * (0.8 + 0.2*sin(uTime*0.7 + aRand*50.0));
         float gm = w1 * uGal;
         wp.xyz += mix(push, spray, sw);
 
@@ -398,7 +398,7 @@ export function initHero3D() {
 
     mouse.ox += (w.x - mouse.ox) * 0.12; mouse.oy += (w.y - mouse.oy) * 0.12;
     orb.position.set(mouse.ox, mouse.oy, 0.3);
-    orb.material.opacity += ((mouse.inside ? 0.18 : 0) - orb.material.opacity) * 0.08;   // muy tenue: el puntero propio ya marca la posición
+    orb.material.opacity += (0 - orb.material.opacity) * 0.08;   // sin resplandor: el puntero propio ya marca la posición
 
     // orientación de cada forma (inclinación mínima hacia el cursor)
     mat.uniforms.uTilt.value.set(1.2 - mouse.y * 0.1, serviceShape ? 0.12 - mouse.y * 0.06 : 0.27 + Math.sin(t * 0.23) * 0.025 - mouse.y * 0.08, -0.05 - mouse.y * 0.05);

@@ -208,9 +208,9 @@ html.has-cursor, html.has-cursor * { cursor: none !important; }
 .gl-cursor { position: fixed; inset: 0; z-index: 9999; pointer-events: none; opacity: 0; transition: opacity .25s; }
 .gl-cursor.is-on { opacity: 1; }
 .gl-cursor__dot, .gl-cursor__ring { position: absolute; left: 0; top: 0; will-change: transform; }
-.gl-cursor__dot::before { content: ''; position: absolute; left: -2.5px; top: -2.5px; width: 5px; height: 5px; border-radius: 50%; background: var(--color-secondary); box-shadow: 0 0 10px 2px color-mix(in srgb, var(--color-secondary) 70%, transparent); }
-.gl-cursor__ring::before { content: ''; position: absolute; left: -17px; top: -17px; width: 34px; height: 34px; border-radius: 50%; border: 1px solid rgba(255, 255, 255, .55); transition: transform .25s ease, border-color .25s ease, background-color .25s ease; }
-.gl-cursor__ring b { position: absolute; left: -.5px; top: -.5px; width: 1px; height: 7px; background: #fff; transform: rotate(var(--a)) translateY(-23px); transform-origin: 50% 0; transition: transform .25s ease, opacity .25s ease; opacity: .8; }
+.gl-cursor__dot::before { content: ''; position: absolute; left: -3.5px; top: -3.5px; width: 7px; height: 7px; border-radius: 50%; background: var(--color-secondary); box-shadow: 0 0 10px 2px color-mix(in srgb, var(--color-secondary) 70%, transparent); }
+.gl-cursor__ring::before { content: ''; position: absolute; left: -17px; top: -17px; width: 34px; height: 34px; border-radius: 50%; border: 2px solid rgba(255, 255, 255, .8); transition: transform .25s ease, border-color .25s ease, background-color .25s ease; }
+.gl-cursor__ring b { position: absolute; left: -1px; top: -1px; width: 2px; height: 8px; background: #fff; transform: rotate(var(--a)) translateY(-23px); transform-origin: 50% 0; transition: transform .25s ease, opacity .25s ease; opacity: .8; }
 .gl-cursor__ring b:nth-child(1) { --a: 0deg; }
 .gl-cursor__ring b:nth-child(2) { --a: 90deg; }
 .gl-cursor__ring b:nth-child(3) { --a: 180deg; }
