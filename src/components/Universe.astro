@@ -1,0 +1,68 @@
+---
+// Plataformas que orbitan la galaxia: cada herramienta es un "planeta" de un mismo universo (iconos de simple-icons, CC0).
+import { siGooglesearchconsole, siGoogletagmanager, siMeta, siShopify, siGoogleads, siGoogleanalytics, siMailchimp } from 'simple-icons';
+
+const inner = [
+  { icon: siGoogletagmanager, name: 'Tag Manager' },
+  { icon: siGoogleanalytics, name: 'Analytics' },
+  { icon: siGooglesearchconsole, name: 'Search Console' },
+];
+const outer = [
+  { icon: siShopify, name: 'Shopify' },
+  { icon: siMeta, name: 'Meta Ads' },
+  { icon: siGoogleads, name: 'Google Ads' },
+  { icon: siMailchimp, name: 'Mailchimp' },
+];
+const rings = [inner, outer];
+---
+
+<div data-universe class="pointer-events-none absolute left-1/2 top-[57%] z-[1] max-sm:top-[61%] h-0 w-0" aria-hidden="true">
+  {
+    rings.map((ring, r) =>
+      ring.map((p, i) => (
+        <span
+          data-orbit
+          data-ring={r}
+          data-i={i}
+          data-n={ring.length}
+          class="absolute left-0 top-0 flex items-center gap-2 whitespace-nowrap rounded-full border border-white/15 bg-white/[.07] py-1.5 pl-2 pr-3 font-ui text-[.8rem] text-white/90 shadow-[0_0_24px_rgba(56,111,222,.25)] backdrop-blur-md will-change-transform max-sm:p-1.5"
+        >
+          <svg viewBox="0 0 24 24" class="h-[18px] w-[18px] shrink-0" fill={`#${p.icon.hex}`}>
+            <path d={p.icon.path} />
+          </svg>
+          <span class="max-sm:hidden">{p.name}</span>
+        </span>
+      ))
+    )
+  }
+</div>
+
+<script>
+  // Cada plataforma recorre una elipse (la misma inclinación que la galaxia); las de delante se ven más grandes y nítidas.
+  const root = document.querySelector<HTMLElement>('[data-universe]');
+  if (root) {
+    const items = [...root.querySelectorAll<HTMLElement>('[data-orbit]')];
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let t = 0, last = performance.now();
+    const frame = (now: number) => {
+      const dt = Math.min(0.05, (now - last) / 1000); last = now;
+      if (!reduce) t += dt;
+      const W = window.innerWidth, H = window.innerHeight;
+      const phone = W < 520;
+      const rx0 = phone ? W * 0.44 : Math.min(W * 0.4, 640);
+      const ry0 = Math.min(rx0 * 0.3, H * 0.2);
+      for (const el of items) {
+        const r = +el.dataset.ring!, i = +el.dataset.i!, n = +el.dataset.n!;
+        const k = r === 0 ? 0.6 : 1;
+        const a = (i / n) * Math.PI * 2 + t * (r === 0 ? 0.16 : -0.1) + r * 0.6;
+        const x = Math.cos(a) * rx0 * k, y = Math.sin(a) * ry0 * k;
+        const depth = (Math.sin(a) + 1) / 2;                 // 0 = detrás, 1 = delante
+        el.style.transform = `translate(calc(${x}px - 50%), calc(${y}px - 50%)) scale(${0.78 + depth * 0.3})`;
+        el.style.opacity = String(0.45 + depth * 0.55);
+        el.style.zIndex = String(Math.round(depth * 10));
+      }
+      requestAnimationFrame(frame);
+    };
+    requestAnimationFrame(frame);
+  }
+</script>

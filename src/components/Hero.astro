@@ -1,6 +1,7 @@
 ---
 import { services } from '../data/services.js';
 import Partners from './Partners.astro';
+import Universe from './Universe.astro';
 const words = JSON.stringify(services.map((s) => s.name));
 const stats = [
   { n: '250+', l: 'Proyectos entregados' },
@@ -90,6 +91,7 @@ const stats = [
         Cada campaña es una respuesta a tu público: clics, scroll y pausas, leídos en vivo y convertidos en decisiones.
       </p>
     </div>
+    <Universe />
     <div
       class="absolute inset-x-0 bottom-0 grid h-[12%] grid-cols-4 border-t border-white/15 pl-[7vw] max-md:h-auto max-md:grid-cols-2 max-md:pl-0 max-md:pb-3"
     >
