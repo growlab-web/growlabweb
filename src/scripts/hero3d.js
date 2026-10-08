@@ -378,7 +378,7 @@ export function initHero3D() {
       group.position.x = HOME_X;
       // esfera y cerebro: en pantallas medianas se encogen de forma continua para no pisar los textos de la izquierda
       base.y = phone ? -0.3 : narrow ? -0.2 : -0.15;
-      base.scale = phone ? 0.45 : narrow ? 0.58 : W < 1400 ? 0.54 + ((W - 1000) / 400) * 0.32 : 0.86;
+      base.scale = phone ? (h < 740 ? 0.39 : 0.45) : narrow ? 0.58 : W < 1400 ? 0.54 + ((W - 1000) / 400) * 0.32 : 0.86;
       base.galY = phone ? -0.42 : narrow ? -0.28 : -0.15;
       base.gal = (phone ? 0.48 : narrow ? 0.66 : W < 1400 ? 0.72 : 0.86) * galaxyK();
       group.position.y = base.y;
