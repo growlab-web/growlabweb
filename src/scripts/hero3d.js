@@ -236,7 +236,7 @@ export function initHero3D() {
         // cursor: aparta e ilumina muy poco las partículas cercanas
         vec3 d = wp.xyz - uMouse;
         float dist = length(d.xy);
-        float f = smoothstep(uRadius, 0.0, dist);
+        float f = smoothstep(uRadius * mix(1.0, 0.5, w1 * uGal), 0.0, dist);   // en la galaxia el cursor afecta a la mitad de radio
         vec2 dir = normalize(d.xy + 1e-4);
         vec3 push = vec3(dir * f * (0.06 + 0.05*uPush), f * (0.1 + 0.12*uPush) * (n*0.6+0.4));
         // galaxia: las partículas cercanas se dispersan en todas las direcciones (sin dejar un hueco limpio)
