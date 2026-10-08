@@ -71,7 +71,7 @@ export function initHero3D() {
   /* --- 2) Galaxia: núcleo blanco-violeta del que nacen dos brazos en S, 3 anillos (cian → turquesa → verde) y polvo --- */
   const GSZ = new Float32Array(COUNT).fill(1);              // tamaño propio de cada partícula de la galaxia
   const SPD = new Float32Array(COUNT);                    // velocidad de giro propia de cada partícula (rad/s)
-  const VIO = [0.56, 0.36, 1.0], DEEP = [0.27, 0.24, 0.82], GCY = [0.32, 0.78, 1.0], GTL = [0.16, 0.82, 0.72], GGR = [0.2, 0.86, 0.5];
+  const VIO = [0.56, 0.36, 1.0], DEEP = [0.27, 0.24, 0.82], GCY = [0.32, 0.78, 1.0], GTL = [0.42, 0.85, 0.62], GGR = [0.67, 0.88, 0.33];   // GGR = verde de marca #abe155
   if (!serviceShape) for (let i = 0; i < N1; i++) {
     const q = Math.random();
     let rr, th = Math.random() * Math.PI * 2, y = 0, col, spd, gsz = 1;
@@ -236,13 +236,13 @@ export function initHero3D() {
         // cursor: aparta e ilumina muy poco las partículas cercanas
         vec3 d = wp.xyz - uMouse;
         float dist = length(d.xy);
-        float f = smoothstep(uRadius * mix(1.0, 0.5, w1 * uGal), 0.0, dist);   // en la galaxia el cursor afecta a la mitad de radio
+        float f = smoothstep(uRadius * mix(1.0, 0.28, w1 * uGal), 0.0, dist);   // en la galaxia el cursor afecta a una zona muy pequeña
         vec2 dir = normalize(d.xy + 1e-4);
         vec3 push = vec3(dir * f * (0.06 + 0.05*uPush), f * (0.1 + 0.12*uPush) * (n*0.6+0.4));
         // galaxia: las partículas cercanas se dispersan en todas las direcciones (sin dejar un hueco limpio)
         vec3 rdir = normalize(aScatter + vec3(dir, 0.0) * 1.2);
         rdir.z *= 0.35;                                                  // casi sin acercarse a la cámara: se dispersan pero no crecen
-        vec3 spray = rdir * f * f * (0.22 + 0.3*uPush) * (0.25 + aRand*1.1) * (0.8 + 0.2*sin(uTime*2.5 + aRand*50.0));
+        vec3 spray = rdir * f * f * (0.13 + 0.16*uPush) * (0.25 + aRand*1.1) * (0.8 + 0.2*sin(uTime*2.5 + aRand*50.0));
         float gm = w1 * uGal;
         wp.xyz += mix(push, spray, gm);
 
