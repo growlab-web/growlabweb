@@ -130,7 +130,7 @@ export function initHero3D() {
     for (let i = 0; i < W * H; i++) Z[i] = mask[i] ? Math.sqrt(Math.min(1, dist[i] / (dmax * 0.9))) : 0;
     const cdf = new Float32Array(W * H); let acc = 0;
     for (let i = 0; i < W * H; i++) { acc += D[i] > 0.04 ? 0.3 + 0.7 * D[i] : 0; cdf[i] = acc; }
-    const S = 2.55 / (maxY - minY), cx = W / 2, cy = (minY + maxY) / 2, thick = 1.0;
+    const S = 2.55 / (maxY - minY), cx = W / 2, cy = (minY + maxY) / 2, thick = 1.2;
     for (let n = 0; n < N2; n++) {
       const t = Math.random() * acc; let lo = 0, hi = W * H - 1;
       while (lo < hi) { const m = (lo + hi) >> 1; if (cdf[m] < t) lo = m + 1; else hi = m; }
@@ -142,7 +142,7 @@ export function initHero3D() {
       const zu = Z[Math.max(0, py - 2) * W + px], zd = Z[Math.min(H - 1, py + 2) * W + px];
       const nx = -(zr - zl) * thick / (4 * S) * side, ny = (zd - zu) * thick / (4 * S) * side, nz = side;
       const nl = Math.hypot(nx, ny, nz) || 1;
-      set3(P2, n, x, y, side * zf * thick); set3(N2v, n, nx / nl, ny / nl, nz / nl);
+      set3(P2, n, x, y, side * (zf * thick + (D[py * W + px] - 0.5) * 0.1));   // los pliegues sobresalen un poco set3(N2v, n, nx / nl, ny / nl, nz / nl);
     }
     fill(N2, [P2, N2v]);
   })();
@@ -246,10 +246,10 @@ export function initHero3D() {
         // cursor: aparta e ilumina muy poco las partículas cercanas
         vec3 d = wp.xyz - uMouse;
         float dist = length(d.xy);
-        float sw = clamp(w0 + w1 * uGal, 0.0, 1.0);                      // esfera y galaxia: el cursor dispersa las partículas en una zona pequeña
+        float sw = clamp(w0 + w1 * uGal + w2, 0.0, 1.0);                 // esfera, galaxia y cerebro: el cursor dispersa las partículas en una zona pequeña
         // el borde de la zona afectada es irregular y cambia con el tiempo (no se nota una "bola" pasando)
         float jit = snoise(vec3(wp.xy * 2.6, uTime * 0.18 + aRand * 3.0));
-        float rm = (1.0 - sw) + w0 * 0.8 + w1 * uGal * 0.46;
+        float rm = (1.0 - sw) + (w0 + w2) * 0.8 + w1 * uGal * 0.46;
         float f = smoothstep(uRadius * rm, 0.0, dist * (1.0 + 0.45 * jit * sw));
         vec2 dir = normalize(d.xy + 1e-4);
         vec3 push = vec3(dir * f * (0.06 + 0.05*uPush), f * (0.1 + 0.12*uPush) * (n*0.6+0.4));
@@ -259,7 +259,7 @@ export function initHero3D() {
         vec3 rdir = normalize(normalize(aScatter) + swirl * 1.3);
         rdir.z *= 0.35;                                                  // casi sin acercarse a la cámara: se dispersan pero no crecen
         float amp = 0.04 + 1.9 * pow(fract(aRand * 13.7 + 0.31), 2.6);
-        vec3 spray = rdir * f * (0.4 + 0.6 * f) * (0.13 + 0.16*uPush) * amp * (1.0 + w0 * 0.7) * (0.8 + 0.2*sin(uTime*0.7 + aRand*50.0));
+        vec3 spray = rdir * f * (0.4 + 0.6 * f) * (0.13 + 0.16*uPush) * amp * (1.0 + (w0 + w2) * 0.7) * (0.8 + 0.2*sin(uTime*0.7 + aRand*50.0));
         float gm = w1 * uGal;
         wp.xyz += mix(push, spray, sw);
 
@@ -297,6 +297,8 @@ export function initHero3D() {
         vec3 vdir = normalize(cameraPosition - wp.xyz);
         float facing = dot(normalize(nb + vec3(1e-5)), vdir);
         float vis = mix(1.0, 0.03 + 0.97*smoothstep(-0.05, 0.3, facing), w2);
+        // luz desde arriba a la izquierda: da volumen al cerebro (zonas iluminadas y en sombra)
+        float lit = mix(1.0, 0.55 + 0.65 * max(dot(normalize(nb + vec3(1e-5)), normalize(vec3(-0.35, 0.55, 0.76))), 0.0), w2);
         float alive = aVis.x*w0 + aVis.y*w1 + aVis.z*w2;
 
         // degradado por altura en pantalla (verde arriba → azul → violeta abajo)
@@ -309,7 +311,7 @@ export function initHero3D() {
 
         col = mix(col, mix(col, vec3(1.0), 0.55), star * gm);
         col = mix(col, vec3(0.78, 1.0, 0.93), clamp(syn, 0.0, 1.0)) * (1.0 + syn * 0.7);
-        vColor = col * colD * (1.0 + burst*0.25) + f*0.12 + vec3(0.55,0.95,0.6) * pulse * line;
+        vColor = col * colD * lit * (1.0 + burst*0.25) + f*0.12 + vec3(0.55,0.95,0.6) * pulse * line;
         float base = 0.9*w0 + mix(0.95, 0.62, uGal)*w1 + 1.0*w2;
         vAlpha = base * mix(1.0, 0.5 + 0.9*pulse, line) * (0.45 + 0.55*smoothstep(-0.2,0.8,n+0.4)) * e * vis * alive * alphD * (1.0 + syn * 1.4) / (1.0 + max(sz/uPR - 7.0, 0.0)*0.08);
       }`,
@@ -479,7 +481,7 @@ export function initHero3D() {
 
     // orientación de cada forma (inclinación mínima hacia el cursor)
     mat.uniforms.uTilt.value.set(1.2 - mouse.y * 0.1, serviceShape ? 0.12 - mouse.y * 0.06 : 0.27 + Math.sin(t * 0.23) * 0.025 - mouse.y * 0.08, -0.05 - mouse.y * 0.05);
-    mat.uniforms.uYaw.value.set(mouse.x * 0.14 + t * 0.12, serviceShape ? Math.sin(t * 0.32) * 0.5 + mouse.x * 0.25 : mouse.x * 0.3, 0.25 + Math.sin(t * 0.35) * 0.22 + mouse.x * 0.3);
+    mat.uniforms.uYaw.value.set(mouse.x * 0.14 + t * 0.12, serviceShape ? Math.sin(t * 0.32) * 0.5 + mouse.x * 0.25 : mouse.x * 0.3, 0.12 + Math.sin(t * 0.3) * 0.3 + mouse.x * 0.3);
 
     mat.uniforms.uRoll.value.y = serviceShape ? 0 : mouse.x * 0.02;
     dust.rotation.y = t * 0.02;
