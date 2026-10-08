@@ -187,10 +187,11 @@ export function initHero3D() {
       uTilt: { value: new THREE.Vector3(1.2, 0.26, 0.0) },
       uYaw: { value: new THREE.Vector3(0, 0, 0) },
       uRoll: { value: new THREE.Vector3(0, 0, 0) },
+      uVoice: { value: 0 }, uVDir: { value: new THREE.Vector3(0, 1, 0) }, uVDir2: { value: new THREE.Vector3(1, 0, 0) },
     },
     vertexShader: `
-      uniform float uTime, uIntro, uPR, uSize, uPush, uRadius, uMorph, uGal;
-      uniform vec3 uMouse, uTilt, uYaw, uRoll;
+      uniform float uTime, uIntro, uPR, uSize, uPush, uRadius, uMorph, uGal, uVoice;
+      uniform vec3 uMouse, uTilt, uYaw, uRoll, uVDir, uVDir2;
       attribute vec3 aP1, aP2, aN2, aC1, aScatter, aVis; attribute float aRand, aPath, aSpd, aSz;
       varying vec3 vColor; varying float vAlpha;
       ${noiseGLSL}
@@ -212,6 +213,10 @@ export function initHero3D() {
         float n = snoise(p0*1.5 + vec3(0.0,uTime*0.22,uTime*0.15));
         float n2 = snoise(p0*4.0 - uTime*0.3);
         p0 += normal * (n*0.2 + n2*0.03);
+        // "voz": como un asistente que habla, la esfera se abulta a golpes en direcciones que van cambiando
+        float lobe = pow(max(dot(normal, uVDir), 0.0), 3.0) + 0.65 * pow(max(dot(normal, uVDir2), 0.0), 3.0);
+        float rip = 0.6 + 0.4 * snoise(p0*4.5 + uTime*2.0);
+        p0 += normal * uVoice * (lobe * 0.3 * rip + 0.02 * sin(dot(normal, uVDir) * 16.0 - uTime*8.0));
 
         vec3 q0 = xf(p0, uTilt.x, uYaw.x, uRoll.x);
         // galaxia: cada partícula gira a su ritmo alrededor del núcleo y el disco ondula un poco (volumen)
@@ -375,6 +380,29 @@ export function initHero3D() {
     return camera.position.clone().add(dir.multiplyScalar(t));
   }
 
+  /* ---- "Voz" de la esfera: ráfagas tipo habla (sílabas y pausas) con dirección aleatoria en cada golpe ---- */
+  const reduceMo = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const voice = { v: 0, target: 0, next: 0, phraseEnd: 0, talking: false, d1: new THREE.Vector3(0, 1, 0), d2: new THREE.Vector3(1, 0, 0), t1: new THREE.Vector3(0, 1, 0), t2: new THREE.Vector3(1, 0, 0), last: 0 };
+  const randDir = (v) => { const u = Math.random() * 2 - 1, a = Math.random() * Math.PI * 2, q = Math.sqrt(1 - u * u); return v.set(q * Math.cos(a), u * 0.8, q * Math.sin(a)).normalize(); };
+  function updateVoice(t) {
+    const dt = Math.min(0.05, t - voice.last); voice.last = t;
+    if (reduceMo) return;
+    if (t > voice.phraseEnd) {                                   // alterna frases (1,4–3,6 s) y silencios (0,7–2 s)
+      voice.talking = !voice.talking;
+      voice.phraseEnd = t + (voice.talking ? 1.4 + Math.random() * 2.2 : 0.7 + Math.random() * 1.3);
+      voice.next = t;
+    }
+    if (t >= voice.next) {                                       // cada "sílaba": nueva intensidad y nueva dirección
+      voice.next = t + 0.09 + Math.random() * 0.2;
+      voice.target = voice.talking && Math.random() > 0.18 ? 0.35 + Math.random() * 0.65 : 0;
+      if (voice.target > 0) { randDir(voice.t1); randDir(voice.t2); }
+    }
+    voice.v += (voice.target - voice.v) * Math.min(1, dt * (voice.target > voice.v ? 16 : 7));   // sube rápido, baja más lento
+    voice.d1.lerp(voice.t1, Math.min(1, dt * 9)).normalize(); voice.d2.lerp(voice.t2, Math.min(1, dt * 9)).normalize();
+    mat.uniforms.uVoice.value = voice.v * mat.uniforms.uIntro.value;
+    mat.uniforms.uVDir.value.copy(voice.d1); mat.uniforms.uVDir2.value.copy(voice.d2);
+  }
+
   /* ---- Render ---- */
   let running = true, started = false;
   const t0 = performance.now();
@@ -384,6 +412,7 @@ export function initHero3D() {
     const t = (performance.now() - t0) / 1000;
     mat.uniforms.uTime.value = t;
     mat.uniforms.uMorph.value = state.morph;
+    updateVoice(t);
     {
       const w1 = clamp01(1 - Math.abs(state.morph - 1));                    // 1 cuando la forma es la galaxia
       group.scale.setScalar(base.scale * state.scale * (1 - (1 - galaxyK()) * w1));
