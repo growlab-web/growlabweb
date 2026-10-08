@@ -19,7 +19,7 @@ export function initHero3D() {
   if (!canvas) return { start() {} };
 
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: true, powerPreference: 'high-performance' });
-  const PR = Math.min(window.devicePixelRatio || 1, 2);
+  const PR = Math.min(window.devicePixelRatio || 1, window.innerWidth < 800 ? 1.5 : 2);   // en móvil se dibuja a menos resolución: va bastante más fluido
   renderer.setPixelRatio(PR);
   renderer.setClearColor(0x000000, 0);
 
@@ -30,9 +30,9 @@ export function initHero3D() {
   const clamp01 = (v) => Math.min(1, Math.max(0, v));
   const isMobile = () => window.innerWidth < 800;
   const MOB = isMobile();
-  const COUNT = MOB ? 40000 : 90000;     // la casi-esfera usa todas
-  const N1 = MOB ? 36000 : 86000;        // galaxia (densa)
-  const N2 = MOB ? 34000 : 62000;        // cerebro (muy fino)
+  const COUNT = MOB ? 28000 : 90000;     // la casi-esfera usa todas
+  const N1 = MOB ? 26000 : 86000;        // galaxia (densa)
+  const N2 = MOB ? 26000 : 62000;        // cerebro (muy fino)
   const N0 = COUNT;
 
   /* ================= Utilidades ================= */
@@ -181,9 +181,9 @@ export function initHero3D() {
   const CAN_HOVER = window.matchMedia('(hover: hover) and (pointer: fine)').matches;   // solo con ratón: en táctil el efecto no aporta y cuesta rendimiento
   const mat = new THREE.ShaderMaterial({
     transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
-    defines: CAN_HOVER ? { HOVER: 1 } : {},
+    defines: { ...(CAN_HOVER ? { HOVER: 1 } : {}), ...(MOB ? { LITE: 1 } : {}) },   // LITE: móvil, sin los ruidos secundarios
     uniforms: {
-      uTime: { value: 0 }, uIntro: { value: 0 }, uPR: { value: PR }, uSize: { value: MOB ? 2.4 : 2.3 },
+      uTime: { value: 0 }, uIntro: { value: 0 }, uPR: { value: PR }, uSize: { value: MOB ? 2.4 : 2.3 }, uSm: { value: MOB ? new THREE.Vector3(0.85, 0.58, 0.72) : new THREE.Vector3(1.0, 0.92, 1.1) },
       uMouse: { value: new THREE.Vector3(99, 99, 0) }, uPush: { value: 0 }, uRadius: { value: 0.7 },
       uMorph: { value: 0 }, uGal: { value: serviceShape ? 0 : 1 },
       uTilt: { value: new THREE.Vector3(1.2, 0.26, 0.0) },
@@ -194,7 +194,7 @@ export function initHero3D() {
     },
     vertexShader: `
       uniform float uTime, uIntro, uPR, uSize, uPush, uRadius, uMorph, uGal, uVoice;
-      uniform vec3 uMouse, uTilt, uYaw, uRoll, uVDir, uVDir2;
+      uniform vec3 uMouse, uTilt, uYaw, uRoll, uVDir, uVDir2, uSm;
       uniform vec4 uSpark[8];
       attribute vec3 aP1, aP2, aN2, aC1, aScatter, aVis; attribute float aRand, aPath, aSpd, aSz;
       varying vec3 vColor; varying float vAlpha;
@@ -215,11 +215,19 @@ export function initHero3D() {
         // casi-esfera con relieve de ruido
         vec3 p0 = position;
         float n = snoise(p0*1.5 + vec3(0.0,uTime*0.22,uTime*0.15));
+        #ifdef LITE
+        float n2 = 0.0;
+        #else
         float n2 = snoise(p0*4.0 - uTime*0.3);
+        #endif
         p0 += normal * (n*0.2 + n2*0.03);
         // "voz": como un asistente que habla, la esfera se abulta a golpes en direcciones que van cambiando
         float lobe = pow(max(dot(normal, uVDir), 0.0), 2.5) + 0.65 * pow(max(dot(normal, uVDir2), 0.0), 2.5);
+        #ifdef LITE
+        float rip = 0.9;
+        #else
         float rip = 0.8 + 0.2 * snoise(p0*2.0 + uTime*0.6);
+        #endif
         p0 += normal * uVoice * lobe * 0.3 * rip;
 
         vec3 q0 = xf(p0, uTilt.x, uYaw.x, uRoll.x);
@@ -230,7 +238,9 @@ export function initHero3D() {
         vec3 q1 = xf(g1, uTilt.y, uYaw.y, uRoll.y);
         vec3 q2 = xf(aP2, uTilt.z, uYaw.z, uRoll.z);
         vec3 p = q0*w0 + q1*w1 + q2*w2;
+        #ifndef LITE
         p += normalize(p + vec3(1e-4)) * (w1 + w2) * snoise(p*3.0 + uTime*0.3) * 0.012;
+        #endif
 
         // explosión entre formas (algunas partículas pasan muy cerca de la cámara)
         vec3 bdir = vec3(aScatter.xy*0.75, aScatter.z*0.45 + 1.3);
@@ -283,7 +293,7 @@ export function initHero3D() {
         // paquetes de datos que viajan por las líneas de las estructuras de servicio
         float pulse = aPath >= 0.0 ? pow(0.5 + 0.5*sin(aPath*16.0 - uTime*2.6), 10.0) : 0.0;
         float line = step(0.0, aPath) * w1;
-        float sm = w0*1.0 + w1*mix(1.15, 0.92, uGal) + w2*1.1;
+        float sm = w0*uSm.x + w1*mix(1.15, uSm.y, uGal) + w2*uSm.z;      // tamaño por forma (en móvil, más fino)
         // cerebro: sinapsis → un destello en un punto y una onda que se propaga por las partículas vecinas
         float syn = 0.0, synPt = 0.0;
         for (int i = 0; i < 8; i++) {
@@ -519,7 +529,7 @@ export function initHero3D() {
     gsap.from(state, { scale: 0.6, duration: 2, ease: 'expo.out', onUpdate: () => group.scale.setScalar(base.scale * state.scale) });
 
     // Degradados del fondo: deriva constante (posición); el resto lo controla el scroll
-    [['a', 12, -6, 9, 14], ['b', -16, 5, 11, -12]].forEach(([k, x, y, d, sk]) => {
+    [['a', MOB ? 30 : 12, MOB ? -14 : -6, 9, 14], ['b', MOB ? -34 : -16, MOB ? 12 : 5, 11, -12]].forEach(([k, x, y, d, sk]) => {
       gsap.to(`[data-aurora="${k}"]`, { x: x + 'vw', y: y + 'vw', duration: d, ease: 'sine.inOut', yoyo: true, repeat: -1 });
       gsap.to(`[data-aurora="${k}"]`, { skewX: sk, skewY: -sk * 0.4, duration: d * 0.7, ease: 'sine.inOut', yoyo: true, repeat: -1 });   // además se deforman
     });

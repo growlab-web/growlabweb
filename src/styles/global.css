@@ -245,3 +245,13 @@ html.has-cursor, html.has-cursor * { cursor: none !important; }
   [data-services-track] > * { flex: 0 0 auto; scroll-snap-align: start; width: min(78vw, 340px); }
   .services-hint { display: flex; align-items: center; gap: 1rem; }
 }
+
+/* ---------- Móvil y táctil: degradados baratos de dibujar ----------
+   Cambiar contorno o brillo de una mancha difuminada obliga a recalcular el desenfoque en cada fotograma; aquí solo se mueven y giran. */
+@media (max-width: 799px), (pointer: coarse) {
+  .aurora-blob { animation: none; }
+  .pf-aurora--a, .pf-aurora--c { animation-name: aurora-move-a; }
+  .pf-aurora--b { animation-name: aurora-move-b; }
+}
+@keyframes aurora-move-a { from { transform: translate3d(0, 0, 0) rotate(-10deg) scale(1); } to { transform: translate3d(30%, 22%, 0) rotate(16deg) scale(1.3); } }
+@keyframes aurora-move-b { from { transform: translate3d(0, 0, 0) rotate(8deg) scale(1); } to { transform: translate3d(-30%, -24%, 0) rotate(-14deg) scale(1.35); } }

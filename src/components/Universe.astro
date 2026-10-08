@@ -25,7 +25,7 @@ const rings = [inner, outer];
           data-ring={r}
           data-i={i}
           data-n={ring.length}
-          class="absolute left-0 top-0 flex items-center gap-2 whitespace-nowrap rounded-full border border-white/25 bg-[#0b1226]/70 py-2 pl-2.5 pr-4 font-ui text-[.95rem] text-white/90 shadow-[0_0_24px_rgba(56,111,222,.25)] backdrop-blur-md will-change-transform max-sm:p-2"
+          class="absolute left-0 top-0 flex items-center gap-2 whitespace-nowrap rounded-full border border-white/25 bg-[#0b1226]/70 max-md:bg-[#0b1226]/90 py-2 pl-2.5 pr-4 font-ui text-[.95rem] text-white/90 shadow-[0_0_24px_rgba(56,111,222,.25)] md:backdrop-blur-md will-change-transform max-sm:p-2"
         >
           <svg viewBox="0 0 24 24" class="h-[22px] w-[22px] shrink-0" fill={`#${p.icon.hex}`}>
             <path d={p.icon.path} />
@@ -46,7 +46,9 @@ const rings = [inner, outer];
     const items = [...root.querySelectorAll<HTMLElement>('[data-orbit]')];
     const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
     let t = 0, last = performance.now();
+    const panel = root.closest<HTMLElement>('[data-panel]');
     const frame = (now: number) => {
+      if (panel && panel.style.visibility === 'hidden') { last = now; requestAnimationFrame(frame); return; }   // fuera de su etapa no se calcula nada
       const dt = Math.min(0.05, (now - last) / 1000); last = now;
       if (!reduce) t += dt;
       const W = window.innerWidth, H = window.innerHeight;
