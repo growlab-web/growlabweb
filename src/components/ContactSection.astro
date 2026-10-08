@@ -7,8 +7,8 @@ const { id = 'contacto' } = Astro.props;
 <!-- Contacto: panel visual animado (red de datos) a la izquierda, formulario a la derecha -->
 <section {id} data-contact class="grid min-h-[92vh] border-t border-white/10 lg:grid-cols-[0.9fr_1.1fr]">
   <div class="relative min-h-[44vh] overflow-hidden bg-[#02060f]">
-    <div class="pointer-events-none absolute -left-[10vw] -top-[6vw] h-[28vw] w-[44vw] rounded-full bg-[radial-gradient(closest-side,#386fde,#1d3f94_55%,transparent)] opacity-45 blur-[70px]"></div>
-    <div class="pointer-events-none absolute -bottom-[8vw] -right-[8vw] h-[22vw] w-[36vw] rounded-full bg-[radial-gradient(closest-side,#6df2c0,#1f8f68_55%,transparent)] opacity-25 blur-[80px]"></div>
+    <div class="pointer-events-none absolute -left-[10vw] -top-[6vw] h-[28vw] w-[44vw] opacity-45 blur-[70px]"><i class="aurora-blob aurora-blob--a bg-[radial-gradient(closest-side,#386fde,#1d3f94_55%,transparent)]"></i></div>
+    <div class="pointer-events-none absolute -bottom-[8vw] -right-[8vw] h-[22vw] w-[36vw] opacity-25 blur-[80px]"><i class="aurora-blob aurora-blob--b bg-[radial-gradient(closest-side,#6df2c0,#1f8f68_55%,transparent)]"></i></div>
     <canvas data-flow class="absolute inset-0 h-full w-full" aria-hidden="true"></canvas>
     <div class="pointer-events-none absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/70 to-transparent"></div>
     <p class="pointer-events-none absolute bottom-8 left-[clamp(1.5rem,3vw,3rem)] max-w-[22ch] font-display text-[clamp(1.1rem,1.6vw,1.5rem)] font-light leading-snug text-white/90">

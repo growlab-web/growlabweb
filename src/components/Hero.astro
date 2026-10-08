@@ -25,13 +25,15 @@ const stats = [
   <!-- degradados del fondo (se animan solos y con cada etapa) -->
   <div
     data-aurora="a"
-    class="pointer-events-none absolute -left-[16vw] -top-[10vw] z-0 h-[26vw] w-[62vw] rotate-[-16deg] rounded-full bg-[radial-gradient(closest-side,#386fde,#1d3f94_55%,transparent)] opacity-40 blur-[80px] will-change-transform"
+    class="pointer-events-none absolute -left-[16vw] -top-[10vw] z-0 h-[26vw] w-[62vw] rotate-[-16deg] opacity-40 blur-[80px] will-change-transform"
   >
+    <i class="aurora-blob aurora-blob--a bg-[radial-gradient(closest-side,#386fde,#1d3f94_55%,transparent)]"></i>
   </div>
   <div
     data-aurora="b"
-    class="pointer-events-none absolute -bottom-[8vw] -right-[14vw] z-0 h-[20vw] w-[78vw] rounded-full bg-[radial-gradient(closest-side,#5b8fe6,#26509f_55%,transparent)] opacity-[.28] blur-[80px] will-change-transform"
+    class="pointer-events-none absolute -bottom-[8vw] -right-[14vw] z-0 h-[20vw] w-[78vw] opacity-[.28] blur-[80px] will-change-transform"
   >
+    <i class="aurora-blob aurora-blob--b bg-[radial-gradient(closest-side,#5b8fe6,#26509f_55%,transparent)]"></i>
   </div>
   <!-- objeto 3D -->
   <canvas id="hero3d" class="absolute inset-0 z-[1] block h-full w-full" aria-hidden="true"></canvas>
