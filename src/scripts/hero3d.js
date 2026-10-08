@@ -68,28 +68,37 @@ export function initHero3D() {
     set3(NR0, i, x, y, z);
   }
 
-  /* --- 2) Galaxia: núcleo morado con espiral + 3 anillos + polvo (denso) --- */
+  /* --- 2) Galaxia: núcleo blanco-violeta del que nacen dos brazos en S, 3 anillos (cian → turquesa → verde) y polvo --- */
+  const SPD = new Float32Array(COUNT);                    // velocidad de giro propia de cada partícula (rad/s)
+  const VIO = [0.56, 0.36, 1.0], DEEP = [0.27, 0.24, 0.82], GCY = [0.32, 0.78, 1.0], GTL = [0.16, 0.82, 0.72], GGR = [0.2, 0.86, 0.5];
   if (!serviceShape) for (let i = 0; i < N1; i++) {
     const q = Math.random();
-    let rr, th = Math.random() * Math.PI * 2, y = 0, col;
-    if (q < 0.28) {                          // núcleo en espiral (denso, morado, centro blanco)
-      const t = Math.random(); rr = 0.015 + Math.pow(t, 1.25) * 0.74;
-      th = rr * 6.5 + Math.floor(Math.random() * 2) * Math.PI + g() * 0.5;
-      y = g() * 0.055 * (1.1 - rr);
-      col = rr < 0.2 ? mix3(WHITE, LILAC, rr / 0.2) : mix3(LILAC, PURPLE, (rr - 0.2) / 0.55);
-    } else if (q < 0.4) {                    // anillo interior (azul-cian)
-      rr = 0.95 + g() * 0.045; y = g() * 0.02; col = mix3(BLUE, CYAN, Math.random());
-    } else if (q < 0.54) {                   // anillo medio (verde)
-      rr = 1.27 + g() * 0.05; y = g() * 0.025; col = mix3(CYAN, TEAL, 0.5 + Math.random() * 0.5);
-    } else if (q < 0.78) {                   // anillo exterior (verde, ancho y punteado)
-      rr = 2.0 + g() * 0.075; y = g() * 0.04; col = mix3(TEAL, GREEN, Math.random());
-    } else {                                 // polvo suelto alrededor
-      rr = 0.5 + Math.pow(Math.random(), 0.85) * 2.2; y = g() * 0.12;
-      col = mix3(TEAL, CYAN, Math.random()).map((x) => x * 0.85);
+    let rr, th = Math.random() * Math.PI * 2, y = 0, col, spd;
+    if (q < 0.05) {                          // núcleo: punto fijo muy denso y brillante
+      rr = Math.abs(g()) * 0.1 + 0.004; y = g() * 0.03; spd = 0.24;
+      col = mix3(WHITE, VIO, Math.min(1, rr / 0.13));
+    } else if (q < 0.17) {                   // halo violeta alrededor del núcleo
+      rr = Math.pow(Math.random(), 0.75) * 0.8; y = g() * 0.06 * (1.15 - rr); spd = 0.24;
+      col = mix3(VIO, DEEP, Math.min(1, rr / 0.7)).map((x) => x * (0.7 + Math.random() * 0.3));
+    } else if (q < 0.4) {                    // dos brazos que salen del núcleo y se funden con el primer anillo
+      const t = Math.pow(Math.random(), 0.8); rr = t * 0.86;
+      th = Math.floor(Math.random() * 2) * Math.PI + t * 3.5 + g() * 0.06 * (1.2 - t);
+      rr += g() * 0.016; y = g() * 0.014; spd = 0.24;
+      col = t < 0.3 ? mix3(WHITE, VIO, t / 0.3) : mix3(VIO, GCY, (t - 0.3) / 0.7);
+    } else if (q < 0.5) {                    // anillo interior (cian)
+      rr = 0.86 + g() * 0.022; y = g() * 0.014; spd = 0.24; col = mix3(GCY, [0.55, 0.9, 1.0], Math.random() * 0.6);
+    } else if (q < 0.63) {                   // anillo medio (turquesa)
+      rr = 1.38 + g() * 0.03; y = g() * 0.02; spd = 0.13; col = mix3(GCY, GTL, 0.45 + Math.random() * 0.55);
+    } else if (q < 0.8) {                    // anillo exterior (verde, más ancho y con estrellas sueltas)
+      rr = 2.02 + g() * 0.06; y = g() * 0.035; spd = 0.075; col = mix3(GTL, GGR, Math.random());
+    } else {                                 // polvo y estrellas sueltas por todo el disco
+      rr = 0.25 + Math.pow(Math.random(), 0.8) * 2.5; y = g() * (0.05 + rr * 0.05); spd = 0.05 + 0.14 / (rr + 0.6);
+      col = (rr < 0.9 ? mix3(DEEP, GCY, rr / 0.9) : mix3(GCY, GGR, Math.min(1, (rr - 0.9) / 1.2))).map((x) => x * 0.8);
     }
-    col = sparkle(col, 0.07);
+    col = sparkle(col, 0.06);
     set3(P1, i, Math.cos(th) * rr, y, Math.sin(th) * rr);
     set3(C1, i, col[0], col[1], col[2]);
+    SPD[i] = spd;
   }
   if (serviceShape) {                      // estructura propia del servicio (embudo, red, panel…)
     const sh = buildShape(hero.dataset.shape, N1);
@@ -99,8 +108,7 @@ export function initHero3D() {
       PATH[i] = sh.path[i];
     }
   }
-  fill(N1, [P1, C1]);
-  for (let i = N1; i < COUNT; i++) PATH[i] = PATH[(Math.random() * N1) | 0];
+  for (let i = N1; i < COUNT; i++) { const k = (Math.random() * N1) | 0; copy3(P1, i, k); copy3(C1, i, k); PATH[i] = PATH[k]; SPD[i] = SPD[k]; }
 
   /* --- 3) Cerebro: silueta + surcos reales de la referencia, inflados en 3D --- */
   (function buildBrain() {
@@ -140,7 +148,7 @@ export function initHero3D() {
   const attr = (name, arr, n) => geo.setAttribute(name, new THREE.BufferAttribute(arr, n || 3));
   attr('position', P0); attr('normal', NR0);
   attr('aP1', P1); attr('aC1', C1); attr('aP2', P2); attr('aN2', N2v);
-  attr('aScatter', SC); attr('aVis', VIS); attr('aRand', RN, 1); attr('aPath', PATH, 1);
+  attr('aScatter', SC); attr('aVis', VIS); attr('aRand', RN, 1); attr('aPath', PATH, 1); attr('aSpd', SPD, 1);
 
   const noiseGLSL = `
     vec3 mod289(vec3 x){return x-floor(x*(1.0/289.0))*289.0;}
@@ -172,15 +180,15 @@ export function initHero3D() {
     uniforms: {
       uTime: { value: 0 }, uIntro: { value: 0 }, uPR: { value: PR }, uSize: { value: MOB ? 2.4 : 2.3 },
       uMouse: { value: new THREE.Vector3(99, 99, 0) }, uPush: { value: 0 }, uRadius: { value: 0.7 },
-      uMorph: { value: 0 },
+      uMorph: { value: 0 }, uGal: { value: serviceShape ? 0 : 1 },
       uTilt: { value: new THREE.Vector3(1.2, 0.26, 0.0) },
       uYaw: { value: new THREE.Vector3(0, 0, 0) },
       uRoll: { value: new THREE.Vector3(0, 0, 0) },
     },
     vertexShader: `
-      uniform float uTime, uIntro, uPR, uSize, uPush, uRadius, uMorph;
+      uniform float uTime, uIntro, uPR, uSize, uPush, uRadius, uMorph, uGal;
       uniform vec3 uMouse, uTilt, uYaw, uRoll;
-      attribute vec3 aP1, aP2, aN2, aC1, aScatter, aVis; attribute float aRand, aPath;
+      attribute vec3 aP1, aP2, aN2, aC1, aScatter, aVis; attribute float aRand, aPath, aSpd;
       varying vec3 vColor; varying float vAlpha;
       ${noiseGLSL}
       vec3 rotY(vec3 p,float a){float c=cos(a),s=sin(a);return vec3(c*p.x+s*p.z,p.y,-s*p.x+c*p.z);}
@@ -203,7 +211,11 @@ export function initHero3D() {
         p0 += normal * (n*0.2 + n2*0.03);
 
         vec3 q0 = xf(p0, uTilt.x, uYaw.x, uRoll.x);
-        vec3 q1 = xf(aP1, uTilt.y, uYaw.y, uRoll.y);
+        // galaxia: cada partícula gira a su ritmo alrededor del núcleo y el disco ondula un poco (volumen)
+        vec3 g1 = rotY(aP1, -aSpd * uTime * uGal);
+        float gr = length(g1.xz);
+        g1.y += uGal * sin(atan(g1.z, g1.x) * 2.0 + uTime * 0.45) * 0.045 * gr * smoothstep(0.15, 1.2, gr);
+        vec3 q1 = xf(g1, uTilt.y, uYaw.y, uRoll.y);
         vec3 q2 = xf(aP2, uTilt.z, uYaw.z, uRoll.z);
         vec3 p = q0*w0 + q1*w1 + q2*w2;
         p += normalize(p + vec3(1e-4)) * (w1 + w2) * snoise(p*3.0 + uTime*0.3) * 0.012;
@@ -223,8 +235,12 @@ export function initHero3D() {
         float dist = length(d.xy);
         float f = smoothstep(uRadius, 0.0, dist);
         vec2 dir = normalize(d.xy + 1e-4);
-        wp.xy += dir * f * (0.06 + 0.05*uPush);
-        wp.z  += f * (0.1 + 0.12*uPush) * (n*0.6+0.4);
+        vec3 push = vec3(dir * f * (0.06 + 0.05*uPush), f * (0.1 + 0.12*uPush) * (n*0.6+0.4));
+        // galaxia: las partículas cercanas se dispersan en todas las direcciones (sin dejar un hueco limpio)
+        vec3 rdir = normalize(aScatter + vec3(dir, 0.0) * 1.2);
+        vec3 spray = rdir * f * f * (0.22 + 0.3*uPush) * (0.25 + aRand*1.1) * (0.8 + 0.2*sin(uTime*2.5 + aRand*50.0));
+        float gm = w1 * uGal;
+        wp.xyz += mix(push, spray, gm);
 
         vec4 mv = viewMatrix * wp;
         gl_Position = projectionMatrix * mv;
@@ -239,8 +255,10 @@ export function initHero3D() {
         // paquetes de datos que viajan por las líneas de las estructuras de servicio
         float pulse = aPath >= 0.0 ? pow(0.5 + 0.5*sin(aPath*16.0 - uTime*2.6), 10.0) : 0.0;
         float line = step(0.0, aPath) * w1;
-        float sm = w0*1.0 + w1*1.15 + w2*1.1;
-        float sz = uSize * uPR * (5.0 / max(-mv.z, 0.3)) * (0.6 + aRand*0.7) * sm * sizeD * (1.0 + f*0.8) * (1.0 + pulse*0.9*line);
+        float sm = w0*1.0 + w1*mix(1.15, 0.8, uGal) + w2*1.1;
+        float star = pow(fract(aRand*7.31 + 0.13), 16.0);                 // unas pocas estrellas mucho más grandes
+        float szv = mix(0.6 + aRand*0.7, 0.42 + fract(aRand*3.7)*0.55 + star*2.6, gm);
+        float sz = uSize * uPR * (5.0 / max(-mv.z, 0.3)) * szv * sm * sizeD * (1.0 + f*0.8) * (1.0 + pulse*0.9*line);
         sz = min(sz, 40.0 * uPR);
         gl_PointSize = sz;
 
@@ -259,8 +277,9 @@ export function initHero3D() {
         vec3 col = mix(aC1, grad, dm);
         col = mix(col, vec3(1.0), step(0.95, aRand) * 0.5 * w2);
 
+        col = mix(col, mix(col, vec3(1.0), 0.55), star * gm);
         vColor = col * colD * (1.0 + burst*0.25) + f*0.12 + vec3(0.55,0.95,0.6) * pulse * line;
-        float base = 0.9*w0 + 0.95*w1 + 1.0*w2;
+        float base = 0.9*w0 + mix(0.95, 0.5, uGal)*w1 + 1.0*w2;
         vAlpha = base * mix(1.0, 0.5 + 0.9*pulse, line) * (0.45 + 0.55*smoothstep(-0.2,0.8,n+0.4)) * e * vis * alive * alphD / (1.0 + max(sz/uPR - 7.0, 0.0)*0.08);
       }`,
     fragmentShader: `
@@ -371,9 +390,10 @@ export function initHero3D() {
     orb.material.opacity += ((mouse.inside ? 0.7 : 0) - orb.material.opacity) * 0.08;
 
     // orientación de cada forma (inclinación mínima hacia el cursor)
-    mat.uniforms.uTilt.value.set(1.2 - mouse.y * 0.1, serviceShape ? 0.12 - mouse.y * 0.06 : 0.26 - mouse.y * 0.05, -0.05 - mouse.y * 0.05);
-    mat.uniforms.uYaw.value.set(mouse.x * 0.14 + t * 0.12, serviceShape ? Math.sin(t * 0.32) * 0.5 + mouse.x * 0.25 : mouse.x * 0.1 + t * 0.08, 0.25 + Math.sin(t * 0.35) * 0.22 + mouse.x * 0.3);
+    mat.uniforms.uTilt.value.set(1.2 - mouse.y * 0.1, serviceShape ? 0.12 - mouse.y * 0.06 : 0.3 + Math.sin(t * 0.23) * 0.05 - mouse.y * 0.1, -0.05 - mouse.y * 0.05);
+    mat.uniforms.uYaw.value.set(mouse.x * 0.14 + t * 0.12, serviceShape ? Math.sin(t * 0.32) * 0.5 + mouse.x * 0.25 : mouse.x * 0.3, 0.25 + Math.sin(t * 0.35) * 0.22 + mouse.x * 0.3);
 
+    mat.uniforms.uRoll.value.y = serviceShape ? 0 : Math.sin(t * 0.17) * 0.06 + mouse.x * 0.05;
     dust.rotation.y = t * 0.02;
     dust.position.y = Math.sin(t * 0.3) * 0.1;
 
@@ -394,13 +414,15 @@ export function initHero3D() {
     gsap.from(state, { scale: 0.6, duration: 2, ease: 'expo.out', onUpdate: () => group.scale.setScalar(base.scale * state.scale) });
 
     // Degradados del fondo: deriva constante (posición); el resto lo controla el scroll
-    [['a', 9, -5, 9], ['b', -12, 4, 11], ['c', 10, 8, 13]].forEach(([k, x, y, d]) =>
-      gsap.to(`[data-aurora="${k}"]`, { x: x + 'vw', y: y + 'vw', duration: d, ease: 'sine.inOut', yoyo: true, repeat: -1 }));
+    [['a', 12, -6, 9, 14], ['b', -16, 5, 11, -12]].forEach(([k, x, y, d, sk]) => {
+      gsap.to(`[data-aurora="${k}"]`, { x: x + 'vw', y: y + 'vw', duration: d, ease: 'sine.inOut', yoyo: true, repeat: -1 });
+      gsap.to(`[data-aurora="${k}"]`, { skewX: sk, skewY: -sk * 0.4, duration: d * 0.7, ease: 'sine.inOut', yoyo: true, repeat: -1 });   // además se deforman
+    });
 
     if (!pinned) return;
 
     // Secuencia de scroll con el hero fijo: casi-esfera → galaxia → cerebro
-    const A = '[data-aurora="a"]', B = '[data-aurora="b"]', C = '[data-aurora="c"]';
+    const A = '[data-aurora="a"]', B = '[data-aurora="b"]';
     const p1 = ['[data-hero-title]', '[data-foot-wrap]', '[data-actions]', '[data-logos]'];
     const hide = { autoAlpha: 0, y: -40, duration: 0.7, ease: 'power2.in' };
     const show = { autoAlpha: 1, y: 0, duration: 0.8, ease: 'power2.out' };
@@ -418,20 +440,17 @@ export function initHero3D() {
       .to(group.position, { x: 0, duration: 1.7, ease: E }, 0.6)                              // la galaxia va centrada bajo su titular
       .to(p1, hide, 0.7)
       .fromTo('[data-panel="2"]', { autoAlpha: 0, y: 40 }, show, 1.9)
-      // fondo: franja teal en diagonal en la explosión, luego banda verde abajo y violeta arriba
-      .to(A, { opacity: 0.8, rotation: -30, scale: 1.3, xPercent: 18, yPercent: 30, duration: 0.9, ease: E }, 0.6)
-      .to(A, { opacity: 0.35, rotation: -12, scale: 1.0, xPercent: 0, yPercent: 0, duration: 0.9, ease: E }, 1.5)
-      .to(B, { opacity: 0.55, yPercent: -90, scale: 1.1, duration: 1.7, ease: E }, 0.6)
-      .to(C, { opacity: 0.55, duration: 1.7, ease: E }, 0.6)
+      // fondo: franja azul en diagonal en la explosión; con la galaxia queda muy tenue
+      .to(A, { opacity: 0.5, rotation: -30, scale: 1.3, xPercent: 18, yPercent: 30, duration: 0.9, ease: E }, 0.6)
+      .to(A, { opacity: 0.16, rotation: -12, scale: 1.0, xPercent: 0, yPercent: 0, duration: 0.9, ease: E }, 1.5)
+      .to(B, { opacity: 0.2, yPercent: -90, scale: 1.1, duration: 1.7, ease: E }, 0.6)
       .to(state, { morph: 2, duration: 1.7, ease: E }, 3.7)                                   // → cerebro
       .to(group.position, { x: homeX, duration: 1.7, ease: E }, 3.7)
       .to('[data-panel="2"]', hide, 3.8)
       .fromTo('[data-panel="3"]', { autoAlpha: 0, y: 40 }, show, 5.0)
       .fromTo('[data-hero-title]', { autoAlpha: 0, y: 30 }, { ...show, immediateRender: false }, 5.0)
-      .to(C, { opacity: 0.85, xPercent: 6, yPercent: 15, duration: 0.9, ease: E }, 3.7)
-      .to(C, { opacity: 0.4, xPercent: 0, yPercent: 0, duration: 0.9, ease: E }, 4.6)
-      .to(A, { opacity: 0.7, rotation: -24, scale: 1.2, xPercent: 8, yPercent: 14, duration: 1.7, ease: E }, 3.7)
-      .to(B, { opacity: 0.3, yPercent: -30, scale: 0.95, duration: 1.7, ease: E }, 3.7)
+      .to(A, { opacity: 0.45, rotation: -24, scale: 1.2, xPercent: 8, yPercent: 14, duration: 1.7, ease: E }, 3.7)
+      .to(B, { opacity: 0.25, yPercent: -30, scale: 0.95, duration: 1.7, ease: E }, 3.7)
       .to({}, { duration: 1.2 }, 5.4)                                                        // pausa final
       .addLabel('esfera', 0).addLabel('galaxia', 2.75).addLabel('cerebro', 5.95);
   }
