@@ -25,12 +25,14 @@ const rings = [inner, outer];
           data-ring={r}
           data-i={i}
           data-n={ring.length}
-          class="absolute left-0 top-0 flex items-center gap-2 whitespace-nowrap rounded-full border border-white/15 bg-white/[.07] py-1.5 pl-2 pr-3 font-ui text-[.8rem] text-white/90 shadow-[0_0_24px_rgba(56,111,222,.25)] backdrop-blur-md will-change-transform max-sm:p-1.5"
+          class="absolute left-0 top-0 flex items-center gap-2 whitespace-nowrap rounded-full border border-white/25 bg-[#0b1226]/70 py-1.5 pl-2 pr-3 font-ui text-[.8rem] text-white/90 shadow-[0_0_24px_rgba(56,111,222,.25)] backdrop-blur-md will-change-transform max-sm:p-1.5"
         >
           <svg viewBox="0 0 24 24" class="h-[18px] w-[18px] shrink-0" fill={`#${p.icon.hex}`}>
             <path d={p.icon.path} />
           </svg>
           <span class="max-sm:hidden">{p.name}</span>
+          <i class="pointer-events-none absolute left-1/2 top-full h-7 w-px -translate-x-1/2 bg-gradient-to-b from-white/60 to-white/10"></i>
+          <i class="pointer-events-none absolute left-1/2 top-full mt-7 h-[5px] w-[5px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-white shadow-[0_0_8px_2px_rgba(255,255,255,.7)]"></i>
         </span>
       ))
     )
@@ -58,7 +60,7 @@ const rings = [inner, outer];
         const x = Math.cos(a) * rx0 * k, y = Math.sin(a) * ry0 * k;
         const depth = (Math.sin(a) + 1) / 2;                 // 0 = detrás, 1 = delante
         el.style.transform = `translate(calc(${x}px - 50%), calc(${y}px - 50%)) scale(${0.78 + depth * 0.3})`;
-        el.style.opacity = String(0.45 + depth * 0.55);
+        el.style.opacity = String(0.72 + depth * 0.28);
         el.style.zIndex = String(Math.round(depth * 10));
       }
       requestAnimationFrame(frame);
