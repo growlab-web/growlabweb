@@ -17,10 +17,10 @@ export const services = [
   {
     slug: 'web-development',
     n: '02',
-    name: 'Web Development',
+    name: 'Web Development & Ecommerce',
     icon: 'app-window',
     art: 'chips',
-    short: 'Webs y tiendas rápidas, medibles y listas para escalar con tus campañas.',
+    short: 'Webs y tiendas online (Shopify y a medida) rápidas, medibles y listas para escalar con tus campañas.',
   },
   {
     slug: 'ux-ui-design',
