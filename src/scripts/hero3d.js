@@ -16,7 +16,7 @@ gsap.registerPlugin(ScrollTrigger);
 export function initHero3D() {
   const hero = document.querySelector('[data-hero]');
   const canvas = hero && hero.querySelector('#hero3d');
-  if (!canvas) return { start() {} };
+  if (!canvas) return { start() {}, ready: Promise.resolve() };
 
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: true, powerPreference: 'high-performance' });
   const PR = Math.min(window.devicePixelRatio || 1, window.innerWidth < 800 ? 1.25 : 2);   // en móvil se dibuja a menos resolución: va bastante más fluido
@@ -531,7 +531,11 @@ export function initHero3D() {
 
   window.addEventListener('resize', resize);
   resize();
-  frame();
+  // el sombreador se compila en segundo plano (si el navegador lo permite) y se dibuja un primer fotograma antes de quitar la carga:
+  // así el tirón de preparar la gráfica ocurre tras la pantalla de carga y no en el primer scroll
+  const ready = Promise.resolve(renderer.compileAsync ? renderer.compileAsync(scene, camera) : null)
+    .catch(() => {})
+    .then(() => { renderer.render(scene, camera); frame(); });
 
   if ('IntersectionObserver' in window) new IntersectionObserver(([en]) => (running = en.isIntersecting)).observe(hero);
 
@@ -588,5 +592,5 @@ export function initHero3D() {
       .addLabel('esfera', 0).addLabel('galaxia', 2.75).addLabel('cerebro', 5.95);
   }
 
-  return { start };
+  return { start, ready };
 }

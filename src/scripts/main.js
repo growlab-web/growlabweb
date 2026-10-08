@@ -16,6 +16,7 @@ gsap.registerPlugin(ScrollTrigger);
 initCursor();
 
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const isTouch = window.matchMedia('(pointer: coarse)').matches || window.innerWidth < 800;
 const $ = (s, root = document) => root.querySelector(s);
 const $$ = (s, root = document) => Array.from(root.querySelectorAll(s));
 
@@ -53,7 +54,7 @@ const hasHero = !!$('[data-hero]');
 let hero3d = { start() {} };
 const heroReady = hasHero
   ? import('./hero3d.js')
-      .then((m) => { hero3d = m.initHero3D(); })
+      .then((m) => { hero3d = m.initHero3D(); return Promise.race([hero3d.ready, new Promise((r) => setTimeout(r, 3000))]); })   // espera a que la gráfica esté lista (máx. 3 s)
       .catch((err) => console.warn('WebGL no disponible, se omite el objeto 3D.', err))
   : Promise.resolve();
 
@@ -144,13 +145,17 @@ function initPage() {
 
   if (hasHero) {
     // entrada del hero: el texto sale del desenfoque
-    gsap.from('[data-line]', { autoAlpha: 0, y: 26, filter: 'blur(14px)', duration: 1.3, stagger: 0.14, ease: 'power3.out' });
-    gsap.from('[data-foot], [data-actions] > *, [data-logos] > *', { autoAlpha: 0, y: 20, filter: 'blur(8px)', duration: 1.1, stagger: 0.12, delay: 0.35, ease: 'power3.out' });
+    // en táctil sin desenfoque: animar un blur es de lo más caro en un teléfono y coincide con el arranque del 3D
+    gsap.from('[data-line]', { autoAlpha: 0, y: 26, ...(isTouch ? {} : { filter: 'blur(14px)' }), duration: 1.3, stagger: 0.14, ease: 'power3.out' });
+    gsap.from('[data-foot], [data-actions] > *, [data-logos] > *', { autoAlpha: 0, y: 20, ...(isTouch ? {} : { filter: 'blur(8px)' }), duration: 1.1, stagger: 0.12, delay: 0.35, ease: 'power3.out' });
     hero3d.start(reduceMotion);
     initTypewriter();
   }
 
   if (reduceMotion) { scrollToHash(); return; }
+
+  // el resto de secciones se prepara aparte: en táctil, un momento después, para no competir con la entrada del hero
+  const initSections = () => {
 
   /* MARQUEE: se mueve según el scroll, en direcciones opuestas */
   if ($('[data-marquee]')) {
@@ -274,4 +279,6 @@ function initPage() {
 
   ScrollTrigger.refresh();
   scrollToHash();
+  };
+  if (isTouch && hasHero && !location.hash) setTimeout(initSections, 1600); else initSections();
 }
