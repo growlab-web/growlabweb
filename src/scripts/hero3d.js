@@ -39,7 +39,7 @@ export function initHero3D() {
   const mix3 = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t];
   const g = () => (Math.random() + Math.random() + Math.random() - 1.5) / 1.5;
   const PURPLE = [0.16, 0.32, 0.8], LILAC = [0.5, 0.68, 0.98], BLUE = [0.22, 0.435, 0.87];
-  const WHITE = [0.92, 0.96, 1.0], CYAN = [0.45, 0.72, 0.97], TEAL = [0.5, 0.8, 0.6], GREEN = [0.67, 0.88, 0.33];
+  const WHITE = [0.92, 0.96, 1.0], CYAN = [0.45, 0.72, 0.97], TEAL = [0.5, 0.8, 0.6], GREEN = [0.2, 0.86, 0.5];
   const sparkle = (c, p) => (Math.random() < p ? mix3(c, [1, 1, 1], 0.65) : c);
 
   /* ================= Buffers ================= */
@@ -71,7 +71,7 @@ export function initHero3D() {
   /* --- 2) Galaxia: núcleo blanco-violeta del que nacen dos brazos en S, 3 anillos (cian → turquesa → verde) y polvo --- */
   const GSZ = new Float32Array(COUNT).fill(1);              // tamaño propio de cada partícula de la galaxia
   const SPD = new Float32Array(COUNT);                    // velocidad de giro propia de cada partícula (rad/s)
-  const VIO = [0.56, 0.36, 1.0], DEEP = [0.27, 0.24, 0.82], GCY = [0.32, 0.78, 1.0], GTL = [0.42, 0.85, 0.62], GGR = [0.67, 0.88, 0.33];   // GGR = verde de marca #abe155
+  const VIO = [0.56, 0.36, 1.0], DEEP = [0.27, 0.24, 0.82], GCY = [0.32, 0.78, 1.0], GTL = [0.16, 0.82, 0.72], GGR = [0.2, 0.86, 0.5];   // GGR = verde del sitio #33db80
   if (!serviceShape) for (let i = 0; i < N1; i++) {
     const q = Math.random();
     let rr, th = Math.random() * Math.PI * 2, y = 0, col, spd, gsz = 1;
@@ -275,7 +275,7 @@ export function initHero3D() {
 
         // degradado por altura en pantalla (verde arriba → azul → violeta abajo)
         float hh = smoothstep(-1.0, 1.0, wp.y + 0.1);
-        vec3 purple = vec3(0.16,0.32,0.8), blue = vec3(0.22,0.435,0.87), green = vec3(0.67,0.88,0.33);
+        vec3 purple = vec3(0.16,0.32,0.8), blue = vec3(0.22,0.435,0.87), green = vec3(0.2,0.86,0.5);
         vec3 grad = mix(purple, blue, smoothstep(0.0,0.45,hh));
         grad = mix(grad, green, smoothstep(0.45,0.95,hh));
         vec3 col = mix(aC1, grad, dm);

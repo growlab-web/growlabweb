@@ -5,7 +5,7 @@
  *  - setConverge: 0 = cae en diagonal; 1 = todas las líneas se encogen y viajan hacia el centro,
  *    donde el hero 3D está ensamblando la esfera (la lluvia "se convierte" en las partículas).
  */
-const PALETTE = ['255,255,255', '255,255,255', '140,180,255', '56,111,222', '171,225,85'];
+const PALETTE = ['255,255,255', '255,255,255', '140,180,255', '56,111,222', '51,219,128'];
 
 export function startRain(canvas, opts = {}) {
   const cxRatio = opts.cx ?? 0.5, cyRatio = opts.cy ?? 0.54;
