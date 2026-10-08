@@ -187,11 +187,13 @@ export function initHero3D() {
       uTilt: { value: new THREE.Vector3(1.2, 0.26, 0.0) },
       uYaw: { value: new THREE.Vector3(0, 0, 0) },
       uRoll: { value: new THREE.Vector3(0, 0, 0) },
+      uSpark: { value: Array.from({ length: 8 }, () => new THREE.Vector4(0, 0, 0, -1)) },
       uVoice: { value: 0 }, uVDir: { value: new THREE.Vector3(0, 1, 0) }, uVDir2: { value: new THREE.Vector3(1, 0, 0) },
     },
     vertexShader: `
       uniform float uTime, uIntro, uPR, uSize, uPush, uRadius, uMorph, uGal, uVoice;
       uniform vec3 uMouse, uTilt, uYaw, uRoll, uVDir, uVDir2;
+      uniform vec4 uSpark[8];
       attribute vec3 aP1, aP2, aN2, aC1, aScatter, aVis; attribute float aRand, aPath, aSpd, aSz;
       varying vec3 vColor; varying float vAlpha;
       ${noiseGLSL}
@@ -275,9 +277,17 @@ export function initHero3D() {
         float pulse = aPath >= 0.0 ? pow(0.5 + 0.5*sin(aPath*16.0 - uTime*2.6), 10.0) : 0.0;
         float line = step(0.0, aPath) * w1;
         float sm = w0*1.0 + w1*mix(1.15, 0.92, uGal) + w2*1.1;
+        // cerebro: sinapsis → un destello en un punto y una onda que se propaga por las partículas vecinas
+        float syn = 0.0;
+        for (int i = 0; i < 8; i++) {
+          vec4 sp = uSpark[i];
+          float sd = distance(aP2, sp.xyz), fade = 1.0 - sp.w, sr = (sd - sp.w * 0.7) / 0.055;
+          syn += step(0.0, sp.w) * (exp(-sr*sr) * fade * 0.9 + exp(-sd*sd / 0.006) * fade * fade * 1.8);
+        }
+        syn *= w2 * (0.3 + 0.7 * step(0.4, fract(aRand * 5.3)));
         float star = pow(fract(aRand*7.31 + 0.13), 16.0);                 // unas pocas estrellas mucho más grandes
         float szv = mix(0.6 + aRand*0.7, aSz*(0.5 + fract(aRand*3.7)*0.55) + star*2.6, gm);
-        float sz = uSize * uPR * (5.0 / max(-mv.z, 0.3)) * szv * sm * sizeD * (1.0 + f*0.8*(1.0 - sw)) * (1.0 + pulse*0.9*line);
+        float sz = uSize * uPR * (5.0 / max(-mv.z, 0.3)) * szv * sm * sizeD * (1.0 + f*0.8*(1.0 - sw)) * (1.0 + pulse*0.9*line) * (1.0 + min(syn, 1.5) * 0.8);
         sz = min(sz, 40.0 * uPR);
         gl_PointSize = sz;
 
@@ -297,9 +307,10 @@ export function initHero3D() {
         col = mix(col, vec3(1.0), step(0.95, aRand) * 0.5 * w2);
 
         col = mix(col, mix(col, vec3(1.0), 0.55), star * gm);
+        col = mix(col, vec3(0.78, 1.0, 0.93), clamp(syn, 0.0, 1.0)) * (1.0 + syn * 0.7);
         vColor = col * colD * (1.0 + burst*0.25) + f*0.12 + vec3(0.55,0.95,0.6) * pulse * line;
         float base = 0.9*w0 + mix(0.95, 0.62, uGal)*w1 + 1.0*w2;
-        vAlpha = base * mix(1.0, 0.5 + 0.9*pulse, line) * (0.45 + 0.55*smoothstep(-0.2,0.8,n+0.4)) * e * vis * alive * alphD / (1.0 + max(sz/uPR - 7.0, 0.0)*0.08);
+        vAlpha = base * mix(1.0, 0.5 + 0.9*pulse, line) * (0.45 + 0.55*smoothstep(-0.2,0.8,n+0.4)) * e * vis * alive * alphD * (1.0 + syn * 1.4) / (1.0 + max(sz/uPR - 7.0, 0.0)*0.08);
       }`,
     fragmentShader: `
       varying vec3 vColor; varying float vAlpha;
@@ -403,6 +414,38 @@ export function initHero3D() {
     mat.uniforms.uVDir.value.copy(voice.d1); mat.uniforms.uVDir2.value.copy(voice.d2);
   }
 
+  /* ---- Sinapsis del cerebro: destellos que nacen en puntos al azar y a veces se encadenan con uno vecino ---- */
+  const sparks = mat.uniforms.uSpark.value.map((v) => ({ v, age: -1, dur: 1, wait: Math.random() * 1.5 }));
+  let sparkLast = 0;
+  const sparkPoint = (near) => {                                  // punto de la cara visible del cerebro; si hay "near", cerca de él
+    let best = 0, bd = 1e9;
+    for (let k = 0; k < (near ? 14 : 1); k++) {
+      let n = 0;
+      for (let tries = 0; tries < 20; tries++) { n = (Math.random() * N2) | 0; if (P2[n * 3 + 2] > 0.05) break; }
+      if (!near) return n;
+      const d = Math.abs(Math.hypot(P2[n * 3] - near.x, P2[n * 3 + 1] - near.y, P2[n * 3 + 2] - near.z) - 0.5);
+      if (d < bd) { bd = d; best = n; }
+    }
+    return best;
+  };
+  function updateSparks(t) {
+    const dt = Math.min(0.05, t - sparkLast); sparkLast = t;
+    if (reduceMo || state.morph < 1.6) { sparks.forEach((sp) => { sp.age = -1; sp.v.w = -1; }); return; }
+    for (const sp of sparks) {
+      if (sp.age < 0) {
+        sp.wait -= dt;
+        if (sp.wait <= 0) {
+          const n = sparkPoint(sp.chain ? sp.v : null);
+          sp.v.set(P2[n * 3], P2[n * 3 + 1], P2[n * 3 + 2], 0); sp.age = 0; sp.dur = 0.7 + Math.random() * 0.6;
+        }
+      } else {
+        sp.age += dt / sp.dur;
+        if (sp.age >= 1) { sp.age = -1; sp.chain = Math.random() < 0.6; sp.wait = sp.chain ? 0.02 + Math.random() * 0.12 : 0.3 + Math.random() * 1.4; }
+      }
+      sp.v.w = sp.age;
+    }
+  }
+
   /* ---- Render ---- */
   let running = true, started = false;
   const t0 = performance.now();
@@ -413,6 +456,7 @@ export function initHero3D() {
     mat.uniforms.uTime.value = t;
     mat.uniforms.uMorph.value = state.morph;
     updateVoice(t);
+    updateSparks(t);
     {
       const w1 = clamp01(1 - Math.abs(state.morph - 1));                    // 1 cuando la forma es la galaxia
       group.scale.setScalar(base.scale * state.scale * (1 - (1 - galaxyK()) * w1));
