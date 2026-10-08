@@ -75,28 +75,25 @@ export function initHero3D() {
   if (!serviceShape) for (let i = 0; i < N1; i++) {
     const q = Math.random();
     let rr, th = Math.random() * Math.PI * 2, y = 0, col, spd, gsz = 1;
-    if (q < 0.05) {                          // núcleo: punto fijo muy denso y brillante
-      rr = Math.abs(g()) * 0.1 + 0.004; y = g() * 0.03; spd = 0.24;
-      col = mix3(WHITE, VIO, Math.min(1, rr / 0.13));
-    } else if (q < 0.22) {                   // halo violeta alrededor del núcleo
-      rr = Math.pow(Math.random(), 0.9) * 0.95; y = g() * 0.06 * (1.15 - rr); spd = 0.24;
-      col = mix3(VIO, DEEP, Math.min(1, rr / 0.7)).map((x) => x * (0.7 + Math.random() * 0.3));
-    } else if (q < 0.32) {                   // dos brazos que salen del núcleo y se funden con el primer anillo
-      const t = Math.pow(Math.random(), 0.8); rr = t * 0.86;
-      th = Math.floor(Math.random() * 2) * Math.PI + t * 3.5 + g() * 0.06 * (1.2 - t);
-      rr += g() * 0.016; y = g() * 0.014; spd = 0.24;
-      col = t < 0.3 ? mix3(WHITE, VIO, t / 0.3) : mix3(VIO, GCY, (t - 0.3) / 0.7);
-    } else if (q < 0.38) {                   // anillo interior (cian)
-      rr = 0.86 + g() * 0.022; y = g() * 0.014; spd = 0.24; col = mix3(GCY, [0.55, 0.9, 1.0], Math.random() * 0.6);
-    } else if (q < 0.46) {                   // anillo medio (turquesa)
-      rr = 1.38 + g() * 0.03; y = g() * 0.02; spd = 0.13; col = mix3(GCY, GTL, 0.45 + Math.random() * 0.55);
-    } else if (q < 0.57) {                   // anillo exterior (verde, más ancho y con estrellas sueltas)
-      rr = 2.02 + g() * 0.06; y = g() * 0.035; spd = 0.075; col = mix3(GTL, GGR, Math.random());
+    if (q < 0.055) {                          // núcleo: punto fijo muy denso y luminoso
+      rr = Math.abs(g()) * 0.085 + 0.003; y = g() * 0.03; spd = 0.16; gsz = 1.35;
+      col = mix3([1, 1, 1], VIO, Math.min(1, rr / 0.16));
+    } else if (q < 0.2) {                   // resplandor violeta alrededor del núcleo
+      rr = Math.pow(Math.random(), 1.2) * 0.75; y = g() * 0.06 * (1.15 - rr); spd = 0.16;
+      col = mix3(VIO, DEEP, Math.min(1, rr / 0.7)).map((x) => x * 0.8);
+    } else if (q < 0.6) {                    // dos brazos continuos: nacen en el núcleo y dan vuelta y media hasta el borde (sin anillos cerrados)
+      const t = Math.pow(Math.random(), 0.9);
+      rr = Math.pow(t, 1.08) * 2.08;
+      th = Math.floor(Math.random() * 2) * Math.PI + t * Math.PI * 3.0;
+      rr += g() * (0.012 + 0.028 * t * t) + (t > 0.94 ? g() * (t - 0.94) * 2 : 0);   // la punta se deshace en polvo
+      y = g() * (0.012 + 0.02 * t); spd = 0.16;
+      col = t < 0.1 ? mix3([1, 1, 1], VIO, t / 0.1) : t < 0.3 ? mix3(VIO, GCY, (t - 0.1) / 0.2) : t < 0.62 ? mix3(GCY, GTL, (t - 0.3) / 0.32) : mix3(GTL, GGR, (t - 0.62) / 0.38);
+      if (t > 0.94) col = col.map((x) => x * (1 - (t - 0.94) * 9));
     } else {                                 // polvo y estrellas sueltas por todo el disco
       rr = 0.2 + Math.pow(Math.random(), 1.3) * 2.4; y = g() * (0.03 + rr * 0.035);   // más denso hacia el centro, se va vaciando hacia el borde
       spd = 0.05 + 0.14 / (rr + 0.6);
       gsz = 0.95 + Math.pow(Math.random(), 3) * 1.4;        // puntos sueltos: se tienen que ver uno a uno
-      col = (rr < 0.9 ? mix3(DEEP, GCY, rr / 0.9) : mix3(GCY, GGR, Math.min(1, (rr - 0.9) / 1.2)));
+      col = (rr < 0.9 ? mix3(DEEP, GCY, rr / 0.9) : mix3(GCY, GGR, Math.min(1, (rr - 0.9) / 1.2))).map((x) => x * 0.8);
     }
     col = sparkle(col, 0.06);
     set3(P1, i, Math.cos(th) * rr, y, Math.sin(th) * rr);
