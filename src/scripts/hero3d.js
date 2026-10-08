@@ -229,7 +229,10 @@ export function initHero3D() {
 
         // ensamblado inicial
         float e = smoothstep(0.0, 1.0, clamp(uIntro*1.4 - aRand*0.4, 0.0, 1.0));
-        p = mix(aScatter, p, e);
+        // las partículas suben desde abajo, abiertas en abanico, y se juntan en el centro
+        vec3 from = vec3(aScatter.x * 0.75, -3.4 - abs(aScatter.y) * 0.45 - aRand * 1.2, aScatter.z * 0.35);
+        p = mix(from, p, e);
+        p.x += sin(e * 3.14159) * aScatter.z * 0.06;                     // ligera curva al subir
 
         vec4 wp = modelMatrix * vec4(p,1.0);
 
@@ -421,7 +424,7 @@ export function initHero3D() {
   function start(reduce) {
     if (started) return; started = true;
     if (reduce) { mat.uniforms.uIntro.value = 1; return; }
-    gsap.to(mat.uniforms.uIntro, { value: 1, duration: 2, ease: 'power3.out' });
+    gsap.to(mat.uniforms.uIntro, { value: 1, duration: 2.4, ease: 'power2.out' });
     gsap.from(state, { scale: 0.6, duration: 2, ease: 'expo.out', onUpdate: () => group.scale.setScalar(base.scale * state.scale) });
 
     // Degradados del fondo: deriva constante (posición); el resto lo controla el scroll
