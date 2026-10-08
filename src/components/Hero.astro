@@ -2,6 +2,7 @@
 import { services } from '../data/services.js';
 import Partners from './Partners.astro';
 import Universe from './Universe.astro';
+import AiTools from './AiTools.astro';
 const words = JSON.stringify(services.map((s) => s.name));
 const stats = [
   { n: '250+', l: 'Proyectos entregados' },
@@ -110,9 +111,7 @@ const stats = [
         Nos reforzamos en la inteligencia artificial para combinar señales de comportamiento, datos first&#8209;party y modelos predictivos, y así anticipar qué necesita cada cliente y activarlo con el mensaje, el canal y el momento precisos.
       </p>
     </div>
-    <p class="cap absolute right-(--gx) top-[56%] max-w-[14em] max-lg:hidden">
-      Cada interacción es una señal de intención. La modelamos en tiempo real.
-    </p>
+    <AiTools />
     <h3 class="display-xl absolute bottom-[4%] right-(--gx) text-right max-md:text-[2.2rem]">
       Predice, activa<br />y convierte.
     </h3>
