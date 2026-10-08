@@ -143,7 +143,7 @@ h1, h2, h3 { font-weight: 700 !important; letter-spacing: -0.02em !important; }
 /* ───────── Portafolio 3D ───────── */
 .pf-aurora { position: absolute; border-radius: 9999px; filter: blur(90px); pointer-events: none; opacity: .35; }
 .pf-aurora--a { left: -14vw; top: -10vw; width: 54vw; height: 24vw; background: radial-gradient(closest-side, #386fde, #1d3f94 55%, transparent); opacity: .22; animation: aurora-morph-a 11s ease-in-out infinite alternate; }
-.pf-aurora--b { right: -14vw; bottom: -10vw; width: 62vw; height: 24vw; background: radial-gradient(closest-side, #8b5cf6, #4c1d95 55%, transparent); opacity: .2; animation: aurora-morph-b 13s ease-in-out infinite alternate; }
+.pf-aurora--b { right: -14vw; bottom: -10vw; width: 62vw; height: 24vw; background: radial-gradient(closest-side, #386fde, #1d3f94 55%, transparent); opacity: .2; animation: aurora-morph-b 13s ease-in-out infinite alternate; }
 .pf-aurora--c { left: 30vw; top: -16vw; width: 34vw; height: 22vw; background: radial-gradient(closest-side, #6df2c0, #1f8f68 55%, transparent); opacity: .09; animation: aurora-morph-a 16s ease-in-out infinite alternate-reverse; }
 
 /* Degradados de fondo de toda la web: se desplazan bastante y cambian de forma (se estiran, giran, se deforman y laten) */
