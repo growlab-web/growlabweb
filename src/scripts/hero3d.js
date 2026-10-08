@@ -236,7 +236,8 @@ export function initHero3D() {
         // cursor: aparta e ilumina muy poco las partículas cercanas
         vec3 d = wp.xyz - uMouse;
         float dist = length(d.xy);
-        float f = smoothstep(uRadius * mix(1.0, 0.28, w1 * uGal), 0.0, dist);   // en la galaxia el cursor afecta a una zona muy pequeña
+        float sw = clamp(w0 + w1 * uGal, 0.0, 1.0);                      // esfera y galaxia: el cursor dispersa las partículas en una zona pequeña
+        float f = smoothstep(uRadius * mix(1.0, 0.28, sw), 0.0, dist);
         vec2 dir = normalize(d.xy + 1e-4);
         vec3 push = vec3(dir * f * (0.06 + 0.05*uPush), f * (0.1 + 0.12*uPush) * (n*0.6+0.4));
         // galaxia: las partículas cercanas se dispersan en todas las direcciones (sin dejar un hueco limpio)
@@ -244,7 +245,7 @@ export function initHero3D() {
         rdir.z *= 0.35;                                                  // casi sin acercarse a la cámara: se dispersan pero no crecen
         vec3 spray = rdir * f * f * (0.13 + 0.16*uPush) * (0.25 + aRand*1.1) * (0.8 + 0.2*sin(uTime*2.5 + aRand*50.0));
         float gm = w1 * uGal;
-        wp.xyz += mix(push, spray, gm);
+        wp.xyz += mix(push, spray, sw);
 
         vec4 mv = viewMatrix * wp;
         gl_Position = projectionMatrix * mv;
@@ -262,7 +263,7 @@ export function initHero3D() {
         float sm = w0*1.0 + w1*mix(1.15, 0.92, uGal) + w2*1.1;
         float star = pow(fract(aRand*7.31 + 0.13), 16.0);                 // unas pocas estrellas mucho más grandes
         float szv = mix(0.6 + aRand*0.7, aSz*(0.5 + fract(aRand*3.7)*0.55) + star*2.6, gm);
-        float sz = uSize * uPR * (5.0 / max(-mv.z, 0.3)) * szv * sm * sizeD * (1.0 + f*0.8*(1.0 - gm)) * (1.0 + pulse*0.9*line);
+        float sz = uSize * uPR * (5.0 / max(-mv.z, 0.3)) * szv * sm * sizeD * (1.0 + f*0.8*(1.0 - sw)) * (1.0 + pulse*0.9*line);
         sz = min(sz, 40.0 * uPR);
         gl_PointSize = sz;
 
