@@ -174,9 +174,17 @@ function initPage() {
 
   /* SERVICIOS: scroll horizontal con pin */
   const track = $('[data-services-track]');
+  // en móvil y tablet la gente arrastra las tarjetas de lado: ahí es un carrusel que se desliza con el dedo, sin pin
+  const swipeServices = window.matchMedia('(max-width: 1023px), (pointer: coarse)').matches;
+  if (track && swipeServices) {
+    const bar = $('[data-services-bar]');
+    const upd = () => { const max = track.scrollWidth - track.clientWidth; if (bar) bar.style.transform = `scaleX(${max > 0 ? Math.max(0.08, track.scrollLeft / max) : 1})`; };
+    track.addEventListener('scroll', upd, { passive: true });
+    upd();
+  }
   if (track) {
     const getDist = () => track.scrollWidth - window.innerWidth;
-    gsap.to(track, {
+    if (!swipeServices) gsap.to(track, {
       x: () => -getDist(), ease: 'none',
       scrollTrigger: { trigger: '[data-services-pin]', start: 'top top', end: () => '+=' + getDist(), pin: true, scrub: 0.4, invalidateOnRefresh: true, anticipatePin: 1 },
     });
@@ -251,7 +259,7 @@ function initPage() {
   };
   enter('[data-marquee]', null, { y: 30, duration: 1.2 }, 'top 92%');
   $$('[data-manifesto]').forEach((m) => enter([m.previousElementSibling], m.parentElement));
-  enter('[data-services-track] > *', '[data-services]', { y: 0, x: 140, stagger: 0.09, duration: 1.1 }, 'top 55%');
+  enter('[data-services-track] > *', '[data-services]', { y: 0, x: 140, stagger: 0.09, duration: 1.1 }, swipeServices ? 'top 75%' : 'top 55%');
   $$('[data-contact]').forEach((c) => {
     enter([c.firstElementChild], c, { y: 0, x: -50, duration: 1.3 }, 'top 75%');
     enter($$('[data-contact-form] > *', c), $('[data-contact-form]', c), { y: 26, stagger: 0.06, duration: 0.9 }, 'top 88%');

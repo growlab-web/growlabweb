@@ -235,3 +235,13 @@ html.has-cursor, html.has-cursor * { cursor: none !important; }
 .gl-cursor.is-link .gl-cursor__ring::before { transform: scale(1.45); border-color: var(--color-secondary); background-color: color-mix(in srgb, var(--color-secondary) 12%, transparent); }
 .gl-cursor.is-link .gl-cursor__ring b { transform: rotate(calc(var(--a) + 45deg)) translateY(-30px); background: var(--color-secondary); }
 .gl-cursor.is-down .gl-cursor__ring::before { transform: scale(.8); }
+
+/* ---------- Servicios en móvil/tablet: carrusel que se desliza con el dedo (en escritorio sigue el scroll con pin) ---------- */
+.services-hint { display: none; }
+@media (max-width: 1023px), (pointer: coarse) {
+  [data-services-pin] { height: auto; overflow: visible; padding-block: 10vh; gap: 2rem; }
+  [data-services-track] { width: auto; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scroll-padding-inline: var(--pad); -webkit-overflow-scrolling: touch; scrollbar-width: none; gap: 1rem; will-change: auto; }
+  [data-services-track]::-webkit-scrollbar { display: none; }
+  [data-services-track] > * { flex: 0 0 auto; scroll-snap-align: start; width: min(78vw, 340px); }
+  .services-hint { display: flex; align-items: center; gap: 1rem; }
+}

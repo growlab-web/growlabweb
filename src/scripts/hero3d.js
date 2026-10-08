@@ -178,8 +178,10 @@ export function initHero3D() {
       return 42.0*dot(m*m,vec4(dot(p0,x0),dot(p1,x1),dot(p2,x2),dot(p3,x3)));
     }`;
 
+  const CAN_HOVER = window.matchMedia('(hover: hover) and (pointer: fine)').matches;   // solo con ratón: en táctil el efecto no aporta y cuesta rendimiento
   const mat = new THREE.ShaderMaterial({
     transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+    defines: CAN_HOVER ? { HOVER: 1 } : {},
     uniforms: {
       uTime: { value: 0 }, uIntro: { value: 0 }, uPR: { value: PR }, uSize: { value: MOB ? 2.4 : 2.3 },
       uMouse: { value: new THREE.Vector3(99, 99, 0) }, uPush: { value: 0 }, uRadius: { value: 0.7 },
@@ -243,6 +245,7 @@ export function initHero3D() {
 
         vec4 wp = modelMatrix * vec4(p,1.0);
 
+        #ifdef HOVER
         // cursor: aparta e ilumina muy poco las partículas cercanas
         vec3 d = wp.xyz - uMouse;
         float dist = length(d.xy);
@@ -262,6 +265,10 @@ export function initHero3D() {
         vec3 spray = rdir * f * (0.4 + 0.6 * f) * (0.13 + 0.16*uPush) * amp * (1.0 + (w0 + w2) * 0.7) * (0.8 + 0.2*sin(uTime*0.7 + aRand*50.0));
         float gm = w1 * uGal;
         wp.xyz += mix(push, spray, sw);
+        #else
+        // pantallas táctiles: sin efecto de cursor (ahorra tres cálculos de ruido por partícula)
+        float f = 0.0, sw = 0.0, gm = w1 * uGal;
+        #endif
 
         vec4 mv = viewMatrix * wp;
         gl_Position = projectionMatrix * mv;
@@ -387,7 +394,8 @@ export function initHero3D() {
   /* ---- Ratón ---- */
   const mouse = { x: 0, y: 0, tx: 0, ty: 0, inside: false, speed: 0, ox: 0, oy: 0 };
   const ndc = new THREE.Vector3();
-  window.addEventListener('pointermove', (e) => {
+  if (CAN_HOVER) window.addEventListener('pointermove', (e) => {
+    if (e.pointerType && e.pointerType !== 'mouse') return;
     const rect = hero.getBoundingClientRect();
     mouse.tx = ((e.clientX - rect.left) / rect.width) * 2 - 1;
     mouse.ty = -(((e.clientY - rect.top) / rect.height) * 2 - 1);

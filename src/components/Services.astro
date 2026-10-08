@@ -32,6 +32,12 @@ import Icon from './Icon.astro';
         ))
       }
     </div>
+
+    <!-- solo en móvil/tablet: aviso de que se desliza de lado + barra de avance -->
+    <div class="services-hint px-(--pad)" aria-hidden="true">
+      <span class="h-[2px] flex-1 overflow-hidden rounded-full bg-white/12"><i data-services-bar class="block h-full origin-left bg-secondary" style="transform:scaleX(.08)"></i></span>
+      <span class="flex items-center gap-2 font-ui text-[.8rem] text-white/60">Desliza <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg></span>
+    </div>
   </div>
 </section>
 
