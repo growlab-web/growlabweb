@@ -491,7 +491,6 @@ export function initHero3D() {
       .to(group.position, { x: homeX, duration: 1.7, ease: E }, 3.7)
       .to('[data-panel="2"]', hide, 3.8)
       .fromTo('[data-panel="3"]', { autoAlpha: 0, y: 40 }, show, 5.0)
-      .fromTo('[data-hero-title]', { autoAlpha: 0, y: 30 }, { ...show, immediateRender: false }, 5.0)
       .to(A, { opacity: 0.45, rotation: -24, scale: 1.2, xPercent: 8, yPercent: 14, duration: 1.7, ease: E }, 3.7)
       .to(B, { opacity: 0.25, yPercent: -30, scale: 0.95, duration: 1.7, ease: E }, 3.7)
       .to({}, { duration: 1.2 }, 5.4)                                                        // pausa final
