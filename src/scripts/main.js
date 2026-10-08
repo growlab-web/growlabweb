@@ -9,8 +9,11 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Lenis from 'lenis';
 import { startRain } from './loaderRain.js';
 import { initDataFlow } from './dataflow.js';
+import { initCursor } from './cursor.js';
 
 gsap.registerPlugin(ScrollTrigger);
+
+initCursor();
 
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const $ = (s, root = document) => root.querySelector(s);
