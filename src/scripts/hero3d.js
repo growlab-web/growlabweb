@@ -282,12 +282,13 @@ export function initHero3D() {
         for (int i = 0; i < 8; i++) {
           vec4 sp = uSpark[i];
           float sd = distance(aP2, sp.xyz), fade = 1.0 - sp.w, sr = (sd - sp.w * 0.7) / 0.055;
-          syn += step(0.0, sp.w) * (exp(-sr*sr) * fade * 0.9 + exp(-sd*sd / 0.006) * fade * fade * 1.8);
+          float f4 = fade * fade * fade * fade;
+          syn += step(0.0, sp.w) * (exp(-sr*sr) * fade * 0.9 + exp(-sd*sd / 0.006) * fade * fade * 1.4 + exp(-sd*sd / 0.02) * f4 * f4 * 3.5);   // el último término: fogonazo al nacer
         }
         syn *= w2 * (0.3 + 0.7 * step(0.4, fract(aRand * 5.3)));
         float star = pow(fract(aRand*7.31 + 0.13), 16.0);                 // unas pocas estrellas mucho más grandes
         float szv = mix(0.6 + aRand*0.7, aSz*(0.5 + fract(aRand*3.7)*0.55) + star*2.6, gm);
-        float sz = uSize * uPR * (5.0 / max(-mv.z, 0.3)) * szv * sm * sizeD * (1.0 + f*0.8*(1.0 - sw)) * (1.0 + pulse*0.9*line) * (1.0 + min(syn, 1.5) * 0.8);
+        float sz = uSize * uPR * (5.0 / max(-mv.z, 0.3)) * szv * sm * sizeD * (1.0 + f*0.8*(1.0 - sw)) * (1.0 + pulse*0.9*line) * (1.0 + min(syn, 3.0) * 0.8);
         sz = min(sz, 40.0 * uPR);
         gl_PointSize = sz;
 
@@ -415,7 +416,7 @@ export function initHero3D() {
   }
 
   /* ---- Sinapsis del cerebro: destellos que nacen en puntos al azar y a veces se encadenan con uno vecino ---- */
-  const sparks = mat.uniforms.uSpark.value.map((v) => ({ v, age: -1, dur: 1, wait: Math.random() * 1.5 }));
+  const sparks = mat.uniforms.uSpark.value.slice(0, 4).map((v, i) => ({ v, age: -1, dur: 1, wait: 0.4 + i * 0.9 + Math.random() }));   // pocos y espaciados
   let sparkLast = 0;
   const sparkPoint = (near) => {                                  // punto de la cara visible del cerebro; si hay "near", cerca de él
     let best = 0, bd = 1e9;
@@ -440,7 +441,7 @@ export function initHero3D() {
         }
       } else {
         sp.age += dt / sp.dur;
-        if (sp.age >= 1) { sp.age = -1; sp.chain = Math.random() < 0.6; sp.wait = sp.chain ? 0.02 + Math.random() * 0.12 : 0.3 + Math.random() * 1.4; }
+        if (sp.age >= 1) { sp.age = -1; sp.chain = Math.random() < 0.3; sp.wait = sp.chain ? 0.12 + Math.random() * 0.2 : 1.6 + Math.random() * 2.6; }
       }
       sp.v.w = sp.age;
     }
