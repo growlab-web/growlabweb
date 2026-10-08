@@ -389,8 +389,10 @@ export function initHero3D() {
       // esfera y cerebro: en pantallas medianas se encogen de forma continua para no pisar los textos de la izquierda
       base.y = phone ? -0.3 : narrow ? -0.2 : -0.15;
       base.scale = phone ? (h < 740 ? 0.39 : 0.45) : narrow ? 0.58 : W < 1400 ? 0.54 + ((W - 1000) / 400) * 0.32 : 0.86;
-      base.galY = phone ? -0.42 : narrow ? -0.28 : -0.15;
-      base.gal = (phone ? 0.48 : narrow ? 0.66 : W < 1400 ? 0.72 : 0.86) * galaxyK();
+      // móvil: la galaxia va grande y más vista desde arriba para llenar el alto de la pantalla (se sale por los lados a propósito)
+      base.galY = phone ? -0.22 : narrow ? -0.28 : -0.15;
+      base.gal = phone ? 0.62 : (narrow ? 0.66 : W < 1400 ? 0.72 : 0.86) * galaxyK();
+      base.galTilt = phone ? 0.62 : 0.27;
       group.position.y = base.y;
     } else {                                                               // cabeceras de páginas interiores
       group.position.x = narrow ? 0 : serviceShape ? 1.55 : 1.8;
@@ -505,7 +507,7 @@ export function initHero3D() {
     orb.material.opacity += (0 - orb.material.opacity) * 0.08;   // sin resplandor: el puntero propio ya marca la posición
 
     // orientación de cada forma (inclinación mínima hacia el cursor)
-    mat.uniforms.uTilt.value.set(1.2 - mouse.y * 0.1, serviceShape ? 0.12 - mouse.y * 0.06 : 0.27 + Math.sin(t * 0.23) * 0.025 - mouse.y * 0.08, -0.05 - mouse.y * 0.05);
+    mat.uniforms.uTilt.value.set(1.2 - mouse.y * 0.1, serviceShape ? 0.12 - mouse.y * 0.06 : (base.galTilt || 0.27) + Math.sin(t * 0.23) * 0.025 - mouse.y * 0.08, -0.05 - mouse.y * 0.05);
     mat.uniforms.uYaw.value.set(mouse.x * 0.14 + t * 0.12, serviceShape ? Math.sin(t * 0.32) * 0.5 + mouse.x * 0.25 : mouse.x * 0.3, 0.12 + Math.sin(t * 0.3) * 0.3 + mouse.x * 0.3);
 
     mat.uniforms.uRoll.value.y = serviceShape ? 0 : mouse.x * 0.02;

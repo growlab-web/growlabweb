@@ -16,7 +16,7 @@ const outer = [
 const rings = [inner, outer];
 ---
 
-<div data-universe data-in class="pointer-events-none absolute left-1/2 top-[57%] z-[1] max-sm:top-[61%] h-0 w-0" aria-hidden="true">
+<div data-universe data-in class="pointer-events-none absolute left-1/2 top-[57%] z-[1] max-sm:top-[56%] h-0 w-0" aria-hidden="true">
   {
     rings.map((ring, r) =>
       ring.map((p, i) => (
@@ -53,8 +53,8 @@ const rings = [inner, outer];
       if (!reduce) t += dt;
       const W = window.innerWidth, H = window.innerHeight;
       const phone = W < 520;
-      const rx0 = phone ? W * 0.44 : Math.min(W * 0.4, 640);
-      const ry0 = Math.min(rx0 * 0.3, H * 0.2);
+      const rx0 = phone ? W * 0.42 : Math.min(W * 0.4, 640);
+      const ry0 = phone ? Math.min(rx0 * 0.85, H * 0.17) : Math.min(rx0 * 0.3, H * 0.2);   // en móvil la galaxia se ve más desde arriba: órbita más alta
       for (const el of items) {
         const r = +el.dataset.ring!, i = +el.dataset.i!, n = +el.dataset.n!;
         const k = r === 0 ? 0.6 : 1;
