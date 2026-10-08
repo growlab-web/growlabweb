@@ -282,9 +282,9 @@ export function initHero3D() {
         for (int i = 0; i < 8; i++) {
           vec4 sp = uSpark[i];
           float on = step(0.0, sp.w), sd = distance(aP2, sp.xyz);
-          synPt += on * exp(-sd*sd / 0.0014) * (1.0 - smoothstep(0.0, 0.5, sp.w)) * 4.5;       // primero: un solo punto muy brillante
-          float ra = max(sp.w - 0.2, 0.0) / 0.8, sr = (sd - ra * 0.7) / 0.05;                    // después: la onda sale de ese punto
-          syn += on * step(0.2, sp.w) * exp(-sr*sr) * (1.0 - ra) * 0.9;
+          synPt += on * exp(-sd*sd / 0.0014) * (1.0 - smoothstep(0.0, 0.3, sp.w)) * 4.5;       // nace en un solo punto muy brillante…
+          float ra = sp.w, sr = (sd - ra * ra * 0.75) / (0.03 + 0.03 * ra);                       // …y la onda sale de él sin pausa, cada vez más rápida
+          syn += on * exp(-sr*sr) * (1.0 - ra) * 0.9;
         }
         syn = (syn * (0.3 + 0.7 * step(0.4, fract(aRand * 5.3))) + synPt) * w2;
         float star = pow(fract(aRand*7.31 + 0.13), 16.0);                 // unas pocas estrellas mucho más grandes
