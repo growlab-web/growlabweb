@@ -278,14 +278,15 @@ export function initHero3D() {
         float line = step(0.0, aPath) * w1;
         float sm = w0*1.0 + w1*mix(1.15, 0.92, uGal) + w2*1.1;
         // cerebro: sinapsis → un destello en un punto y una onda que se propaga por las partículas vecinas
-        float syn = 0.0;
+        float syn = 0.0, synPt = 0.0;
         for (int i = 0; i < 8; i++) {
           vec4 sp = uSpark[i];
-          float sd = distance(aP2, sp.xyz), fade = 1.0 - sp.w, sr = (sd - sp.w * 0.7) / 0.055;
-          float f4 = fade * fade * fade * fade;
-          syn += step(0.0, sp.w) * (exp(-sr*sr) * fade * 0.9 + exp(-sd*sd / 0.006) * fade * fade * 1.4 + exp(-sd*sd / 0.02) * f4 * f4 * 3.5);   // el último término: fogonazo al nacer
+          float on = step(0.0, sp.w), sd = distance(aP2, sp.xyz);
+          synPt += on * exp(-sd*sd / 0.0014) * (1.0 - smoothstep(0.0, 0.5, sp.w)) * 4.5;       // primero: un solo punto muy brillante
+          float ra = max(sp.w - 0.2, 0.0) / 0.8, sr = (sd - ra * 0.7) / 0.05;                    // después: la onda sale de ese punto
+          syn += on * step(0.2, sp.w) * exp(-sr*sr) * (1.0 - ra) * 0.9;
         }
-        syn *= w2 * (0.3 + 0.7 * step(0.4, fract(aRand * 5.3)));
+        syn = (syn * (0.3 + 0.7 * step(0.4, fract(aRand * 5.3))) + synPt) * w2;
         float star = pow(fract(aRand*7.31 + 0.13), 16.0);                 // unas pocas estrellas mucho más grandes
         float szv = mix(0.6 + aRand*0.7, aSz*(0.5 + fract(aRand*3.7)*0.55) + star*2.6, gm);
         float sz = uSize * uPR * (5.0 / max(-mv.z, 0.3)) * szv * sm * sizeD * (1.0 + f*0.8*(1.0 - sw)) * (1.0 + pulse*0.9*line) * (1.0 + min(syn, 3.0) * 0.8);
@@ -439,7 +440,7 @@ export function initHero3D() {
         sp.wait -= dt;
         if (sp.wait <= 0) {
           const n = sparkPoint(sp.chain ? sp.v : null);
-          sp.v.set(P2[n * 3], P2[n * 3 + 1], P2[n * 3 + 2], 0); sp.age = 0; sp.dur = 0.7 + Math.random() * 0.6;
+          sp.v.set(P2[n * 3], P2[n * 3 + 1], P2[n * 3 + 2], 0); sp.age = 0; sp.dur = 1.0 + Math.random() * 0.6;
         }
       } else {
         sp.age += dt / sp.dur;
