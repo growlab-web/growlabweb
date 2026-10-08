@@ -214,9 +214,9 @@ export function initHero3D() {
         float n2 = snoise(p0*4.0 - uTime*0.3);
         p0 += normal * (n*0.2 + n2*0.03);
         // "voz": como un asistente que habla, la esfera se abulta a golpes en direcciones que van cambiando
-        float lobe = pow(max(dot(normal, uVDir), 0.0), 3.0) + 0.65 * pow(max(dot(normal, uVDir2), 0.0), 3.0);
-        float rip = 0.6 + 0.4 * snoise(p0*4.5 + uTime*2.0);
-        p0 += normal * uVoice * (lobe * 0.3 * rip + 0.02 * sin(dot(normal, uVDir) * 16.0 - uTime*8.0));
+        float lobe = pow(max(dot(normal, uVDir), 0.0), 2.0) + 0.65 * pow(max(dot(normal, uVDir2), 0.0), 2.0);
+        float rip = 0.8 + 0.2 * snoise(p0*2.0 + uTime*0.6);
+        p0 += normal * uVoice * lobe * 0.2 * rip;
 
         vec3 q0 = xf(p0, uTilt.x, uYaw.x, uRoll.x);
         // galaxia: cada partícula gira a su ritmo alrededor del núcleo y el disco ondula un poco (volumen)
@@ -389,16 +389,16 @@ export function initHero3D() {
     if (reduceMo) return;
     if (t > voice.phraseEnd) {                                   // alterna frases (1,4–3,6 s) y silencios (0,7–2 s)
       voice.talking = !voice.talking;
-      voice.phraseEnd = t + (voice.talking ? 1.4 + Math.random() * 2.2 : 0.7 + Math.random() * 1.3);
+      voice.phraseEnd = t + (voice.talking ? 2 + Math.random() * 2.5 : 0.9 + Math.random() * 1.4);
       voice.next = t;
     }
     if (t >= voice.next) {                                       // cada "sílaba": nueva intensidad y nueva dirección
-      voice.next = t + 0.09 + Math.random() * 0.2;
+      voice.next = t + 0.28 + Math.random() * 0.4;
       voice.target = voice.talking && Math.random() > 0.18 ? 0.35 + Math.random() * 0.65 : 0;
       if (voice.target > 0) { randDir(voice.t1); randDir(voice.t2); }
     }
-    voice.v += (voice.target - voice.v) * Math.min(1, dt * (voice.target > voice.v ? 16 : 7));   // sube rápido, baja más lento
-    voice.d1.lerp(voice.t1, Math.min(1, dt * 9)).normalize(); voice.d2.lerp(voice.t2, Math.min(1, dt * 9)).normalize();
+    voice.v += (voice.target - voice.v) * Math.min(1, dt * (voice.target > voice.v ? 4.5 : 2.6));   // sube y baja con suavidad
+    voice.d1.lerp(voice.t1, Math.min(1, dt * 2.2)).normalize(); voice.d2.lerp(voice.t2, Math.min(1, dt * 2.2)).normalize();
     mat.uniforms.uVoice.value = voice.v * mat.uniforms.uIntro.value;
     mat.uniforms.uVDir.value.copy(voice.d1); mat.uniforms.uVDir2.value.copy(voice.d2);
   }
