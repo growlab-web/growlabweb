@@ -93,6 +93,9 @@ export function initHero3D() {
       rr = 0.2 + Math.pow(Math.random(), 1.3) * 2.4; y = g() * (0.03 + rr * 0.035);   // más denso hacia el centro, se va vaciando hacia el borde
       spd = 0.05 + 0.14 / (rr + 0.6);
       gsz = 0.95 + Math.pow(Math.random(), 3) * 1.4;        // puntos sueltos: se tienen que ver uno a uno
+      if (Math.random() < 0.13) {                           // partículas sueltas más allá del borde: el final queda irregular
+        rr = 1.9 + Math.pow(Math.random(), 1.7) * 1.35; y = g() * (0.08 + (rr - 1.9) * 0.22); gsz = 0.9 + Math.pow(Math.random(), 4) * 1.8;
+      }
       col = (rr < 0.9 ? mix3(DEEP, GCY, rr / 0.9) : mix3(GCY, GGR, Math.min(1, (rr - 0.9) / 1.2))).map((x) => x * 0.8);
     }
     col = sparkle(col, 0.06);
