@@ -108,12 +108,12 @@ function initTypewriter() {
       const word = words[w];
       if (!deleting) {
         i++; el.textContent = word.slice(0, i);
-        if (i === word.length) { deleting = true; return setTimeout(tick, 1800); }   // pausa con la palabra completa
-        return setTimeout(tick, 70 + Math.random() * 55);
+        if (i === word.length) { deleting = true; return setTimeout(tick, 1100); }   // pausa con la palabra completa
+        return setTimeout(tick, 26 + Math.random() * 20);
       }
       i--; el.textContent = word.slice(0, i);
-      if (i === 0) { deleting = false; w = (w + 1) % words.length; return setTimeout(tick, 380); }
-      return setTimeout(tick, 32);
+      if (i === 0) { deleting = false; w = (w + 1) % words.length; return setTimeout(tick, 180); }
+      return setTimeout(tick, 14);
     };
     setTimeout(tick, 900);
   });
