@@ -214,9 +214,9 @@ export function initHero3D() {
         float n2 = snoise(p0*4.0 - uTime*0.3);
         p0 += normal * (n*0.2 + n2*0.03);
         // "voz": como un asistente que habla, la esfera se abulta a golpes en direcciones que van cambiando
-        float lobe = pow(max(dot(normal, uVDir), 0.0), 2.0) + 0.65 * pow(max(dot(normal, uVDir2), 0.0), 2.0);
+        float lobe = pow(max(dot(normal, uVDir), 0.0), 2.5) + 0.65 * pow(max(dot(normal, uVDir2), 0.0), 2.5);
         float rip = 0.8 + 0.2 * snoise(p0*2.0 + uTime*0.6);
-        p0 += normal * uVoice * lobe * 0.2 * rip;
+        p0 += normal * uVoice * lobe * 0.3 * rip;
 
         vec3 q0 = xf(p0, uTilt.x, uYaw.x, uRoll.x);
         // galaxia: cada partícula gira a su ritmo alrededor del núcleo y el disco ondula un poco (volumen)
@@ -393,12 +393,12 @@ export function initHero3D() {
       voice.next = t;
     }
     if (t >= voice.next) {                                       // cada "sílaba": nueva intensidad y nueva dirección
-      voice.next = t + 0.28 + Math.random() * 0.4;
+      voice.next = t + 0.16 + Math.random() * 0.24;
       voice.target = voice.talking && Math.random() > 0.18 ? 0.35 + Math.random() * 0.65 : 0;
       if (voice.target > 0) { randDir(voice.t1); randDir(voice.t2); }
     }
-    voice.v += (voice.target - voice.v) * Math.min(1, dt * (voice.target > voice.v ? 4.5 : 2.6));   // sube y baja con suavidad
-    voice.d1.lerp(voice.t1, Math.min(1, dt * 2.2)).normalize(); voice.d2.lerp(voice.t2, Math.min(1, dt * 2.2)).normalize();
+    voice.v += (voice.target - voice.v) * Math.min(1, dt * (voice.target > voice.v ? 9 : 4.5));   // sube y baja con suavidad
+    voice.d1.lerp(voice.t1, Math.min(1, dt * 5)).normalize(); voice.d2.lerp(voice.t2, Math.min(1, dt * 5)).normalize();
     mat.uniforms.uVoice.value = voice.v * mat.uniforms.uIntro.value;
     mat.uniforms.uVDir.value.copy(voice.d1); mat.uniforms.uVDir2.value.copy(voice.d2);
   }
