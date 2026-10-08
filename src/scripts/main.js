@@ -244,6 +244,20 @@ function initPage() {
     });
   });
 
+  /* ENTRADAS de lo que no tenía animación propia: marquesina, antetítulos, tarjetas de servicios, contacto y pie */
+  const enter = (els, trigger, vars = {}, start = 'top 85%') => {
+    els = (typeof els === 'string' ? $$(els) : els).filter(Boolean);
+    if (els.length) gsap.from(els, { y: 40, opacity: 0, duration: 1, ease: 'expo.out', stagger: 0.08, ...vars, scrollTrigger: { trigger: trigger || els[0], start } });
+  };
+  enter('[data-marquee]', null, { y: 30, duration: 1.2 }, 'top 92%');
+  $$('[data-manifesto]').forEach((m) => enter([m.previousElementSibling], m.parentElement));
+  enter('[data-services-track] > *', '[data-services]', { y: 0, x: 140, stagger: 0.09, duration: 1.1 }, 'top 55%');
+  $$('[data-contact]').forEach((c) => {
+    enter([c.firstElementChild], c, { y: 0, x: -50, duration: 1.3 }, 'top 75%');
+    enter($$('[data-contact-form] > *', c), $('[data-contact-form]', c), { y: 26, stagger: 0.06, duration: 0.9 }, 'top 88%');
+  });
+  enter('footer > *', 'footer', { y: 20, stagger: 0.1 }, 'top 98%');
+
   /* REVELADO: cualquier bloque marcado con data-reveal sube y aparece al entrar en pantalla */
   $$('[data-reveal]').forEach((el) => {
     gsap.from(el, { y: 50, opacity: 0, duration: 1, ease: 'expo.out', scrollTrigger: { trigger: el, start: 'top 88%' } });

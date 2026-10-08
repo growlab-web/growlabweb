@@ -530,6 +530,7 @@ export function initHero3D() {
       .to(group.position, { x: 0, duration: 1.7, ease: E }, 0.6)                              // la galaxia va centrada bajo su titular
       .to(p1, hide, 0.7)
       .fromTo('[data-panel="2"]', { autoAlpha: 0, y: 40 }, show, 1.9)
+      .from('[data-panel="2"] [data-in]', { autoAlpha: 0, y: 34, duration: 0.5, stagger: 0.05, ease: 'power2.out' }, 1.8)   // sus piezas entran una tras otra
       // fondo: franja azul en diagonal en la explosión; con la galaxia queda muy tenue
       .to(A, { opacity: 0.5, rotation: -30, scale: 1.3, xPercent: 18, yPercent: 30, duration: 0.9, ease: E }, 0.6)
       .to(A, { opacity: 0.16, rotation: -12, scale: 1.0, xPercent: 0, yPercent: 0, duration: 0.9, ease: E }, 1.5)
@@ -538,6 +539,7 @@ export function initHero3D() {
       .to(group.position, { x: homeX, duration: 1.7, ease: E }, 3.7)
       .to('[data-panel="2"]', hide, 3.8)
       .fromTo('[data-panel="3"]', { autoAlpha: 0, y: 40 }, show, 5.0)
+      .from('[data-panel="3"] [data-in]', { autoAlpha: 0, y: 34, duration: 0.5, stagger: 0.06, ease: 'power2.out' }, 5.0)
       .to(A, { opacity: 0.45, rotation: -24, scale: 1.2, xPercent: 8, yPercent: 14, duration: 1.7, ease: E }, 3.7)
       .to(B, { opacity: 0.25, yPercent: -30, scale: 0.95, duration: 1.7, ease: E }, 3.7)
       .to({}, { duration: 1.2 }, 5.4)                                                        // pausa final

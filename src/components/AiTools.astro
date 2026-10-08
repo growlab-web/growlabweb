@@ -16,7 +16,7 @@ const tools = [
 <ul class="absolute right-(--gx) top-[47%] flex flex-col items-end gap-4 max-lg:hidden">
   {
     tools.map((t) => (
-      <li class="flex items-center gap-2.5 text-white/85">
+      <li data-in class="flex items-center gap-2.5 text-white/85">
         <span class="font-ui text-[1rem]">{t.name}</span>
         <svg viewBox="0 0 24 24" class="h-[26px] w-[26px] fill-current" role="img" aria-label={t.name}>
           <path d={t.path} />
