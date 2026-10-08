@@ -1,7 +1,7 @@
 // Datos generales del sitio: se editan aquí y se usan en el menú, el pie y la página de contacto.
 export const site = {
   name: 'GrowLab',
-  email: 'hola@nova.agency', // TODO: cambiar por el correo real de GrowLab
+  email: 'hola.grow.lab@gmail.com', // correo al que llegan los mensajes del formulario
   nav: [
     { href: '/', label: 'Inicio' },
     { href: '/#servicios', label: 'Servicios' },
