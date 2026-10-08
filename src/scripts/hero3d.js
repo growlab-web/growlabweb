@@ -19,7 +19,7 @@ export function initHero3D() {
   if (!canvas) return { start() {} };
 
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: true, powerPreference: 'high-performance' });
-  const PR = Math.min(window.devicePixelRatio || 1, window.innerWidth < 800 ? 1.5 : 2);   // en móvil se dibuja a menos resolución: va bastante más fluido
+  const PR = Math.min(window.devicePixelRatio || 1, window.innerWidth < 800 ? 1.25 : 2);   // en móvil se dibuja a menos resolución: va bastante más fluido
   renderer.setPixelRatio(PR);
   renderer.setClearColor(0x000000, 0);
 
@@ -243,7 +243,11 @@ export function initHero3D() {
         #endif
 
         // explosión entre formas (algunas partículas pasan muy cerca de la cámara)
+        #ifdef LITE
+        vec3 bdir = vec3(aScatter.xy*0.75, aScatter.z*0.3 + 0.35);          // móvil: la explosión no se acerca a la cámara (partículas enormes = tirones)
+        #else
         vec3 bdir = vec3(aScatter.xy*0.75, aScatter.z*0.45 + 1.3);
+        #endif
         p += bdir * burst * (0.6 + aRand*0.8);
 
         // ensamblado inicial
@@ -307,7 +311,11 @@ export function initHero3D() {
         float star = pow(fract(aRand*7.31 + 0.13), 16.0);                 // unas pocas estrellas mucho más grandes
         float szv = mix(0.6 + aRand*0.7, aSz*(0.5 + fract(aRand*3.7)*0.55) + star*2.6, gm);
         float sz = uSize * uPR * (5.0 / max(-mv.z, 0.3)) * szv * sm * sizeD * (1.0 + f*0.8*(1.0 - sw)) * (1.0 + pulse*0.9*line) * (1.0 + min(syn, 3.0) * 0.8);
+        #ifdef LITE
+        sz = min(sz, 9.0 * uPR);
+        #else
         sz = min(sz, 40.0 * uPR);
+        #endif
         gl_PointSize = sz;
 
         // cerebro: sólo la cara frontal brillante
@@ -377,8 +385,12 @@ export function initHero3D() {
   const SHAPES = { sphere: 0, galaxy: 1, brain: 2 };                // páginas interiores: una forma fija
   const galaxyK = () => (window.innerWidth < 520 ? 0.62 : window.innerWidth < 1000 ? 0.78 : 1);
   const state = { scale: 1, morph: pinned ? 0 : serviceShape ? 1 : (SHAPES[hero.dataset.shape] ?? 0) };
+  let lastW = 0, lastH = 0;
   function resize() {
     const w = hero.clientWidth, h = hero.clientHeight;
+    // en móvil la barra del navegador aparece y desaparece al hacer scroll y dispara "resize": si el tamaño no cambió de verdad, no se rehace nada
+    if (w === lastW && (h === lastH || (MOB && Math.abs(h - lastH) < 140))) return;
+    lastW = w; lastH = h;
     renderer.setSize(w, h, false);
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
@@ -549,7 +561,10 @@ export function initHero3D() {
       scrollTrigger: {
         trigger: hero, start: 'top top', end: '+=260%', pin: true, scrub: 0.35, anticipatePin: 1,
         // cada etapa se engancha sola: un gesto de scroll basta para pasar a la siguiente
-        snap: { snapTo: 'labelsDirectional', duration: { min: 0.15, max: 0.5 }, delay: 0.05, ease: 'power1.inOut' },
+        // en móvil el enganche espera a que el dedo y la inercia terminen, para no pelearse con el scroll del teléfono
+        snap: MOB
+          ? { snapTo: 'labelsDirectional', duration: { min: 0.25, max: 0.6 }, delay: 0.16, inertia: false, ease: 'power1.inOut' }
+          : { snapTo: 'labelsDirectional', duration: { min: 0.15, max: 0.5 }, delay: 0.05, ease: 'power1.inOut' },
       },
     });
     const homeX = isMobile() ? 0 : HOME_X;

@@ -32,6 +32,7 @@ if (!isApp) {
   gsap.ticker.add((t) => lenis.raf(t * 1000));
 }
 gsap.ticker.lagSmoothing(0);
+ScrollTrigger.config({ ignoreMobileResize: true });      // la barra del navegador móvil no obliga a recalcular todo en pleno scroll
 lenis.stop();
 
 // enlaces internos con ancla (#algo) dentro de la misma página
