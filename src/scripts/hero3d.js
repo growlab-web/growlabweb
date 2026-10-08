@@ -302,7 +302,7 @@ export function initHero3D() {
 
   /* ---- Tamaño ---- */
   const base = { scale: 0.82 };
-  const HOME_X = 0.3;                                              // el titular grande ocupa la izquierda: la esfera del inicio se corre un poco a la derecha
+  const HOME_X = 0;                                                // la esfera del inicio va exactamente al centro
   const pinned = hero.hasAttribute('data-pin');                       // inicio: secuencia completa con scroll
   const SHAPES = { sphere: 0, galaxy: 1, brain: 2 };                // páginas interiores: una forma fija
   const galaxyK = () => (window.innerWidth < 520 ? 0.62 : window.innerWidth < 1000 ? 0.78 : 1);
@@ -315,9 +315,9 @@ export function initHero3D() {
     const W = window.innerWidth, phone = W < 520, narrow = W < 1000;     // narrow: móvil y tableta → el objeto va bajo el texto
     const shape = hero.dataset.shape;
     if (pinned) {                                                          // inicio
-      group.position.x = narrow ? 0 : W < 1400 ? 0.62 : HOME_X;
+      group.position.x = HOME_X;
       group.position.y = phone ? -0.42 : narrow ? -0.28 : -0.15;
-      base.scale = phone ? 0.44 : narrow ? 0.6 : W < 1400 ? 0.68 : 0.82;
+      base.scale = phone ? 0.48 : narrow ? 0.66 : W < 1400 ? 0.72 : 0.86;
     } else {                                                               // cabeceras de páginas interiores
       group.position.x = narrow ? 0 : serviceShape ? 1.55 : 1.8;
       group.position.y = narrow ? (phone ? -1.05 : -0.95) : -0.15;
