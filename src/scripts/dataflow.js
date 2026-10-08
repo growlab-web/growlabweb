@@ -3,7 +3,7 @@
  * nodos que derivan despacio, se conectan entre sí y por cuyas líneas viajan "paquetes" de luz.
  * Sólo anima mientras el panel está en pantalla.
  */
-const BLUE = '56,111,222', SKY = '123,165,240', GREEN = '51,219,128';
+const BLUE = '56,111,222', SKY = '123,165,240', GREEN = '109,242,192';
 
 export function initDataFlow(canvas) {
   const ctx = canvas.getContext('2d');

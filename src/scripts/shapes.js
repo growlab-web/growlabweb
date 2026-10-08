@@ -6,7 +6,7 @@
  *   path : posición a lo largo de una línea (para que el shader haga viajar "paquetes de datos");
  *          -1 = partícula estática (nodos, relleno).
  */
-const BLUE = [0.22, 0.435, 0.87], SKY = [0.5, 0.7, 0.97], GREEN = [0.2, 0.86, 0.5], WHITE = [0.93, 0.96, 1.0], DEEP = [0.14, 0.28, 0.72];
+const BLUE = [0.22, 0.435, 0.87], SKY = [0.5, 0.7, 0.97], GREEN = [0.43, 0.95, 0.75], WHITE = [0.93, 0.96, 1.0], DEEP = [0.14, 0.28, 0.72];
 const mix = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t];
 const lerp3 = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t];
 const dist = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
