@@ -354,7 +354,7 @@ export function initHero3D() {
   scene.add(orb);
 
   /* ---- Tamaño ---- */
-  const base = { scale: 0.82 };
+  const base = { scale: 0.82, y: -0.15, gal: 0.82, galY: -0.15 };   // gal/galY: tamaño y altura propios de la galaxia (va con las plataformas en órbita)
   const HOME_X = 0;                                                // la esfera del inicio va exactamente al centro
   const pinned = hero.hasAttribute('data-pin');                       // inicio: secuencia completa con scroll
   const SHAPES = { sphere: 0, galaxy: 1, brain: 2 };                // páginas interiores: una forma fija
@@ -369,12 +369,17 @@ export function initHero3D() {
     const shape = hero.dataset.shape;
     if (pinned) {                                                          // inicio
       group.position.x = HOME_X;
-      group.position.y = phone ? -0.42 : narrow ? -0.28 : -0.15;
-      base.scale = phone ? 0.48 : narrow ? 0.66 : W < 1400 ? 0.72 : 0.86;
+      // esfera y cerebro: en pantallas medianas se encogen de forma continua para no pisar los textos de la izquierda
+      base.y = phone ? -0.3 : narrow ? -0.2 : -0.15;
+      base.scale = phone ? 0.45 : narrow ? 0.58 : W < 1400 ? 0.54 + ((W - 1000) / 400) * 0.32 : 0.86;
+      base.galY = phone ? -0.42 : narrow ? -0.28 : -0.15;
+      base.gal = (phone ? 0.48 : narrow ? 0.66 : W < 1400 ? 0.72 : 0.86) * galaxyK();
+      group.position.y = base.y;
     } else {                                                               // cabeceras de páginas interiores
       group.position.x = narrow ? 0 : serviceShape ? 1.55 : 1.8;
-      group.position.y = narrow ? (phone ? -1.05 : -0.95) : -0.15;
+      group.position.y = base.y = base.galY = narrow ? (phone ? -1.05 : -0.95) : -0.15;
       base.scale = narrow ? (phone ? 0.4 : 0.5) : serviceShape ? 0.68 : shape === 'galaxy' ? 0.46 : 0.7;
+      base.gal = base.scale * galaxyK();
     }
     group.scale.setScalar(base.scale * state.scale);
   }
@@ -463,7 +468,8 @@ export function initHero3D() {
     updateSparks(t);
     {
       const w1 = clamp01(1 - Math.abs(state.morph - 1));                    // 1 cuando la forma es la galaxia
-      group.scale.setScalar(base.scale * state.scale * (1 - (1 - galaxyK()) * w1));
+      group.scale.setScalar(state.scale * (base.scale + (base.gal - base.scale) * w1));
+      group.position.y = base.y + (base.galY - base.y) * w1;
     }
 
     const px = mouse.x, py = mouse.y;
