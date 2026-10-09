@@ -2,6 +2,14 @@
 import { site } from '../data/site.js';
 import { services } from '../data/services.js';
 
+// Prefijos telefónicos del desplegable: Perú primero (es el que sale elegido) y el resto por orden alfabético
+const countries = [
+  ['Perú', '+51'], ['Alemania', '+49'], ['Argentina', '+54'], ['Bolivia', '+591'], ['Brasil', '+55'], ['Canadá', '+1'], ['Chile', '+56'],
+  ['Colombia', '+57'], ['Costa Rica', '+506'], ['Ecuador', '+593'], ['El Salvador', '+503'], ['España', '+34'], ['Estados Unidos', '+1'],
+  ['Francia', '+33'], ['Guatemala', '+502'], ['Honduras', '+504'], ['Italia', '+39'], ['México', '+52'], ['Nicaragua', '+505'], ['Panamá', '+507'],
+  ['Paraguay', '+595'], ['Portugal', '+351'], ['Puerto Rico', '+1'], ['Reino Unido', '+44'], ['República Dominicana', '+1'], ['Uruguay', '+598'], ['Venezuela', '+58'],
+];
+
 // Campos con línea inferior e icono, como un formulario editorial
 const wrap = 'group relative flex items-center gap-3 border-b border-white/20 transition-colors focus-within:border-secondary';
 const icon = 'h-[22px] w-[22px] shrink-0 text-white/45 transition-colors group-focus-within:text-secondary';
@@ -23,11 +31,23 @@ const input = 'w-full bg-transparent py-4 font-body text-[1rem] text-white outli
     <input class={input} name="email" type="email" placeholder="Email *" autocomplete="email" required aria-required="true" />
   </label>
 
-  <label class={wrap}>
+  <!-- Teléfono: prefijo del país (desplegable del sistema, con Perú por defecto) + número -->
+  <div class={wrap}>
     <svg class={icon} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2Z"></path></svg>
-    <span class="sr-only">Teléfono</span>
-    <input class={input} name="telefono" type="tel" inputmode="tel" placeholder="Teléfono *" autocomplete="tel" required aria-required="true" />
-  </label>
+    <span class="relative flex shrink-0 items-center gap-1.5 py-4 font-body text-[1rem] text-white">
+      <span data-prefix-label>+51</span>
+      <svg class="h-3.5 w-3.5 text-white/45" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
+      <!-- el desplegable real va encima, invisible: se ve sólo el prefijo y al tocarlo se abre la lista del sistema -->
+      <select name="prefijo" data-prefix aria-label="País del teléfono" autocomplete="tel-country-code" class="absolute inset-0 h-full w-full cursor-pointer bg-[#0b1226] text-white opacity-0">
+        {countries.map(([name, code], i) => <option value={code} selected={i === 0}>{name} ({code})</option>)}
+      </select>
+    </span>
+    <i class="h-5 w-px shrink-0 bg-white/20" aria-hidden="true"></i>
+    <label class="flex-1">
+      <span class="sr-only">Teléfono</span>
+      <input class={input} name="telefono" type="tel" inputmode="tel" placeholder="Teléfono *" autocomplete="tel-national" required aria-required="true" />
+    </label>
+  </div>
 
   <!-- Servicios de interés: desplegable en el que se pueden marcar varios -->
   <div data-services-select class={wrap + ' z-20'}>
@@ -102,6 +122,12 @@ const input = 'w-full bg-transparent py-4 font-body text-[1rem] text-white outli
       resetServices = () => { open(false); paint(); };
     }
 
+    // prefijo del teléfono: el texto visible sigue al país elegido en el desplegable
+    const prefix = form.querySelector('[data-prefix]'), prefixLabel = form.querySelector('[data-prefix-label]');
+    const paintPrefix = () => { if (prefix && prefixLabel) prefixLabel.textContent = prefix.value; };
+    if (prefix) prefix.addEventListener('change', paintPrefix);
+    paintPrefix();
+
     // medición: primer campo que toca el visitante
     form.addEventListener('focusin', () => track('form_start', { form_location: where }), { once: true });
 
@@ -124,6 +150,10 @@ const input = 'w-full bg-transparent py-4 font-body text-[1rem] text-white outli
       }
       if (!f.get('consent')) return say('Para enviar el mensaje debes aceptar que se recopilen tus datos.', 'error');
 
+      // el teléfono viaja completo, con el prefijo del país delante (salvo que la persona ya lo haya escrito con +)
+      const phone = telefono.startsWith('+') ? telefono : `${f.get('prefijo') || ''} ${telefono}`.trim();
+      f.set('telefono', phone);
+      f.delete('prefijo');
       f.set('pagina', location.href);
       button.disabled = true;
       say('Enviando…');
@@ -143,17 +173,18 @@ const input = 'w-full bg-transparent py-4 font-body text-[1rem] text-white outli
           lead_services: servicios.join(', ') || '(sin especificar)',
           lead_services_count: servicios.length,
           // sólo para conversiones mejoradas (Google Ads / Meta); no se envía a GA4, ver scripts/track.js
-          user_data: { email: email.toLowerCase(), phone_number: telefono },
+          user_data: { email: email.toLowerCase(), phone_number: '+' + phone.replace(/\D/g, '') },     // teléfono en formato internacional
         });
         form.reset();
         resetServices();
+        paintPrefix();
         return;
       }
       if (result) return say(result.error || 'No pudimos enviar tu mensaje. Inténtalo de nuevo.', 'error');
 
       // sin servicio de envío: se abre el programa de correo con el mensaje listo
       const body = [
-        `Nombre: ${nombre}`, `Correo: ${email}`, `Teléfono: ${telefono}`, `Servicios de interés: ${servicios.join(', ') || '-'}`, '', mensaje || '(sin mensaje)',
+        `Nombre: ${nombre}`, `Correo: ${email}`, `Teléfono: ${phone}`, `Servicios de interés: ${servicios.join(', ') || '-'}`, '', mensaje || '(sin mensaje)',
       ].join('\n');
       const subject = servicios.length ? `Información sobre ${servicios.join(', ')} · ${nombre}` : `Nuevo contacto: ${nombre}`;
       say('Se abrirá tu correo con el mensaje listo para enviar.');
