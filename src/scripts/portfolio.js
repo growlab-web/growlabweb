@@ -44,6 +44,15 @@ export async function initPortfolio(root) {
   renderer.setPixelRatio(PR);
   renderer.setClearColor(0x000000, 0);
   const scene = new THREE.Scene();
+  // el suelo y el polvo de partículas van en otro lienzo, detrás de la barra inferior (los proyectos quedan delante de todo)
+  const bgCanvas = document.createElement('canvas');
+  bgCanvas.className = 'pointer-events-none absolute inset-0 z-0 h-full w-full';
+  bgCanvas.setAttribute('aria-hidden', 'true');
+  canvas.before(bgCanvas);
+  const bgRenderer = new THREE.WebGLRenderer({ canvas: bgCanvas, antialias: false, alpha: true });
+  bgRenderer.setPixelRatio(PR);
+  bgRenderer.setClearColor(0x000000, 0);
+  const bgScene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 80);
   const cam = { baseZ: 8, offX: 0.3 };
 
@@ -142,7 +151,7 @@ export async function initPortfolio(root) {
   });
   const floor = new THREE.Points(floorGeo, floorMat);
   floor.frustumCulled = false;
-  scene.add(floor);
+  bgScene.add(floor);
 
   const DUST = 700, dpos = new Float32Array(DUST * 3), dseed = new Float32Array(DUST);
   for (let i = 0; i < DUST; i++) { dpos[i * 3] = (Math.random() - 0.5) * 26; dpos[i * 3 + 1] = -1.4 + Math.random() * 6.5; dpos[i * 3 + 2] = 5 - Math.random() * 22; dseed[i] = Math.random(); }
@@ -170,7 +179,7 @@ export async function initPortfolio(root) {
   });
   const dust = new THREE.Points(dustGeo, dustMat);
   dust.frustumCulled = false;
-  scene.add(dust);
+  bgScene.add(dust);
 
   /* ===================== Etiquetas y botón "+" (HTML pegado a cada panel) ===================== */
   const tags = projects.map((p, i) => {
@@ -191,6 +200,7 @@ export async function initPortfolio(root) {
   function resize() {
     width = root.clientWidth; height = root.clientHeight;
     renderer.setSize(width, height, false);
+    bgRenderer.setSize(width, height, false);
     const aspect = width / height;
     camera.aspect = aspect; camera.updateProjectionMatrix();
     // móvil vertical: la cámara se coloca para que el proyecto central ocupe ~86 % del ancho y los vecinos queden casi fuera
@@ -354,10 +364,13 @@ export async function initPortfolio(root) {
       tags[i].plus.style.pointerEvents = visPlus > 0.4 ? 'auto' : 'none';
     });
 
+    const ci = mod(Math.round(S.pos), N);
+    if (counterEl && ci !== counterIdx) { counterIdx = ci; counterEl.textContent = `${String(ci + 1).padStart(2, '0')} / ${String(N).padStart(2, '0')}`; }
     floorMat.uniforms.uTime.value = dustMat.uniforms.uTime.value = time;
     floorMat.uniforms.uOffset.value = dustMat.uniforms.uOffset.value = S.pos * SPACING;
     floorMat.uniforms.uFade.value = 1 - S.dim * 0.45;
 
+    bgRenderer.render(bgScene, camera);
     renderer.render(scene, camera);
   }
   requestAnimationFrame(frame);
@@ -374,6 +387,13 @@ export async function initPortfolio(root) {
     else gsap.to($$('[data-pf-full-item]', fullEl), { autoAlpha: 0, y: -8, duration: 0.3, stagger: 0.015, onComplete: () => { fullEl.hidden = true; } });
   }
   modeBtns.forEach((b) => b.addEventListener('click', () => setMode(b.dataset.pfMode)));
+  // flechas de la barra: avisan de que hay más proyectos y permiten pasar de uno en uno
+  $$('[data-pf-step]', root).forEach((b) => b.addEventListener('click', () => {
+    if (S.mode < 0.5) setMode('featured');
+    S.target = Math.round(S.target) + Number(b.dataset.pfStep); S.lastInput = performance.now();
+  }));
+  const counterEl = $('[data-pf-counter]', root);
+  let counterIdx = -1;
   $$('[data-pf-full-item]', fullEl).forEach((a) => a.addEventListener('click', (e) => { e.preventDefault(); openProject(a.dataset.slug); }));
 
   /* ===================== Página de proyecto (panel blanco) ===================== */

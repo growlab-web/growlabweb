@@ -31,10 +31,21 @@ const { open } = Astro.props;
   <!-- barra inferior: Destacados / Todos y, debajo, el mismo botón del inicio (todo centrado) -->
   <!-- capa: por encima del fondo y por debajo de los proyectos (los toques le llegan desde el lienzo) -->
   <div data-pf-ui class="pointer-events-none absolute inset-x-0 bottom-0 z-[1] flex flex-col items-center gap-4 px-[1.8vw] pb-6 opacity-0">
-    <div class="pf-modes pointer-events-auto flex items-center gap-2">
-      <button type="button" data-pf-mode="featured" class="is-on">Destacados</button>
-      <span aria-hidden="true">/</span>
-      <button type="button" data-pf-mode="full">Todos</button>
+    <div class="flex items-center gap-5">
+      <button type="button" data-pf-step="-1" class="pf-arrow pointer-events-auto" aria-label="Proyecto anterior">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6" /></svg>
+      </button>
+      <div class="flex flex-col items-center gap-1.5">
+        <span data-pf-counter class="pf-count-bar">01 / {String(projects.length).padStart(2, '0')}</span>
+        <div class="pf-modes pointer-events-auto flex items-center gap-2">
+          <button type="button" data-pf-mode="featured" class="is-on">Destacados</button>
+          <span aria-hidden="true">/</span>
+          <button type="button" data-pf-mode="full">Todos</button>
+        </div>
+      </div>
+      <button type="button" data-pf-step="1" class="pf-arrow pf-arrow--next pointer-events-auto" aria-label="Proyecto siguiente">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+      </button>
     </div>
     <a href="/contacto" class="hbtn pointer-events-auto min-w-[190px]">Agendar reunión</a>
   </div>

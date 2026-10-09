@@ -260,3 +260,10 @@ html.has-cursor, html.has-cursor * { cursor: none !important; }
    En iPhone/iPad, 100vh es más alto que lo que se ve (la barra del navegador tapa la parte de abajo) y el botón «Enviar solicitud»
    quedaba oculto. 100svh es la altura visible real; los navegadores que no la entienden se quedan con h-screen. */
 [data-hero][data-pin] { height: 100svh; }
+
+/* ---------- Portafolio: flechas y contador de la barra inferior ---------- */
+.pf-arrow { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 9999px; border: 1px solid rgba(255,255,255,.22); background: rgba(255,255,255,.06); color: #fff; cursor: pointer; transition: border-color .25s, background-color .25s, color .25s; }
+.pf-arrow:hover { border-color: var(--color-secondary); background: var(--color-secondary); color: #000; }
+.pf-arrow--next { animation: pf-nudge 2.4s ease-in-out infinite; }   /* empujoncito: hay más a la derecha */
+@keyframes pf-nudge { 0%, 70%, 100% { transform: translateX(0); } 80% { transform: translateX(5px); } 90% { transform: translateX(0); } }
+.pf-count-bar { font: 500 .62rem var(--font-ui); letter-spacing: .14em; color: rgba(255,255,255,.55); font-variant-numeric: tabular-nums; }
