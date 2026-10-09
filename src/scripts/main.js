@@ -27,7 +27,7 @@ $$('[data-flow]').forEach((c) => initDataFlow(c));
 const isApp = document.body.hasAttribute('data-app');       // portafolio 3D: maneja su propia rueda/arrastre
 const lenis = isApp
   ? { on() {}, raf() {}, stop() {}, start() {}, scrollTo() {} }
-  : new Lenis({ lerp: 0.14, smoothWheel: !reduceMotion });
+  : new Lenis({ lerp: 0.14, smoothWheel: !reduceMotion, virtualScroll: limitWheel });
 if (!isApp) {
   lenis.on('scroll', ScrollTrigger.update);
   gsap.ticker.add((t) => lenis.raf(t * 1000));
@@ -35,6 +35,52 @@ if (!isApp) {
 gsap.ticker.lagSmoothing(0);
 ScrollTrigger.config({ ignoreMobileResize: true });      // la barra del navegador móvil no obliga a recalcular todo en pleno scroll
 lenis.stop();
+
+/* ---------- Paradas de scroll: un gesto de rueda o trackpad avanza como mucho hasta la siguiente ---------- */
+// la inercia del trackpad sigue mandando scroll un buen rato después de soltar: sin esto, un gesto rápido cruza toda la página
+// Paradas: las etapas del hero, los tramos del carrusel de servicios y las secciones marcadas con data-stop (sólo en páginas con pin)
+let stops = [];
+const gesture = { t: 0, dir: 0, limit: null, held: false, heldAt: 0, low: 0 };
+function measureStops() {
+  const max = ScrollTrigger.maxScroll(window), out = [];
+  const pins = ScrollTrigger.getAll().filter((st) => st.pin);
+  pins.forEach((st) => {
+    const span = st.end - st.start, tl = st.animation, labels = tl && tl.labels ? Object.values(tl.labels) : [];
+    if (labels.length) return labels.forEach((time) => out.push(st.start + (span * time) / tl.duration()));
+    const n = Math.max(1, Math.round(span / window.innerHeight));       // sin etiquetas: tramos de más o menos una pantalla
+    for (let i = 0; i <= n; i++) out.push(st.start + (span * i) / n);
+  });
+  if (pins.length) $$('[data-stop]').forEach((el) => {
+    const r = el.getBoundingClientRect(), top = r.top + window.scrollY;
+    out.push(el.dataset.stop === 'center' ? top + r.height / 2 - window.innerHeight / 2 : top);
+  });
+  stops = [...new Set(out.map((v) => Math.round(Math.min(max, Math.max(0, v)))))].sort((a, b) => a - b);
+}
+ScrollTrigger.addEventListener('refresh', measureStops);
+
+function limitWheel(data) {
+  const e = data.event, dy = data.deltaY;
+  if (!e.type.includes('wheel') || e.ctrlKey || !stops.length || !dy || Math.abs(data.deltaX) > Math.abs(dy)) return true;
+  const g = gesture, now = e.timeStamp, dir = Math.sign(dy), abs = Math.abs(dy);
+  // gesto nuevo: tras una pausa, al cambiar de sentido o, ya detenido, cuando el impulso vuelve a crecer (la inercia sólo decae)
+  const fresh = now - g.t > 160 || dir !== g.dir || (g.held && now - g.heldAt > 220 && abs > Math.max(g.low * 3, g.low + 30));
+  g.t = now;
+  if (fresh) {
+    const from = lenis.targetScroll;
+    g.dir = dir; g.held = false;
+    g.limit = dir > 0 ? stops.find((s) => s > from + 2) : stops.findLast((s) => s < from - 2);
+  }
+  if (g.limit == null) return true;                     // más allá de la última parada el scroll es libre
+  if (g.held) g.low = Math.min(g.low, abs);
+  else {
+    const left = (g.limit - lenis.targetScroll) * dir;
+    if (left > abs) return true;
+    g.held = true; g.heldAt = now; g.low = abs;
+    if (left >= 1) { data.deltaY = left * dir; return true; }   // el último tramo llega justo a la parada
+  }
+  if (e.cancelable) e.preventDefault();                 // el resto del gesto (inercia) se descarta
+  return false;
+}
 
 // enlaces internos con ancla (#algo) dentro de la misma página
 $$('a[href^="#"], a[href^="/#"]').forEach((a) => {
