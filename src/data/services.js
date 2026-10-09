@@ -2,7 +2,7 @@
  * Servicios de GrowLab (se muestran en la sección «Servicios» del inicio y en la línea que se va escribiendo bajo el titular).
  * Los nombres van en inglés porque así los conoce el mercado.
  *
- * icon → nombre del icono (ver components/Icon.astro).  art → dibujo de la tarjeta (bars, bars-rev, rings, dots, shapes, chips).
+ * icon → nombre del icono (ver components/Icon.astro).  art → dibujo de la tarjeta (bars, bars-rev, rings, dots, shapes, chips, mail).
  * ⚠ Las descripciones (`short`) son borradores: revísalas y ajústalas a cómo describe GrowLab cada servicio.
  */
 export const services = [
@@ -43,7 +43,7 @@ export const services = [
     n: '05',
     name: 'Email Marketing',
     icon: 'mail',
-    art: 'bars-rev',
+    art: 'mail',
     short: 'Newsletters y flujos automáticos que nutren, fidelizan y reactivan a tus clientes con el mensaje justo en cada etapa.',
   },
   {

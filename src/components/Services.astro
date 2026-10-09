@@ -107,4 +107,34 @@ import Icon from './Icon.astro';
   .art-chips i:nth-child(3) { transform: translateY(-40px); background: var(--color-secondary); }
   .art-chips i:nth-child(4) { transform: translateY(-22px); border-color: var(--color-sky); }
   .art-chips i:nth-child(5) { transform: translateY(-4px); background: var(--color-primary); border-color: var(--color-primary); }
+  /* sobre (email) con aviso de mensaje nuevo */
+  .art-mail i:nth-child(1) {
+    position: relative;
+    width: 150px;
+    height: 100px;
+    overflow: hidden;
+    border: 2px solid var(--color-sky);
+    border-radius: 14px;
+  }
+  .art-mail i:nth-child(1)::before {
+    content: '';
+    position: absolute;
+    left: 21.5px;
+    top: -51.5px;
+    width: 103px;
+    height: 103px;
+    border: 2px solid var(--color-sky);
+    border-radius: 0 0 10px 0;
+    transform: scaleY(0.62) rotate(45deg);
+  }
+  .art-mail i:nth-child(2) {
+    position: absolute;
+    right: calc(2rem - 9px);
+    bottom: calc(2rem + 91px);
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--color-secondary);
+  }
+  .art-mail i:nth-child(n + 3) { display: none; }
 </style>
