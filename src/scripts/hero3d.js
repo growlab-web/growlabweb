@@ -72,7 +72,21 @@ export function initHero3D() {
   const GSZ = new Float32Array(COUNT).fill(1);              // tamaño propio de cada partícula de la galaxia
   const SPD = new Float32Array(COUNT);                    // velocidad de giro propia de cada partícula (rad/s)
   const GAL_SPIN = 0.16;                                  // giro del núcleo y los brazos (rad/s)
-  const galaxyPose = (window.__galaxyPose = { spin: 0, tilt: 0.27, yaw: 0, roll: 0, fov: camera.fov });
+  const dustSpeed = (rr) => 0.05 + 0.14 / (rr + 0.6);     // polvo suelto: gira más lento cuanto más lejos del núcleo
+  // Las plataformas en órbita (Universe.astro) son un planeta más del disco: piden aquí la posición en pantalla de un punto de la galaxia
+  const orbitV = new THREE.Vector3();
+  const galaxyOrbit = (window.__galaxyOrbit = {
+    t: 0, unit: 1, speed: dustSpeed, tilt: 0.27, yaw: 0, roll: 0,   // unit: píxeles por unidad de la galaxia
+    project(r, th, out) {                                            // mismo camino que el sombreador: yaw (Y) → inclinación (X) → roll (Z) → grupo → cámara
+      const x = Math.cos(th) * r, z = Math.sin(th) * r;
+      const cy = Math.cos(this.yaw), sy = Math.sin(this.yaw), ct = Math.cos(this.tilt), st = Math.sin(this.tilt), cr = Math.cos(this.roll), sr = Math.sin(this.roll);
+      const x1 = cy * x + sy * z, z1 = -sy * x + cy * z, y2 = -st * z1, z2 = ct * z1;
+      orbitV.set(cr * x1 - sr * y2, sr * x1 + cr * y2, z2).applyMatrix4(group.matrixWorld).project(camera);
+      out.x = (orbitV.x + 1) * 0.5 * hero.clientWidth; out.y = (1 - orbitV.y) * 0.5 * hero.clientHeight;
+      out.depth = clamp01((z1 / r + 1) / 2);                         // 0 = detrás, 1 = delante
+      return out;
+    },
+  });
   const VIO = [0.56, 0.36, 1.0], DEEP = [0.27, 0.24, 0.82], GCY = [0.32, 0.78, 1.0], GTL = [0.16, 0.82, 0.72], GGR = [0.43, 0.95, 0.75];   // GGR = verde del sitio #6df2c0
   if (!serviceShape) for (let i = 0; i < N1; i++) {
     const q = Math.random();
@@ -93,7 +107,7 @@ export function initHero3D() {
       if (t > 0.94) col = col.map((x) => x * (1 - (t - 0.94) * 9));
     } else {                                 // polvo y estrellas sueltas por todo el disco
       rr = 0.2 + Math.pow(Math.random(), 1.3) * 2.4; y = g() * (0.03 + rr * 0.035);   // más denso hacia el centro, se va vaciando hacia el borde
-      spd = 0.05 + 0.14 / (rr + 0.6);
+      spd = dustSpeed(rr);
       gsz = 0.95 + Math.pow(Math.random(), 3) * 1.4;        // puntos sueltos: se tienen que ver uno a uno
       if (Math.random() < 0.13) {                           // partículas sueltas más allá del borde: el final queda irregular
         rr = 1.9 + Math.pow(Math.random(), 1.7) * 1.35; y = g() * (0.08 + (rr - 1.9) * 0.22); gsz = 0.9 + Math.pow(Math.random(), 4) * 1.8;
@@ -408,6 +422,7 @@ export function initHero3D() {
       base.gal = phone ? 0.62 : (narrow ? 0.66 : W < 1400 ? 0.72 : 0.86) * galaxyK();
       base.galTilt = phone ? 0.62 : 0.27;
       base.brainDy = phone ? -0.24 : 0;                                  // móvil: el cerebro baja un poco para dejar sitio al texto
+      galaxyOrbit.unit = (h / (2 * Math.tan((camera.fov * Math.PI) / 360) * camera.position.z)) * base.gal;
       group.position.y = base.y;
     } else {                                                               // cabeceras de páginas interiores
       group.position.x = narrow ? 0 : serviceShape ? 1.55 : 1.8;
@@ -526,8 +541,7 @@ export function initHero3D() {
     mat.uniforms.uYaw.value.set(mouse.x * 0.14 + t * 0.12, serviceShape ? Math.sin(t * 0.32) * 0.5 + mouse.x * 0.25 : mouse.x * 0.3, 0.12 + Math.sin(t * 0.3) * 0.3 + mouse.x * 0.3);
 
     mat.uniforms.uRoll.value.y = serviceShape ? 0 : mouse.x * 0.02;
-    // las plataformas en órbita (Universe.astro) leen de aquí el giro y la orientación de la galaxia para moverse con ella
-    if (pinned) { galaxyPose.spin = GAL_SPIN * t; galaxyPose.tilt = mat.uniforms.uTilt.value.y; galaxyPose.yaw = mat.uniforms.uYaw.value.y; galaxyPose.roll = mat.uniforms.uRoll.value.y; }
+    if (pinned) { galaxyOrbit.t = t; galaxyOrbit.tilt = mat.uniforms.uTilt.value.y; galaxyOrbit.yaw = mat.uniforms.uYaw.value.y; galaxyOrbit.roll = mat.uniforms.uRoll.value.y; }
     dust.rotation.y = t * 0.02;
     dust.position.y = Math.sin(t * 0.3) * 0.1;
 
