@@ -370,8 +370,6 @@ export async function initPortfolio(root) {
       tags[i].plus.style.pointerEvents = visPlus > 0.4 ? 'auto' : 'none';
     });
 
-    const ci = mod(Math.round(S.pos), N);
-    if (counterEl && ci !== counterIdx) { counterIdx = ci; counterEl.textContent = `${String(ci + 1).padStart(2, '0')} / ${String(N).padStart(2, '0')}`; }
     floorMat.uniforms.uTime.value = dustMat.uniforms.uTime.value = time;
     floorMat.uniforms.uOffset.value = dustMat.uniforms.uOffset.value = S.pos * SPACING;
     floorMat.uniforms.uFade.value = 1 - S.dim * 0.45;
@@ -398,9 +396,8 @@ export async function initPortfolio(root) {
     if (S.mode < 0.5) setMode('featured');
     S.target = Math.round(S.target) + Number(b.dataset.pfStep); S.lastInput = performance.now();
   }));
-  const counterEl = $('[data-pf-counter]', root);
   const arrowsEl = $('[data-pf-arrows]', root);
-  let counterIdx = -1;
+
   $$('[data-pf-full-item]', fullEl).forEach((a) => a.addEventListener('click', (e) => { e.preventDefault(); openProject(a.dataset.slug); }));
 
   /* ===================== Página de proyecto (panel blanco) ===================== */

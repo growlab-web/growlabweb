@@ -267,4 +267,3 @@ html.has-cursor, html.has-cursor * { cursor: none !important; }
 .pf-arrow:hover { color: var(--color-secondary); }
 .pf-arrow--next { animation: pf-nudge 2.4s ease-in-out infinite; }   /* empujoncito: hay más a la derecha */
 @keyframes pf-nudge { 0%, 70%, 100% { transform: translateX(0); } 80% { transform: translateX(5px); } 90% { transform: translateX(0); } }
-.pf-count-bar { font: 500 .62rem var(--font-ui); letter-spacing: .14em; color: rgba(255,255,255,.55); font-variant-numeric: tabular-nums; }
