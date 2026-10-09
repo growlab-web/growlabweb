@@ -405,6 +405,7 @@ export function initHero3D() {
       base.galY = phone ? -0.22 : narrow ? -0.28 : -0.15;
       base.gal = phone ? 0.62 : (narrow ? 0.66 : W < 1400 ? 0.72 : 0.86) * galaxyK();
       base.galTilt = phone ? 0.62 : 0.27;
+      base.brainDy = phone ? -0.16 : 0;                                  // móvil: el cerebro baja un poco para dejar sitio al texto
       group.position.y = base.y;
     } else {                                                               // cabeceras de páginas interiores
       group.position.x = narrow ? 0 : serviceShape ? 1.55 : 1.8;
@@ -501,7 +502,7 @@ export function initHero3D() {
     {
       const w1 = clamp01(1 - Math.abs(state.morph - 1));                    // 1 cuando la forma es la galaxia
       group.scale.setScalar(state.scale * (base.scale + (base.gal - base.scale) * w1));
-      group.position.y = base.y + (base.galY - base.y) * w1;
+      group.position.y = base.y + (base.galY - base.y) * w1 + (base.brainDy || 0) * clamp01(state.morph - 1);
     }
 
     const px = mouse.x, py = mouse.y;
