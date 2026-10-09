@@ -14,19 +14,19 @@ const input = 'w-full bg-transparent py-4 font-body text-[1rem] text-white outli
   <label class={wrap}>
     <svg class={icon} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"></path></svg>
     <span class="sr-only">Nombre</span>
-    <input class={input} name="nombre" type="text" placeholder="Nombre" autocomplete="name" required />
+    <input class={input} name="nombre" type="text" placeholder="Nombre *" autocomplete="name" required aria-required="true" />
   </label>
 
   <label class={wrap}>
     <svg class={icon} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="1.5"></rect><path d="m3.5 6.5 8.5 7 8.5-7"></path></svg>
     <span class="sr-only">Email</span>
-    <input class={input} name="email" type="email" placeholder="Email" autocomplete="email" required />
+    <input class={input} name="email" type="email" placeholder="Email *" autocomplete="email" required aria-required="true" />
   </label>
 
   <label class={wrap}>
     <svg class={icon} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2Z"></path></svg>
     <span class="sr-only">Teléfono</span>
-    <input class={input} name="telefono" type="tel" placeholder="Teléfono" autocomplete="tel" />
+    <input class={input} name="telefono" type="tel" inputmode="tel" placeholder="Teléfono *" autocomplete="tel" required aria-required="true" />
   </label>
 
   <!-- Servicios de interés: desplegable en el que se pueden marcar varios -->
@@ -51,7 +51,7 @@ const input = 'w-full bg-transparent py-4 font-body text-[1rem] text-white outli
   <label class={wrap + ' items-start sm:col-span-2'}>
     <svg class={icon + ' mt-4'} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20l1-4L16.5 4.5a2 2 0 0 1 3 0l0 0a2 2 0 0 1 0 3L8 19l-4 1Z"></path><path d="m14 7 3 3"></path></svg>
     <span class="sr-only">Mensaje</span>
-    <textarea class={input + ' min-h-[110px] resize-none'} name="mensaje" placeholder="¿Cómo podemos ayudar? ¡No dudes en ponerte en contacto con nosotros!" required></textarea>
+    <textarea class={input + ' min-h-[110px] resize-none'} name="mensaje" placeholder="¿Cómo podemos ayudar? ¡No dudes en ponerte en contacto con nosotros!"></textarea>
   </label>
 
   <!-- campo trampa para robots: las personas no lo ven ni llegan a él con el teclado -->
@@ -115,7 +115,13 @@ const input = 'w-full bg-transparent py-4 font-body text-[1rem] text-white outli
       const telefono = String(f.get('telefono') || '').trim();
       const mensaje = String(f.get('mensaje') || '').trim();
       const servicios = f.getAll('servicios').map(String);
-      if (!nombre || !/^\S+@\S+\.\S+$/.test(email) || !mensaje) return say('Completa tu nombre, un correo válido y el mensaje.', 'error');
+      // obligatorios: nombre, correo y teléfono (el teléfono, con al menos 6 dígitos); servicios y mensaje son opcionales
+      const missing = [!nombre && 'tu nombre', !/^\S+@\S+\.\S+$/.test(email) && 'un correo válido', telefono.replace(/\D/g, '').length < 6 && 'un teléfono válido'].filter(Boolean);
+      if (missing.length) {
+        const field = form.querySelector(!nombre ? '[name=nombre]' : missing[0] === 'un correo válido' ? '[name=email]' : '[name=telefono]');
+        if (field) field.focus();
+        return say(`Completa ${missing.join(missing.length > 2 ? ', ' : ' y ').replace(/, ([^,]*)$/, ' y $1')}.`, 'error');
+      }
       if (!f.get('consent')) return say('Para enviar el mensaje debes aceptar que se recopilen tus datos.', 'error');
 
       f.set('pagina', location.href);
@@ -137,7 +143,7 @@ const input = 'w-full bg-transparent py-4 font-body text-[1rem] text-white outli
           lead_services: servicios.join(', ') || '(sin especificar)',
           lead_services_count: servicios.length,
           // sólo para conversiones mejoradas (Google Ads / Meta); no se envía a GA4, ver scripts/track.js
-          user_data: { email: email.toLowerCase(), phone_number: telefono || undefined },
+          user_data: { email: email.toLowerCase(), phone_number: telefono },
         });
         form.reset();
         resetServices();
@@ -147,7 +153,7 @@ const input = 'w-full bg-transparent py-4 font-body text-[1rem] text-white outli
 
       // sin servicio de envío: se abre el programa de correo con el mensaje listo
       const body = [
-        `Nombre: ${nombre}`, `Correo: ${email}`, `Teléfono: ${telefono || '-'}`, `Servicios de interés: ${servicios.join(', ') || '-'}`, '', mensaje,
+        `Nombre: ${nombre}`, `Correo: ${email}`, `Teléfono: ${telefono}`, `Servicios de interés: ${servicios.join(', ') || '-'}`, '', mensaje || '(sin mensaje)',
       ].join('\n');
       const subject = servicios.length ? `Información sobre ${servicios.join(', ')} · ${nombre}` : `Nuevo contacto: ${nombre}`;
       say('Se abrirá tu correo con el mensaje listo para enviar.');

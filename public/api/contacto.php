@@ -60,8 +60,9 @@ $servicios = $_POST['servicios'] ?? [];
 if (!is_array($servicios)) { $servicios = [$servicios]; }
 $servicios = array_values(array_filter(array_map(function ($s) { return line($s, 80); }, array_slice($servicios, 0, 20))));
 
-if ($nombre === '' || $mensaje === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-    respond(422, ['ok' => false, 'error' => 'Completa tu nombre, un correo válido y el mensaje.']);
+// obligatorios: nombre, correo y teléfono (con al menos 6 dígitos); los servicios y el mensaje son opcionales
+if ($nombre === '' || !filter_var($email, FILTER_VALIDATE_EMAIL) || strlen(preg_replace('/\D/', '', $telefono)) < 6) {
+    respond(422, ['ok' => false, 'error' => 'Completa tu nombre, un correo válido y un teléfono válido.']);
 }
 if (!$consent) {
     respond(422, ['ok' => false, 'error' => 'Para enviar el mensaje debes aceptar que se recopilen tus datos.']);
@@ -118,10 +119,10 @@ $subject = $servicios ? 'Nuevo lead: ' . $lista . ' · ' . $nombre : 'Nuevo cont
 $body = implode("\n", [
     'Nombre: ' . $nombre,
     'Correo: ' . $email,
-    'Teléfono: ' . ($telefono !== '' ? $telefono : '-'),
+    'Teléfono: ' . $telefono,
     'Servicios de interés: ' . $lista,
     '',
-    $mensaje,
+    $mensaje !== '' ? $mensaje : '(sin mensaje)',
     '',
     '--',
     'Enviado desde ' . ($pagina !== '' ? $pagina : 'growlab.pe') . ' el ' . $fecha,
