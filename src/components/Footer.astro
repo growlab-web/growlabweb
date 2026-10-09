@@ -15,7 +15,7 @@ const links = [...site.nav, site.contact];
     {
       site.social.map((s, i) => (
         <>
-          <a href={s.href} class="transition-colors hover:text-secondary">{s.label}</a>
+          <a href={s.href} target="_blank" rel="noopener noreferrer" class="transition-colors hover:text-secondary">{s.label}</a>
           {i < site.social.length - 1 && ' · '}
         </>
       ))

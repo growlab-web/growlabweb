@@ -11,9 +11,8 @@ export const site = {
   contact: { href: '/contacto', label: 'Contacto' },
   cta: 'Agendar reunión', // texto del botón del menú (lleva a la página de contacto)
   social: [
-    { label: 'Instagram', href: '#' },
-    { label: 'LinkedIn', href: '#' },
-    { label: 'TikTok', href: '#' },
+    { label: 'Instagram', href: 'https://www.instagram.com/lab.grow/' },   // @lab.grow
+    { label: 'LinkedIn', href: 'https://www.linkedin.com/company/grow-digital-marketing-lab/' },
   ],
   // cifras de la agencia: las mismas en la galaxia del inicio y en «Nosotros» (v = valor, s = sufijo, d = decimales, i = icono)
   stats: [

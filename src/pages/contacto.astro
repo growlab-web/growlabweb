@@ -36,7 +36,7 @@ import Icon from '../components/Icon.astro';
       <div data-reveal>
         <p class="mb-3 flex items-center gap-2 font-display text-[.78rem] uppercase tracking-[.14em] text-white/50"><Icon name="share-2" size={18} class="text-secondary" />Síguenos</p>
         <p class="flex flex-wrap gap-x-5 gap-y-1 text-muted">
-          {site.social.map((s) => <a href={s.href} class="transition-colors hover:text-secondary">{s.label}</a>)}
+          {site.social.map((s) => <a href={s.href} target="_blank" rel="noopener noreferrer" class="transition-colors hover:text-secondary">{s.label}</a>)}
         </p>
       </div>
     </section>
