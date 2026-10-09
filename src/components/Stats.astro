@@ -1,12 +1,8 @@
 ---
 import Icon from './Icon.astro';
 // Cifras con contador animado (GSAP): data-count / data-dec / data-suffix.
-const stats = [
-  { i: 'folder-check', v: 250, s: '+', l: 'Proyectos entregados' },
-  { i: 'trending-up', v: 4.8, s: 'x', d: 1, l: 'ROAS medio en campañas' },
-  { i: 'coins', v: 12, s: 'M€', l: 'Facturación generada' },
-  { i: 'repeat', v: 98, s: '%', l: 'Clientes que repiten' },
-];
+import { site } from '../data/site.js';
+const stats = site.stats;
 ---
 
 <section data-stats class="grid gap-10 border-t border-white/10 px-(--pad) py-[12vh] sm:grid-cols-2 lg:grid-cols-4">

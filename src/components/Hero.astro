@@ -1,15 +1,11 @@
 ---
 import { services } from '../data/services.js';
+import { site } from '../data/site.js';
 import Partners from './Partners.astro';
 import Universe from './Universe.astro';
 import AiTools from './AiTools.astro';
 const words = JSON.stringify(services.map((s) => s.name));
-const stats = [
-  { n: '50+', l: 'Proyectos culminados' },
-  { n: '5M$', l: 'Facturación generada' },
-  { n: '4.8x', l: 'ROAS promedio en campañas' },
-  { n: '95%', l: 'Clientes recurrentes' },
-];
+const stats = site.stats.map((s) => ({ n: `${s.v}${s.s}`, l: s.l }));
 ---
 
 <!--

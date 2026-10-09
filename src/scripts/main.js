@@ -253,7 +253,7 @@ function initPage() {
     const o = { v: 0 };
     gsap.to(o, {
       v: end, duration: 2.2, ease: 'power3.out',
-      onUpdate: () => (el.textContent = o.v.toFixed(dec).replace('.', ',') + suffix),
+      onUpdate: () => (el.textContent = o.v.toFixed(dec) + suffix),
       scrollTrigger: { trigger: el, start: 'top 90%', once: true },
     });
   });
