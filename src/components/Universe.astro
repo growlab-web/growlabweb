@@ -48,6 +48,7 @@ const rings = [inner, outer];
   // Cada plataforma es un planeta del disco: ocupa un punto real de la galaxia y gira alrededor del núcleo al ritmo del polvo que tiene al lado
   // (hero3d.js da la velocidad a cada radio y proyecta el punto a pantalla). Las de delante se ven más grandes.
   // Siempre opacas: si no, las partículas se ven a través y no se leen.
+  // Con el cursor encima crecen un poco (se calcula aquí, no con :hover, porque la posición y la escala las pone este script).
   type Spot = { x: number; y: number; depth: number };
   type Orbit = { t: number; unit: number; speed(r: number): number; project(r: number, th: number, out: Spot): Spot };
   const root = document.querySelector<HTMLElement>('[data-universe]');
@@ -57,12 +58,22 @@ const rings = [inner, outer];
     const angle = items.map((el) => (+el.dataset.i! / +el.dataset.n!) * Math.PI * 2 + +el.dataset.ring! * 0.6);   // cada una lleva su propio ángulo
     const panel = root.closest<HTMLElement>('[data-panel]');
     const spot: Spot = { x: 0, y: 0, depth: 0 };
-    let last = -1;
+    const size = items.map(() => ({ w: 0, h: 0 })), grow = items.map(() => 0);
+    const measure = () => items.forEach((el, k) => { size[k].w = el.offsetWidth; size[k].h = el.offsetHeight; });
+    measure();
+    window.addEventListener('resize', measure);
+    const mouse = { x: -1e4, y: -1e4 };
+    if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+      window.addEventListener('pointermove', (e) => { mouse.x = e.clientX; mouse.y = e.clientY; }, { passive: true });
+      document.addEventListener('pointerleave', () => { mouse.x = mouse.y = -1e4; });
+    }
+    let last = -1, lastNow = performance.now();
     const frame = () => {
       requestAnimationFrame(frame);
       const g: Orbit | undefined = (window as any).__galaxyOrbit;
       if (!g) return;
       const dt = last < 0 ? 0 : g.t - last; last = g.t;                 // el tiempo es el de la galaxia: avanzan lo mismo que sus partículas aunque no se vean
+      const now = performance.now(), ease = 1 - Math.exp(-(now - lastNow) / 110); lastNow = now;
       const hidden = !!panel && panel.style.visibility === 'hidden';   // fuera de su etapa solo se lleva la cuenta del ángulo
       const W = window.innerWidth, H = window.innerHeight;
       const phone = W < 520;
@@ -73,8 +84,11 @@ const rings = [inner, outer];
         angle[k] += g.speed(r) * dt;
         if (!c || !o) return;
         g.project(r, angle[k], spot);
-        el.style.transform = `translate(calc(${c.left + spot.x - o.left}px - 50%), calc(${c.top + spot.y - o.top}px - 50%)) scale(${0.78 + spot.depth * 0.3})`;
-        el.style.zIndex = String(Math.round(spot.depth * 10));
+        const cx = c.left + spot.x, cy = c.top + spot.y, sc = 0.78 + spot.depth * 0.3;
+        const over = Math.abs(mouse.x - cx) < (size[k].w * sc) / 2 + 4 && Math.abs(mouse.y - cy) < (size[k].h * sc) / 2 + 4;
+        grow[k] += ((over ? 1 : 0) - grow[k]) * ease;
+        el.style.transform = `translate(calc(${cx - o.left}px - 50%), calc(${cy - o.top}px - 50%)) scale(${sc * (1 + grow[k] * 0.12)})`;
+        el.style.zIndex = String(Math.round(spot.depth * 10) + (over ? 20 : 0));     // la que se señala pasa por delante de sus vecinas
       });
     };
     requestAnimationFrame(frame);
