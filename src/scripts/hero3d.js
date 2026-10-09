@@ -399,13 +399,13 @@ export function initHero3D() {
     if (pinned) {                                                          // inicio
       group.position.x = HOME_X;
       // esfera y cerebro: en pantallas medianas se encogen de forma continua para no pisar los textos de la izquierda
-      base.y = phone ? -0.3 : narrow ? -0.2 : -0.15;
+      base.y = phone ? -0.22 : narrow ? -0.2 : -0.15;
       base.scale = phone ? (h < 740 ? 0.39 : 0.45) : narrow ? 0.58 : W < 1400 ? 0.54 + ((W - 1000) / 400) * 0.32 : 0.86;
       // móvil: la galaxia va grande y más vista desde arriba para llenar el alto de la pantalla (se sale por los lados a propósito)
       base.galY = phone ? -0.22 : narrow ? -0.28 : -0.15;
       base.gal = phone ? 0.62 : (narrow ? 0.66 : W < 1400 ? 0.72 : 0.86) * galaxyK();
       base.galTilt = phone ? 0.62 : 0.27;
-      base.brainDy = phone ? -0.16 : 0;                                  // móvil: el cerebro baja un poco para dejar sitio al texto
+      base.brainDy = phone ? -0.24 : 0;                                  // móvil: el cerebro baja un poco para dejar sitio al texto
       group.position.y = base.y;
     } else {                                                               // cabeceras de páginas interiores
       group.position.x = narrow ? 0 : serviceShape ? 1.55 : 1.8;
