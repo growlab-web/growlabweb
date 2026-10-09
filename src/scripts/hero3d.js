@@ -129,7 +129,7 @@ export function initHero3D() {
   }
   for (let i = N1; i < COUNT; i++) { const k = (Math.random() * N1) | 0; copy3(P1, i, k); copy3(C1, i, k); PATH[i] = PATH[k]; SPD[i] = SPD[k]; GSZ[i] = GSZ[k]; }
 
-  /* --- 3) Cerebro: silueta + surcos reales de la referencia, inflados en 3D --- */
+  /* --- 3) Cerebro: silueta + surcos reales de la referencia, inflados en 3D con perfil redondo --- */
   (function buildBrain() {
     const B = BRAIN_DATA;
     const W = B.w, H = B.h, bin = atob(B.d), D = new Float32Array(W * H);
@@ -137,28 +137,65 @@ export function initHero3D() {
     const mask = new Uint8Array(W * H);
     let minY = H, maxY = 0;
     for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) if (D[y * W + x] > 0.12) { mask[y * W + x] = 1; minY = Math.min(minY, y); maxY = Math.max(maxY, y); }
-    const dist = new Float32Array(W * H);
-    for (let i = 0; i < W * H; i++) dist[i] = mask[i] ? 1e6 : 0;
+    // silueta maciza: todo lo que queda dentro del contorno cuenta, aunque el dibujo tenga zonas oscuras entre surcos
+    // (si no, el relieve se hunde hasta el centro en cada hueco y de lado el cerebro se ve hecho de capas)
+    const outside = new Uint8Array(W * H), queue = [];
+    for (let x = 0; x < W; x++) queue.push(x, (H - 1) * W + x);
+    for (let y = 0; y < H; y++) queue.push(y * W, y * W + W - 1);
+    while (queue.length) {
+      const i = queue.pop();
+      if (outside[i] || mask[i]) continue;
+      outside[i] = 1;
+      const x = i % W, y = (i / W) | 0;
+      if (x > 0) queue.push(i - 1); if (x < W - 1) queue.push(i + 1); if (y > 0) queue.push(i - W); if (y < H - 1) queue.push(i + W);
+    }
+    let dist = new Float32Array(W * H);
+    for (let i = 0; i < W * H; i++) dist[i] = outside[i] ? 0 : 1e6;
     for (let y = 1; y < H; y++) for (let x = 1; x < W - 1; x++) { const i = y * W + x; dist[i] = Math.min(dist[i], dist[i - 1] + 1, dist[i - W] + 1, dist[i - W - 1] + 1.41, dist[i - W + 1] + 1.41); }
     for (let y = H - 2; y >= 0; y--) for (let x = W - 2; x >= 1; x--) { const i = y * W + x; dist[i] = Math.min(dist[i], dist[i + 1] + 1, dist[i + W] + 1, dist[i + W + 1] + 1.41, dist[i + W - 1] + 1.41); }
-    let dmax = 0; for (let i = 0; i < W * H; i++) if (dist[i] < 1e5) dmax = Math.max(dmax, dist[i]);
+    for (let i = 0; i < W * H; i++) if (dist[i] > 1e5) dist[i] = 0;
+    // la distancia al borde sale en escalones: se suaviza para que la superficie sea continua
+    for (let pass = 0; pass < 3; pass++) {
+      const next = new Float32Array(W * H);
+      for (let y = 1; y < H - 1; y++) for (let x = 1; x < W - 1; x++) {
+        const i = y * W + x;
+        next[i] = outside[i] ? 0 : (dist[i - W - 1] + dist[i - W] + dist[i - W + 1] + dist[i - 1] + dist[i] + dist[i + 1] + dist[i + W - 1] + dist[i + W] + dist[i + W + 1]) / 9;
+      }
+      dist = next;
+    }
+    let dmax = 0; for (let i = 0; i < W * H; i++) dmax = Math.max(dmax, dist[i]);
+    // perfil redondo (un cuarto de círculo): el borde sube en vertical y el centro queda abombado, como un cuerpo con volumen
     const Z = new Float32Array(W * H);
-    for (let i = 0; i < W * H; i++) Z[i] = mask[i] ? Math.sqrt(Math.min(1, dist[i] / (dmax * 0.9))) : 0;
+    for (let i = 0; i < W * H; i++) { const u = Math.min(1, dist[i] / (dmax * 0.9)); Z[i] = Math.sqrt(1 - (1 - u) * (1 - u)); }
+    const sample = (A, fx, fy) => {                       // lectura entre píxeles: sin esto cada píxel es un escalón plano
+      const x = Math.min(W - 1.001, Math.max(0, fx)), y = Math.min(H - 1.001, Math.max(0, fy));
+      const x0 = x | 0, y0 = y | 0, tx = x - x0, ty = y - y0, i = y0 * W + x0;
+      return (A[i] * (1 - tx) + A[i + 1] * tx) * (1 - ty) + (A[i + W] * (1 - tx) + A[i + W + 1] * tx) * ty;
+    };
+    const S = 2.55 / (maxY - minY), cx = W / 2, cy = (minY + maxY) / 2, thick = 1.1;
     const cdf = new Float32Array(W * H); let acc = 0;
-    for (let i = 0; i < W * H; i++) { acc += D[i] > 0.04 ? 0.3 + 0.7 * D[i] : 0; cdf[i] = acc; }
-    const S = 2.55 / (maxY - minY), cx = W / 2, cy = (minY + maxY) / 2, thick = 1.2;
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+      const i = y * W + x;
+      // en los costados la superficie está de canto y ocupa pocos píxeles: se le dan más partículas para que no queden vacíos al girar
+      const gx = (Z[y * W + Math.min(W - 1, x + 1)] - Z[y * W + Math.max(0, x - 1)]) * thick / (2 * S);
+      const gy = (Z[Math.min(H - 1, y + 1) * W + x] - Z[Math.max(0, y - 1) * W + x]) * thick / (2 * S);
+      acc += D[i] > 0.04 && !outside[i] ? (0.1 + 0.9 * Math.pow(D[i], 1.5)) * Math.min(2.4, Math.sqrt(1 + gx * gx + gy * gy)) : 0;
+      cdf[i] = acc;
+    }
     for (let n = 0; n < N2; n++) {
       const t = Math.random() * acc; let lo = 0, hi = W * H - 1;
       while (lo < hi) { const m = (lo + hi) >> 1; if (cdf[m] < t) lo = m + 1; else hi = m; }
-      const px = lo % W, py = (lo / W) | 0;
-      const x = (px + Math.random() - cx) * S, y = -(py + Math.random() - cy) * S;
-      const zf = Z[py * W + px];
+      const fx = (lo % W) + Math.random() - 0.5, fy = ((lo / W) | 0) + Math.random() - 0.5;
       const side = Math.random() < 0.62 ? 1 : -1;
-      const zl = Z[py * W + Math.max(0, px - 2)], zr = Z[py * W + Math.min(W - 1, px + 2)];
-      const zu = Z[Math.max(0, py - 2) * W + px], zd = Z[Math.min(H - 1, py + 2) * W + px];
-      const nx = -(zr - zl) * thick / (4 * S) * side, ny = (zd - zu) * thick / (4 * S) * side, nz = side;
-      const nl = Math.hypot(nx, ny, nz) || 1;
-      set3(P2, n, x, y, side * (zf * thick + (D[py * W + px] - 0.5) * 0.1));   // los pliegues sobresalen un poco set3(N2v, n, nx / nl, ny / nl, nz / nl);
+      const zf = sample(Z, fx, fy);
+      // normal hacia fuera de la superficie (en la cara de atrás sólo cambia el sentido en profundidad)
+      let nx = -(sample(Z, fx + 1.5, fy) - sample(Z, fx - 1.5, fy)) * thick / (3 * S);
+      let ny = (sample(Z, fx, fy + 1.5) - sample(Z, fx, fy - 1.5)) * thick / (3 * S);
+      const nl = Math.hypot(nx, ny, 1);
+      nx /= nl; ny /= nl; const nz = side / nl;
+      const bump = (sample(D, fx, fy) - 0.5) * 0.07 + (Math.random() - 0.5) * 0.015;   // los pliegues sobresalen un poco, siguiendo la curvatura
+      set3(P2, n, (fx + 0.5 - cx) * S + nx * bump, -(fy + 0.5 - cy) * S + ny * bump, side * zf * thick + nz * bump);
+      set3(N2v, n, nx, ny, nz);
     }
     fill(N2, [P2, N2v]);
   })();
