@@ -71,22 +71,24 @@ export function initHero3D() {
   /* --- 2) Galaxia: núcleo blanco-violeta del que nacen dos brazos en S, 3 anillos (cian → turquesa → verde) y polvo --- */
   const GSZ = new Float32Array(COUNT).fill(1);              // tamaño propio de cada partícula de la galaxia
   const SPD = new Float32Array(COUNT);                    // velocidad de giro propia de cada partícula (rad/s)
+  const GAL_SPIN = 0.16;                                  // giro del núcleo y los brazos (rad/s)
+  const galaxyPose = (window.__galaxyPose = { spin: 0, tilt: 0.27, yaw: 0, roll: 0, fov: camera.fov });
   const VIO = [0.56, 0.36, 1.0], DEEP = [0.27, 0.24, 0.82], GCY = [0.32, 0.78, 1.0], GTL = [0.16, 0.82, 0.72], GGR = [0.43, 0.95, 0.75];   // GGR = verde del sitio #6df2c0
   if (!serviceShape) for (let i = 0; i < N1; i++) {
     const q = Math.random();
     let rr, th = Math.random() * Math.PI * 2, y = 0, col, spd, gsz = 1;
     if (q < 0.055) {                          // núcleo: punto fijo muy denso y luminoso
-      rr = Math.abs(g()) * 0.085 + 0.003; y = g() * 0.03; spd = 0.16; gsz = 1.35;
+      rr = Math.abs(g()) * 0.085 + 0.003; y = g() * 0.03; spd = GAL_SPIN; gsz = 1.35;
       col = mix3([1, 1, 1], VIO, Math.min(1, rr / 0.16));
     } else if (q < 0.2) {                   // resplandor violeta alrededor del núcleo
-      rr = Math.pow(Math.random(), 1.2) * 0.75; y = g() * 0.06 * (1.15 - rr); spd = 0.16;
+      rr = Math.pow(Math.random(), 1.2) * 0.75; y = g() * 0.06 * (1.15 - rr); spd = GAL_SPIN;
       col = mix3(VIO, DEEP, Math.min(1, rr / 0.7)).map((x) => x * 0.8);
     } else if (q < 0.6) {                    // dos brazos continuos: nacen en el núcleo y dan vuelta y media hasta el borde (sin anillos cerrados)
       const t = Math.pow(Math.random(), 0.9);
       rr = Math.pow(t, 1.08) * 2.08;
       th = Math.floor(Math.random() * 2) * Math.PI + t * Math.PI * 3.0;
       rr += g() * (0.012 + 0.028 * t * t) + (t > 0.94 ? g() * (t - 0.94) * 2 : 0);   // la punta se deshace en polvo
-      y = g() * (0.012 + 0.02 * t); spd = 0.16;
+      y = g() * (0.012 + 0.02 * t); spd = GAL_SPIN;
       col = t < 0.1 ? mix3([1, 1, 1], VIO, t / 0.1) : t < 0.3 ? mix3(VIO, GCY, (t - 0.1) / 0.2) : t < 0.62 ? mix3(GCY, GTL, (t - 0.3) / 0.32) : mix3(GTL, GGR, (t - 0.62) / 0.38);
       if (t > 0.94) col = col.map((x) => x * (1 - (t - 0.94) * 9));
     } else {                                 // polvo y estrellas sueltas por todo el disco
@@ -524,6 +526,8 @@ export function initHero3D() {
     mat.uniforms.uYaw.value.set(mouse.x * 0.14 + t * 0.12, serviceShape ? Math.sin(t * 0.32) * 0.5 + mouse.x * 0.25 : mouse.x * 0.3, 0.12 + Math.sin(t * 0.3) * 0.3 + mouse.x * 0.3);
 
     mat.uniforms.uRoll.value.y = serviceShape ? 0 : mouse.x * 0.02;
+    // las plataformas en órbita (Universe.astro) leen de aquí el giro y la orientación de la galaxia para moverse con ella
+    if (pinned) { galaxyPose.spin = GAL_SPIN * t; galaxyPose.tilt = mat.uniforms.uTilt.value.y; galaxyPose.yaw = mat.uniforms.uYaw.value.y; galaxyPose.roll = mat.uniforms.uRoll.value.y; }
     dust.rotation.y = t * 0.02;
     dust.position.y = Math.sin(t * 0.3) * 0.1;
 

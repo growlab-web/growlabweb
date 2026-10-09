@@ -45,27 +45,34 @@ const rings = [inner, outer];
 </div>
 
 <script>
-  // Cada plataforma recorre una elipse (la misma inclinación que la galaxia); las de delante se ven más grandes. Siempre opacas: si no, las partículas se ven a través y no se leen.
+  // Cada plataforma va sujeta al disco de la galaxia: gira con sus brazos y toma su misma inclinación y perspectiva (hero3d.js publica la pose).
+  // Las de delante se ven más grandes. Siempre opacas: si no, las partículas se ven a través y no se leen.
+  type Pose = { spin: number; tilt: number; yaw: number; roll: number; fov: number };
   const root = document.querySelector<HTMLElement>('[data-universe]');
   if (root) {
     const items = [...root.querySelectorAll<HTMLElement>('[data-orbit]')];
-    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    let t = 0, last = performance.now();
+    const still: Pose = { spin: 0, tilt: 0.27, yaw: 0, roll: 0, fov: 40 };   // sin 3D (no debería pasar): disco quieto
     const panel = root.closest<HTMLElement>('[data-panel]');
-    const frame = (now: number) => {
-      if (panel && panel.style.visibility === 'hidden') { last = now; requestAnimationFrame(frame); return; }   // fuera de su etapa no se calcula nada
-      const dt = Math.min(0.05, (now - last) / 1000); last = now;
-      if (!reduce) t += dt;
+    const frame = () => {
+      if (panel && panel.style.visibility === 'hidden') { requestAnimationFrame(frame); return; }   // fuera de su etapa no se calcula nada
+      const g: Pose = (window as any).__galaxyPose || still;
       const W = window.innerWidth, H = window.innerHeight;
       const phone = W < 520;
-      const rx0 = phone ? W * 0.42 : Math.min(W * 0.4, 640);
-      const ry0 = phone ? Math.min(rx0 * 0.85, H * 0.17) : Math.min(rx0 * 0.3, H * 0.2);   // en móvil la galaxia se ve más desde arriba: órbita más alta
+      const rx0 = phone ? W * 0.42 : Math.min(W * 0.38, H * 0.66, 600);
+      // distancia de la cámara en píxeles, alejada 2,5×: la órbita es más ancha que los brazos y con la perspectiva real se saldría de la pantalla por delante
+      const cam = (H / (2 * Math.tan((g.fov * Math.PI) / 360))) * 2.5;
+      const cy = Math.cos(g.yaw), sy = Math.sin(g.yaw), ct = Math.cos(g.tilt), st = Math.sin(g.tilt), cr = Math.cos(g.roll), sr = Math.sin(g.roll);
       for (const el of items) {
         const r = +el.dataset.ring!, i = +el.dataset.i!, n = +el.dataset.n!;
-        const k = r === 0 ? 0.6 : 1;
-        const a = (i / n) * Math.PI * 2 + t * (r === 0 ? 0.16 : -0.1) + r * 0.6;
-        const x = Math.cos(a) * rx0 * k, y = Math.sin(a) * ry0 * k;
-        const depth = (Math.sin(a) + 1) / 2;                 // 0 = detrás, 1 = delante
+        const R = rx0 * (r === 0 ? (phone ? 0.48 : 0.55) : 1);
+        const a = (i / n) * Math.PI * 2 + r * 0.6 + g.spin;
+        // mismo orden de giros que el sombreador: yaw (Y) → inclinación (X) → roll (Z)
+        const px = Math.cos(a) * R, pz = Math.sin(a) * R;
+        const x1 = cy * px + sy * pz, z1 = -sy * px + cy * pz;
+        const y2 = -st * z1, z2 = ct * z1;                                // z2 > 0 = hacia la cámara
+        const f = cam / (cam - z2);
+        const x = (cr * x1 - sr * y2) * f, y = -(sr * x1 + cr * y2) * f;
+        const depth = Math.min(1, Math.max(0, (z2 / (R * ct) + 1) / 2)); // 0 = detrás, 1 = delante
         el.style.transform = `translate(calc(${x}px - 50%), calc(${y}px - 50%)) scale(${0.78 + depth * 0.3})`;
         el.style.zIndex = String(Math.round(depth * 10));
       }
