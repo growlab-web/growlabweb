@@ -17,7 +17,7 @@ const input = 'w-full bg-transparent py-4 font-body text-[1rem] text-white outli
 ---
 
 <!-- El formulario se envía a /api/contacto.php (hosting cPanel), que guarda el lead y lo manda al correo de GrowLab.
-     Nunca abre el programa de correo del visitante. En local (npm run dev) no hay PHP: ahí el envío se simula para poder
+     Nunca abre el programa de correo del visitante. En local (npm run dev) y en la vista previa de Vercel no hay PHP: ahí el envío se simula para poder
      ver la pantalla de gracias, y se avisa de que no se ha mandado ningún correo. -->
 <form data-contact-form data-email={site.email} class="grid gap-x-10 gap-y-7 sm:grid-cols-2" novalidate>
   <label class={wrap}>
@@ -96,7 +96,7 @@ const input = 'w-full bg-transparent py-4 font-body text-[1rem] text-white outli
 
 <!-- Pantalla de gracias: sustituye al formulario cuando el envío sale bien, con un mini juego para la espera (scripts/pong.js) -->
 <div data-form-thanks hidden class="text-center" role="status" aria-live="polite">
-  <p data-form-test hidden class="mx-auto mb-5 w-fit rounded-full border border-[#ffcf7a]/50 px-4 py-1.5 font-ui text-[.78rem] text-[#ffcf7a]">Modo de prueba: en local no se envía ningún correo</p>
+  <p data-form-test hidden class="mx-auto mb-5 w-fit rounded-full border border-[#ffcf7a]/50 px-4 py-1.5 font-ui text-[.78rem] text-[#ffcf7a]">Modo de prueba: aquí no se envía ningún correo</p>
   <p class="eyebrow">¡Gracias por tus datos!</p>
   <h3 class="mx-auto max-w-[18em] font-display text-[clamp(1.5rem,2.8vw,2.4rem)] font-medium leading-[1.08] tracking-[-0.03em]">Mientras esperas nuestra respuesta, juega un poco.</h3>
   <p class="mx-auto mt-4 max-w-[46ch] font-body leading-relaxed text-copy">
@@ -225,11 +225,11 @@ const input = 'w-full bg-transparent py-4 font-body text-[1rem] text-white outli
       if (result) return say(result.error || 'No pudimos enviar tu mensaje. Inténtalo de nuevo.', 'error');
 
       // el servicio no respondió
-      if (['localhost', '127.0.0.1'].includes(location.hostname)) {
-        // en local no hay PHP: se enseña la pantalla de gracias como prueba, sin enviar nada ni contar el lead
+      if (['localhost', '127.0.0.1'].includes(location.hostname) || location.hostname.endsWith('.vercel.app')) {
+        // en local y en la vista previa de Vercel no hay PHP: se enseña la pantalla de gracias como prueba, sin enviar nada ni contar el lead
         if (showThanks()) { const p = thanks.querySelector('[data-form-test]'); if (p) p.hidden = false; }
         form.reset(); resetServices(); paintPrefix();
-        return say('Modo de prueba: en local no se envía el correo. El envío real funciona con el sitio subido al hosting.');
+        return say('Modo de prueba: aquí no se envía el correo. El envío real funciona con el sitio subido al hosting de growlab.pe.');
       }
       say(`No pudimos enviar tu mensaje. Inténtalo de nuevo en unos minutos o escríbenos a ${form.dataset.email}.`, 'error');
     });
