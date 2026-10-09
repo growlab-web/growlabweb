@@ -1,16 +1,21 @@
 ---
 // Plataformas que orbitan la galaxia: cada herramienta es un "planeta" de un mismo universo (iconos de simple-icons, CC0).
-import { siGooglesearchconsole, siGoogletagmanager, siMeta, siShopify, siGoogleads, siGoogleanalytics, siMailchimp } from 'simple-icons';
+import { siGooglesearchconsole, siGoogletagmanager, siMeta, siShopify, siGoogleads, siGoogleanalytics, siMailchimp, siTiktok } from 'simple-icons';
+
+// Stape no está en simple-icons: isotipo de su logo oficial.
+const stape = { path: 'M23 7L14 22L23 28V38H0V34L8 20L0 14V5H23V7Z', hex: 'ff6d34', viewBox: '-5 5 33 33' };
 
 const inner = [
   { icon: siGoogletagmanager, name: 'Tag Manager' },
   { icon: siGoogleanalytics, name: 'Analytics' },
   { icon: siGooglesearchconsole, name: 'Search Console' },
+  { icon: stape, name: 'Stape' },
 ];
 const outer = [
   { icon: siShopify, name: 'Shopify' },
   { icon: siMeta, name: 'Meta Ads' },
   { icon: siGoogleads, name: 'Google Ads' },
+  { icon: { ...siTiktok, hex: 'ffffff' }, name: 'TikTok Ads' },
   { icon: siMailchimp, name: 'Mailchimp' },
 ];
 const rings = [inner, outer];
@@ -25,9 +30,9 @@ const rings = [inner, outer];
           data-ring={r}
           data-i={i}
           data-n={ring.length}
-          class="absolute left-0 top-0 flex items-center gap-2 whitespace-nowrap rounded-full border border-white/25 bg-[#0b1226]/70 max-md:bg-[#0b1226]/90 py-2 pl-2.5 pr-4 font-ui text-[.95rem] text-white/90 shadow-[0_0_24px_rgba(56,111,222,.25)] md:backdrop-blur-md will-change-transform max-sm:p-2"
+          class="absolute left-0 top-0 flex items-center gap-2 whitespace-nowrap rounded-full border border-white/25 bg-[#0b1226] py-2 pl-2.5 pr-4 font-ui text-[.95rem] text-white/90 shadow-[0_0_24px_rgba(56,111,222,.25)] will-change-transform max-sm:p-2"
         >
-          <svg viewBox="0 0 24 24" class="h-[22px] w-[22px] shrink-0" fill={`#${p.icon.hex}`}>
+          <svg viewBox={'viewBox' in p.icon ? p.icon.viewBox : '0 0 24 24'} class="h-[22px] w-[22px] shrink-0" fill={`#${p.icon.hex}`}>
             <path d={p.icon.path} />
           </svg>
           <span class="max-sm:hidden">{p.name}</span>
@@ -40,7 +45,7 @@ const rings = [inner, outer];
 </div>
 
 <script>
-  // Cada plataforma recorre una elipse (la misma inclinación que la galaxia); las de delante se ven más grandes y nítidas.
+  // Cada plataforma recorre una elipse (la misma inclinación que la galaxia); las de delante se ven más grandes. Siempre opacas: si no, las partículas se ven a través y no se leen.
   const root = document.querySelector<HTMLElement>('[data-universe]');
   if (root) {
     const items = [...root.querySelectorAll<HTMLElement>('[data-orbit]')];
@@ -62,7 +67,6 @@ const rings = [inner, outer];
         const x = Math.cos(a) * rx0 * k, y = Math.sin(a) * ry0 * k;
         const depth = (Math.sin(a) + 1) / 2;                 // 0 = detrás, 1 = delante
         el.style.transform = `translate(calc(${x}px - 50%), calc(${y}px - 50%)) scale(${0.78 + depth * 0.3})`;
-        el.style.opacity = String(0.72 + depth * 0.28);
         el.style.zIndex = String(Math.round(depth * 10));
       }
       requestAnimationFrame(frame);
