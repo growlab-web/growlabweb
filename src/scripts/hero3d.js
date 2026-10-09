@@ -186,7 +186,7 @@ export function initHero3D() {
       const t = Math.random() * acc; let lo = 0, hi = W * H - 1;
       while (lo < hi) { const m = (lo + hi) >> 1; if (cdf[m] < t) lo = m + 1; else hi = m; }
       const fx = (lo % W) + Math.random() - 0.5, fy = ((lo / W) | 0) + Math.random() - 0.5;
-      const side = Math.random() < 0.62 ? 1 : -1;
+      const side = Math.random() < 0.8 ? 1 : -1;            // casi todas en la cara que se ve: la de atrás queda apagada
       const zf = sample(Z, fx, fy);
       // normal hacia fuera de la superficie (en la cara de atrás sólo cambia el sentido en profundidad)
       let nx = -(sample(Z, fx + 1.5, fy) - sample(Z, fx - 1.5, fy)) * thick / (3 * S);
@@ -240,6 +240,7 @@ export function initHero3D() {
       uMouse: { value: new THREE.Vector3(99, 99, 0) }, uPush: { value: 0 }, uRadius: { value: 0.7 },
       uMorph: { value: 0 }, uGal: { value: serviceShape ? 0 : 1 },
       uTilt: { value: new THREE.Vector3(1.2, 0.26, 0.0) },
+      uGrad: { value: new THREE.Vector2(-0.15, 0.86) },          // centro y escala del objeto: el degradado de color lo recorre entero en cualquier pantalla
       uYaw: { value: new THREE.Vector3(0, 0, 0) },
       uRoll: { value: new THREE.Vector3(0, 0, 0) },
       uSpark: { value: Array.from({ length: 8 }, () => new THREE.Vector4(0, 0, 0, -1)) },
@@ -248,6 +249,7 @@ export function initHero3D() {
     vertexShader: `
       uniform float uTime, uIntro, uPR, uSize, uPush, uRadius, uMorph, uGal, uVoice;
       uniform vec3 uMouse, uTilt, uYaw, uRoll, uVDir, uVDir2, uSm;
+      uniform vec2 uGrad;
       uniform vec4 uSpark[8];
       attribute vec3 aP1, aP2, aN2, aC1, aScatter, aVis; attribute float aRand, aPath, aSpd, aSz;
       varying vec3 vColor; varying float vAlpha;
@@ -381,7 +383,8 @@ export function initHero3D() {
         float alive = aVis.x*w0 + aVis.y*w1 + aVis.z*w2;
 
         // degradado por altura en pantalla (verde arriba → azul → violeta abajo)
-        float hh = smoothstep(-1.0, 1.0, wp.y + 0.1);
+        // medido sobre el propio objeto (como si tuviera el tamaño y la posición de escritorio): en móvil, donde va más pequeño y más abajo, también llega al verde
+        float hh = smoothstep(-1.0, 1.0, (wp.y - uGrad.x) / uGrad.y * 0.86 - 0.05);
         vec3 purple = vec3(0.16,0.32,0.8), blue = vec3(0.22,0.435,0.87), green = vec3(0.43,0.95,0.75);
         vec3 grad = mix(purple, blue, smoothstep(0.0,0.45,hh));
         grad = mix(grad, green, smoothstep(0.45,0.95,hh));
@@ -454,10 +457,10 @@ export function initHero3D() {
       // esfera y cerebro: en pantallas medianas se encogen de forma continua para no pisar los textos de la izquierda
       base.y = phone ? -0.22 : narrow ? -0.2 : -0.15;
       base.scale = phone ? (h < 740 ? 0.39 : 0.45) : narrow ? 0.58 : W < 1400 ? 0.54 + ((W - 1000) / 400) * 0.32 : 0.86;
-      // móvil: la galaxia va grande y más vista desde arriba para llenar el alto de la pantalla (se sale por los lados a propósito)
+      // móvil: la galaxia se ve con la misma inclinación que en escritorio; va algo más grande y se sale un poco por los lados
       base.galY = phone ? -0.22 : narrow ? -0.28 : -0.15;
-      base.gal = phone ? 0.62 : (narrow ? 0.66 : W < 1400 ? 0.72 : 0.86) * galaxyK();
-      base.galTilt = phone ? 0.62 : 0.27;
+      base.gal = phone ? 0.92 : (narrow ? 0.66 : W < 1400 ? 0.72 : 0.86) * galaxyK();
+      base.galTilt = phone ? 0.36 : 0.27;
       base.brainDy = phone ? -0.24 : 0;                                  // móvil: el cerebro baja un poco para dejar sitio al texto
       galaxyOrbit.unit = (h / (2 * Math.tan((camera.fov * Math.PI) / 360) * camera.position.z)) * base.gal;
       group.position.y = base.y;
@@ -558,6 +561,8 @@ export function initHero3D() {
       group.scale.setScalar(state.scale * (base.scale + (base.gal - base.scale) * w1));
       group.position.y = base.y + (base.galY - base.y) * w1 + (base.brainDy || 0) * clamp01(state.morph - 1);
     }
+
+    mat.uniforms.uGrad.value.set(group.position.y, Math.max(group.scale.x, 0.05));
 
     const px = mouse.x, py = mouse.y;
     mouse.x += (mouse.tx - mouse.x) * 0.06;
