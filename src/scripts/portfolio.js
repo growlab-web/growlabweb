@@ -230,6 +230,15 @@ export async function initPortfolio(root) {
   canvas.addEventListener('pointerup', endDrag);
   canvas.addEventListener('pointercancel', endDrag);
   canvas.addEventListener('pointerleave', () => { S.hover = -1; });
+  // la barra de abajo (Destacados/Todos y el botón) queda DEBAJO de los proyectos: un toque que no cae en un proyecto se le pasa a ella
+  canvas.addEventListener('click', (e) => {
+    if (canNav() && (S.moved >= 6 || S.hover >= 0)) return;
+    canvas.style.pointerEvents = 'none';
+    const el = document.elementFromPoint(e.clientX, e.clientY);
+    canvas.style.pointerEvents = '';
+    const t = el && el.closest('[data-pf-ui] a, [data-pf-ui] button');
+    if (t) t.click();
+  });
 
   window.addEventListener('keydown', (e) => {
     if (S.open) {
