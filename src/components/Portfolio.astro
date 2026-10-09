@@ -28,15 +28,14 @@ const { open } = Astro.props;
     </ul>
   </div>
 
-  <!-- barra inferior -->
-  <div data-pf-ui class="pointer-events-none absolute inset-x-0 bottom-0 z-[4] flex items-end justify-between px-[1.8vw] pb-5 opacity-0">
+  <!-- barra inferior: Destacados / Todos y, debajo, el mismo botón del inicio (todo centrado) -->
+  <div data-pf-ui class="pointer-events-none absolute inset-x-0 bottom-0 z-[4] flex flex-col items-center gap-4 px-[1.8vw] pb-6 opacity-0">
     <div class="pf-modes pointer-events-auto flex items-center gap-2">
       <button type="button" data-pf-mode="featured" class="is-on">Destacados</button>
       <span aria-hidden="true">/</span>
       <button type="button" data-pf-mode="full">Todos</button>
     </div>
-    <p class="pf-hint max-md:hidden">Arrastra o usa la rueda</p>
-    <a href="/contacto" class="pf-modes pointer-events-auto is-link">Agendar reunión</a>
+    <a href="/contacto" class="hbtn pointer-events-auto min-w-[190px]">Agendar reunión</a>
   </div>
 
   <!-- cargador: tres rayas -->
