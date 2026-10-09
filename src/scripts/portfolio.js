@@ -103,7 +103,15 @@ export async function initPortfolio(root) {
   const geo = new THREE.PlaneGeometry(CARD_W, CARD_H, 56, 28);
   const maxAniso = renderer.capabilities.getMaxAnisotropy();
   const cards = projects.map((p, i) => {
-    const tex = new THREE.CanvasTexture(PORTRAIT ? makeArt(p, 'cover', 960, 1200) : makeArt(p, 'cover', 1280, 800));   // provisional hasta que cargue la imagen
+    // imagen dibujada por código: sólo si el proyecto no tiene portada o si ésta no llega a cargar.
+    // Dibujarla para todos de entrada bloqueaba la página medio segundo al abrir el portafolio, y se sustituía enseguida.
+    const drawn = () => new THREE.CanvasTexture(PORTRAIT ? makeArt(p, 'cover', 960, 1200) : makeArt(p, 'cover', 1280, 800));
+    const flat = () => {                                             // provisional mientras carga la portada: un color liso del proyecto
+      const c = document.createElement('canvas'); c.width = c.height = 4;
+      const g = c.getContext('2d'); g.fillStyle = (p.palette && p.palette.bg) || '#10131c'; g.fillRect(0, 0, 4, 4);
+      return new THREE.CanvasTexture(c);
+    };
+    const tex = p.cover ? flat() : drawn();
     tex.anisotropy = maxAniso;
     if (p.cover) {
       new THREE.TextureLoader().load(p.cover, (img) => {
@@ -111,7 +119,7 @@ export async function initPortfolio(root) {
         if (PORTRAIT) { img.repeat.set(CARD_W / CARD_H / (img.image.width / img.image.height), 1); img.offset.set((1 - img.repeat.x) / 2, 0); }   // recorte centrado
         img.colorSpace = THREE.SRGBColorSpace || img.colorSpace;
         mat.uniforms.uMap.value = img;
-      });
+      }, undefined, () => { const t = drawn(); t.anisotropy = maxAniso; mat.uniforms.uMap.value = t; });
     }
     const mat = new THREE.ShaderMaterial({
       transparent: true, depthWrite: false, vertexShader: cardVert, fragmentShader: cardFrag,
