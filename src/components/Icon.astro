@@ -43,6 +43,18 @@ import FolderCheck from '@lucide/astro/icons/folder-check';
 import Repeat from '@lucide/astro/icons/repeat';
 import BadgeCheck from '@lucide/astro/icons/badge-check';
 import ArrowUpRight from '@lucide/astro/icons/arrow-up-right';
+import { createLucideIcon } from '@lucide/astro';
+
+// Bolsa de dinero: Lucide no trae una, así que se dibuja aquí con su mismo trazo (lienzo de 24, línea redondeada)
+const MoneyBag = createLucideIcon({
+  name: 'money-bag', size: 24,
+  node: [
+    ['path', { d: 'M9 3h6l-1.6 4h-2.8z' }],
+    ['path', { d: 'M10.6 7C7.1 9 4.5 12.4 4.5 16a4.6 4.6 0 0 0 4.6 5h5.8a4.6 4.6 0 0 0 4.6-5c0-3.6-2.6-7-6.1-9' }],
+    ['path', { d: 'M12 10.6v7.2' }],
+    ['path', { d: 'M14 12.4c-.4-.6-1.1-.9-2-.9-1.2 0-2 .6-2 1.4 0 2 4 .9 4 2.9 0 .8-.9 1.4-2 1.4-.9 0-1.7-.4-2.1-1' }],
+  ],
+});
 
 const icons = {
   target: Target, 'chart-column': ChartColumn, 'trending-up': TrendingUp, radar: Radar, 'layout-dashboard': LayoutDashboard,
@@ -51,7 +63,7 @@ const icons = {
   'file-text': FileText, crosshair: Crosshair, users: Users, 'pen-tool': PenTool, 'shopping-cart': ShoppingCart,
   'flask-conical': FlaskConical, gauge: Gauge, 'message-circle': MessageCircle, database: Database, 'rotate-ccw': RotateCcw,
   workflow: Workflow, rocket: Rocket, eye: Eye, sparkles: Sparkles, mail: Mail, clock: Clock, 'share-2': Share2,
-  'folder-check': FolderCheck, repeat: Repeat, 'badge-check': BadgeCheck, 'arrow-up-right': ArrowUpRight,
+  'folder-check': FolderCheck, repeat: Repeat, 'badge-check': BadgeCheck, 'arrow-up-right': ArrowUpRight, 'money-bag': MoneyBag,
 };
 
 interface Props { name: keyof typeof icons; size?: number; strokeWidth?: number; class?: string }
