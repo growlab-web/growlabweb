@@ -457,10 +457,10 @@ export function initHero3D() {
       // esfera y cerebro: en pantallas medianas se encogen de forma continua para no pisar los textos de la izquierda
       base.y = phone ? -0.22 : narrow ? -0.2 : -0.15;
       base.scale = phone ? (h < 740 ? 0.39 : 0.45) : narrow ? 0.58 : W < 1400 ? 0.54 + ((W - 1000) / 400) * 0.32 : 0.86;
-      // móvil: la galaxia se ve con la misma inclinación que en escritorio; va algo más grande y se sale un poco por los lados
+      // móvil: la galaxia se ve tan de canto como en escritorio y cabe casi entera a lo ancho, para que las plataformas recorran su órbita completa
       base.galY = phone ? -0.22 : narrow ? -0.28 : -0.15;
-      base.gal = phone ? 0.92 : (narrow ? 0.66 : W < 1400 ? 0.72 : 0.86) * galaxyK();
-      base.galTilt = phone ? 0.36 : 0.27;
+      base.gal = phone ? 0.52 : (narrow ? 0.66 : W < 1400 ? 0.72 : 0.86) * galaxyK();
+      base.galTilt = phone ? 0.25 : 0.27;
       base.brainDy = phone ? -0.24 : 0;                                  // móvil: el cerebro baja un poco para dejar sitio al texto
       galaxyOrbit.unit = (h / (2 * Math.tan((camera.fov * Math.PI) / 360) * camera.position.z)) * base.gal;
       group.position.y = base.y;

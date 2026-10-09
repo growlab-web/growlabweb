@@ -38,7 +38,9 @@ if (!isApp) {
 }
 gsap.ticker.lagSmoothing(0);
 ScrollTrigger.config({ ignoreMobileResize: true });      // la barra del navegador móvil no obliga a recalcular todo en pleno scroll
-lenis.stop();
+// el scroll sólo se retiene en el inicio, hasta que el hero fijo está montado (si no, la página saltaría al crearse);
+// en las demás páginas se puede hacer scroll desde el primer momento, aunque las fuentes o el 3D sigan cargando
+if ($('[data-hero][data-pin]') || isApp) lenis.stop();
 
 /* ---------- Paradas de scroll: un gesto de rueda o trackpad avanza como mucho hasta la siguiente ---------- */
 // la inercia del trackpad sigue mandando scroll un buen rato después de soltar: sin esto, un gesto rápido cruza toda la página

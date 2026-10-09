@@ -9,7 +9,8 @@ export function initDust(canvas) {
   const ctx = canvas.getContext('2d');
   if (!ctx) return;
   const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  // en táctil el lienzo cubre toda la sección (varias pantallas de alto): con menos resolución no pesa al hacer scroll
+  const dpr = Math.min(window.devicePixelRatio || 1, window.matchMedia('(pointer: coarse)').matches ? 1.25 : 2);
   let w = 0, h = 0, dots = [], visible = false, last = performance.now(), t = 0;
   const mouse = { x: 0, y: 0, tx: 0, ty: 0 };
 
