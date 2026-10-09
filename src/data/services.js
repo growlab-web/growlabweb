@@ -39,8 +39,16 @@ export const services = [
     short: 'Flujos con IA que atienden, califican leads y recuperan ventas sin intervención manual.',
   },
   {
-    slug: 'data-analytics',
+    slug: 'email-marketing',
     n: '05',
+    name: 'Email Marketing',
+    icon: 'mail',
+    art: 'bars-rev',
+    short: 'Newsletters y flujos automáticos que nutren, fidelizan y reactivan a tus clientes con el mensaje justo en cada etapa.',
+  },
+  {
+    slug: 'data-analytics',
+    n: '06',
     name: 'Data Analytics',
     icon: 'chart-column',
     art: 'rings',
@@ -48,7 +56,7 @@ export const services = [
   },
   {
     slug: 'tracking-attribution',
-    n: '06',
+    n: '07',
     name: 'Tracking & Attribution',
     icon: 'radar',
     art: 'bars-rev',
@@ -56,7 +64,7 @@ export const services = [
   },
   {
     slug: 'reporting-dashboards',
-    n: '07',
+    n: '08',
     name: 'Reporting & Dashboards',
     icon: 'layout-dashboard',
     art: 'bars',
