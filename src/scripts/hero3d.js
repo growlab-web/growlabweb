@@ -563,7 +563,8 @@ export function initHero3D() {
     const tl = gsap.timeline({
       defaults: { ease: 'none' },
       scrollTrigger: {
-        trigger: hero, start: 'top top', end: '+=260%', pin: true, scrub: 0.35, anticipatePin: 1,
+        trigger: hero, start: 'top top', end: MOB ? '+=170%' : '+=260%', pin: true,   // en móvil, menos recorrido de dedo entre etapas
+        scrub: 0.35, anticipatePin: 1,
         // cada etapa se engancha sola: un gesto de scroll basta para pasar a la siguiente
         // en móvil el enganche espera a que el dedo y la inercia terminen, para no pelearse con el scroll del teléfono
         snap: MOB
@@ -588,7 +589,7 @@ export function initHero3D() {
       .from('[data-panel="3"] [data-in]', { autoAlpha: 0, y: 34, duration: 0.5, stagger: 0.06, ease: 'power2.out' }, 5.0)
       .to(A, { opacity: 0.45, rotation: -24, scale: 1.2, xPercent: 8, yPercent: 14, duration: 1.7, ease: E }, 3.7)
       .to(B, { opacity: 0.25, yPercent: -30, scale: 0.95, duration: 1.7, ease: E }, 3.7)
-      .to({}, { duration: 1.2 }, 5.4)                                                        // pausa final
+      .to({}, { duration: 0.25 }, 5.8)                                                       // pausa final mínima: tras el cerebro el scroll sigue enseguida
       .addLabel('esfera', 0).addLabel('galaxia', 2.75).addLabel('cerebro', 5.95);
   }
 

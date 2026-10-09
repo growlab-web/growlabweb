@@ -174,7 +174,7 @@ function initPage() {
     manifesto.innerHTML = manifesto.textContent.trim().split(/\s+/).map((w) => `<span class="w">${w}</span>`).join(' ');
     gsap.to($$('.w', manifesto), {
       opacity: 1, ease: 'none', stagger: 0.1,
-      scrollTrigger: { trigger: manifesto, start: 'top 80%', end: 'bottom 55%', scrub: true },
+      scrollTrigger: { trigger: manifesto, start: isTouch ? 'top 95%' : 'top 80%', end: 'bottom 55%', scrub: true },
     });
   }
 
@@ -196,7 +196,7 @@ function initPage() {
     });
     gsap.from('[data-services-head] > *', {
       y: 60, opacity: 0, stagger: 0.15, duration: 1, ease: 'expo.out',
-      scrollTrigger: { trigger: '[data-services]', start: 'top 70%' },
+      scrollTrigger: { trigger: '[data-services]', start: isTouch ? 'top 95%' : 'top 70%' },
     });
   }
 
@@ -205,11 +205,11 @@ function initPage() {
   if (cases.length) {
     gsap.from('[data-cases-head] > *', {
       y: 60, opacity: 0, stagger: 0.15, duration: 1, ease: 'expo.out',
-      scrollTrigger: { trigger: '[data-cases-head]', start: 'top 80%' },
+      scrollTrigger: { trigger: '[data-cases-head]', start: isTouch ? 'top 95%' : 'top 80%' },
     });
     cases.forEach((c, i) => {
       const inner = $('[data-case-inner]', c);
-      gsap.from(inner, { y: 120, opacity: 0, scale: 0.94, duration: 1.2, ease: 'expo.out', scrollTrigger: { trigger: c, start: 'top 85%' } });
+      gsap.from(inner, { y: 120, opacity: 0, scale: 0.94, duration: 1.2, ease: 'expo.out', scrollTrigger: { trigger: c, start: isTouch ? 'top 95%' : 'top 85%' } });
       if (cases[i + 1]) {
         gsap.to(inner, {
           scale: 0.9, opacity: 0.35, filter: 'blur(4px)', ease: 'none',
@@ -226,17 +226,17 @@ function initPage() {
       scrollTrigger: { trigger: '[data-process-steps]', start: 'top 60%', end: 'bottom 70%', scrub: true },
     });
     $$('[data-process-steps] > li').forEach((li) => {
-      gsap.from(li.children, { y: 60, opacity: 0, stagger: 0.1, duration: 1, ease: 'expo.out', scrollTrigger: { trigger: li, start: 'top 80%' } });
+      gsap.from(li.children, { y: 60, opacity: 0, stagger: 0.1, duration: 1, ease: 'expo.out', scrollTrigger: { trigger: li, start: isTouch ? 'top 95%' : 'top 80%' } });
     });
     gsap.from('[data-process-left] > *', {
       y: 50, opacity: 0, stagger: 0.12, duration: 1, ease: 'expo.out',
-      scrollTrigger: { trigger: '[data-process]', start: 'top 70%' },
+      scrollTrigger: { trigger: '[data-process]', start: isTouch ? 'top 95%' : 'top 70%' },
     });
   }
 
   /* CTA: texto gigante que crece y se asienta */
   if ($('[data-cta]')) {
-    gsap.from('[data-cta-line]', { yPercent: 100, duration: 1.2, ease: 'expo.out', scrollTrigger: { trigger: '[data-cta]', start: 'top 60%' } });
+    gsap.from('[data-cta-line]', { yPercent: 100, duration: 1.2, ease: 'expo.out', scrollTrigger: { trigger: '[data-cta]', start: isTouch ? 'top 95%' : 'top 60%' } });
     gsap.fromTo('[data-cta-big]', { scale: 0.5, yPercent: 30, opacity: 0.2 }, {
       scale: 1, yPercent: 0, opacity: 1, ease: 'none',
       scrollTrigger: { trigger: '[data-cta]', start: 'top 80%', end: 'center center', scrub: true },
@@ -260,6 +260,7 @@ function initPage() {
 
   /* ENTRADAS de lo que no tenía animación propia: marquesina, antetítulos, tarjetas de servicios, contacto y pie */
   const enter = (els, trigger, vars = {}, start = 'top 85%') => {
+    if (isTouch) { start = 'top 97%'; vars = { ...vars, duration: 0.8 }; }   // en el teléfono las piezas aparecen en cuanto asoman
     els = (typeof els === 'string' ? $$(els) : els).filter(Boolean);
     if (els.length) gsap.from(els, { y: 40, opacity: 0, duration: 1, ease: 'expo.out', stagger: 0.08, ...vars, scrollTrigger: { trigger: trigger || els[0], start } });
   };
@@ -274,11 +275,11 @@ function initPage() {
 
   /* REVELADO: cualquier bloque marcado con data-reveal sube y aparece al entrar en pantalla */
   $$('[data-reveal]').forEach((el) => {
-    gsap.from(el, { y: 50, opacity: 0, duration: 1, ease: 'expo.out', scrollTrigger: { trigger: el, start: 'top 88%' } });
+    gsap.from(el, { y: 50, opacity: 0, duration: isTouch ? 0.8 : 1, ease: 'expo.out', scrollTrigger: { trigger: el, start: isTouch ? 'top 97%' : 'top 88%' } });
   });
 
   ScrollTrigger.refresh();
   scrollToHash();
   };
-  if (isTouch && hasHero && !location.hash) setTimeout(initSections, 1600); else initSections();
+  if (isTouch && hasHero && !location.hash) setTimeout(initSections, 900); else initSections();
 }
