@@ -6,10 +6,18 @@ const isActive = (href) => (href === '/' ? path === '/' : path === href || path.
 const contactActive = isActive(site.contact.href);
 ---
 
-<!-- Menú con efecto cristal (glass). En pantallas pequeñas los enlaces van en un desplegable. -->
+<!-- Menú de «cristal líquido»: cápsula transparente que refracta lo que tiene detrás en los bordes, con brillo en el canto.
+     Los estilos están en global.css (.liquid-glass). En pantallas pequeñas los enlaces van en un desplegable. -->
+<svg class="pointer-events-none absolute h-0 w-0" aria-hidden="true" focusable="false">
+  <!-- refracción del borde: el mapa de desplazamiento lo dibuja el script de abajo a la medida exacta del menú -->
+  <filter id="lg-refract" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB" primitiveUnits="userSpaceOnUse">
+    <feImage data-lg-map x="0" y="0" width="1" height="1" preserveAspectRatio="none" result="map"></feImage>
+    <feDisplacementMap in="SourceGraphic" in2="map" scale="0" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap>
+  </filter>
+</svg>
 <header
   data-nav
-  class="fixed inset-x-0 top-[17px] z-[70] mx-auto flex h-[46px] w-[min(740px,calc(100%-24px))] items-center justify-between gap-4 rounded-[18px] border border-white/[.18] bg-white/[.07] px-[22px] shadow-[inset_0_1px_0_rgba(255,255,255,.35),inset_0_-1px_0_rgba(255,255,255,.05),0_10px_34px_rgba(0,0,0,.4)] backdrop-blur-2xl backdrop-saturate-[1.8] before:pointer-events-none before:absolute before:inset-0 before:-z-10 before:rounded-[inherit] before:bg-gradient-to-b before:from-white/[.14] before:to-transparent"
+  class="liquid-glass fixed inset-x-0 top-[17px] z-[70] mx-auto flex h-[50px] w-[min(760px,calc(100%-24px))] items-center justify-between gap-4 rounded-full pl-[24px] pr-[10px]"
 >
   <a href="/" aria-label="GrowLab, ir al inicio" class="flex items-center">
     <img src="/logo.png" alt="GrowLab" width="1046" height="205" class="h-[19px] w-auto" />
@@ -37,7 +45,7 @@ const contactActive = isActive(site.contact.href);
       href={site.contact.href}
       aria-current={contactActive ? 'page' : undefined}
       class:list={[
-        'inline-flex h-[30px] items-center gap-[.7rem] rounded-[10px] border px-3 font-display text-[.92rem] font-light transition-colors hover:bg-white hover:text-black max-[480px]:hidden',
+        'inline-flex h-[32px] items-center gap-[.7rem] rounded-full border px-4 font-display text-[.92rem] font-light transition-colors hover:bg-white hover:text-black max-[480px]:hidden',
         contactActive ? 'border-secondary text-secondary' : 'border-white/60',
       ]}
     >
@@ -51,7 +59,7 @@ const contactActive = isActive(site.contact.href);
       aria-expanded="false"
       aria-controls="nav-sheet"
       aria-label="Abrir menú"
-      class="grid h-[30px] w-[30px] place-items-center rounded-[10px] border border-white/40 sm:hidden"
+      class="grid h-[32px] w-[32px] place-items-center rounded-full border border-white/40 sm:hidden"
     >
       <span class="relative block h-[10px] w-[14px]">
         <i class="absolute inset-x-0 top-0 h-[1.5px] bg-white transition-transform duration-300"></i>
@@ -64,7 +72,7 @@ const contactActive = isActive(site.contact.href);
   <div
     id="nav-sheet"
     hidden
-    class="absolute inset-x-0 top-[calc(100%+8px)] rounded-[18px] border border-white/[.18] bg-[#0b1120]/[.96] p-3 shadow-[inset_0_1px_0_rgba(255,255,255,.3),0_18px_40px_rgba(0,0,0,.5)] backdrop-blur-2xl backdrop-saturate-[1.8] before:pointer-events-none before:absolute before:inset-0 before:-z-10 before:rounded-[inherit] before:bg-gradient-to-b before:from-white/[.12] before:to-transparent sm:hidden"
+    class="absolute inset-x-0 top-[calc(100%+8px)] rounded-[26px] border border-white/[.18] bg-[#0b1120]/[.96] p-3 shadow-[inset_0_1px_0_rgba(255,255,255,.3),0_18px_40px_rgba(0,0,0,.5)] backdrop-blur-2xl backdrop-saturate-[1.8] before:pointer-events-none before:absolute before:inset-0 before:-z-10 before:rounded-[inherit] before:bg-gradient-to-b before:from-white/[.12] before:to-transparent sm:hidden"
   >
     <nav class="grid gap-1 font-display text-[1rem]" aria-label="Menú móvil">
       {
@@ -87,6 +95,37 @@ const contactActive = isActive(site.contact.href);
 
 <script>
   const nav = document.querySelector('[data-nav]');
+
+  // Refracción del cristal: mapa de desplazamiento con la forma de la cápsula. El centro no desplaza nada y, hacia el borde,
+  // cada punto muestra lo que hay un poco más adentro, como el canto curvo de una lente. Sólo actúa donde el navegador admite
+  // filtros SVG sobre el fondo (Chrome/Edge); en el resto queda el cristal sin refracción.
+  const mapEl = document.querySelector('[data-lg-map]');
+  const disp = mapEl && mapEl.nextElementSibling;
+  if (nav && mapEl && disp && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+    const BEZEL = 16, SCALE = 34;
+    const draw = () => {
+      const w = Math.round(nav.offsetWidth), h = Math.round(nav.offsetHeight);
+      if (!w || !h) return;
+      const c = document.createElement('canvas'); c.width = w; c.height = h;
+      const ctx = c.getContext('2d');
+      if (!ctx) return;
+      const img = ctx.createImageData(w, h), r = h / 2;
+      for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+        const qx = Math.min(w - r, Math.max(r, x + 0.5)), vx = x + 0.5 - qx, vy = y + 0.5 - r;
+        const len = Math.hypot(vx, vy) || 1, edge = Math.max(0, r - len);          // distancia al borde de la cápsula
+        const m = Math.pow(Math.max(0, 1 - edge / BEZEL), 2.2);                    // fuerza: nula en el centro, máxima en el canto
+        const i = (y * w + x) * 4;
+        img.data[i] = 128 - (vx / len) * m * 127; img.data[i + 1] = 128 - (vy / len) * m * 127; img.data[i + 2] = 128; img.data[i + 3] = 255;
+      }
+      ctx.putImageData(img, 0, 0);
+      mapEl.setAttribute('width', String(w)); mapEl.setAttribute('height', String(h));
+      mapEl.setAttribute('href', c.toDataURL());
+      disp.setAttribute('scale', String(SCALE));
+    };
+    draw();
+    let timer = 0;
+    window.addEventListener('resize', () => { clearTimeout(timer); timer = window.setTimeout(draw, 150); });
+  }
   const btn = nav && nav.querySelector('[data-nav-toggle]');
   const sheet = nav && nav.querySelector('#nav-sheet');
   if (btn && sheet) {

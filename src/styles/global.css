@@ -282,3 +282,38 @@ html.has-cursor, html.has-cursor * { cursor: none !important; }
   .pf-aurora--c { width: 110vw; height: 80vw; left: 10vw; top: -30vw; }
   [data-contact-glow] { width: 140vw !important; height: 90vw !important; filter: blur(46px) !important; }
 }
+
+/* ---------- Cristal líquido (menú) ----------
+   Un cristal casi transparente: poco desenfoque, mucha saturación, refracción en el borde y un canto que recoge la luz.
+   1) fondo: lo de detrás, apenas desenfocado y más vivo; en Chrome/Edge además se curva en los bordes (filtro #lg-refract de Nav.astro)
+   2) ::before: canto luminoso, más brillante arriba a la izquierda y abajo a la derecha (por donde "entra" y "sale" la luz)
+   3) ::after: volumen interior, con un reflejo arriba y una sombra suave abajo */
+.liquid-glass {
+  /* brillo del cristal sobre un tinte oscuro muy leve, para que los enlaces se lean también encima de textos claros */
+  background: linear-gradient(180deg, rgba(255, 255, 255, .09), rgba(255, 255, 255, .02) 55%, rgba(255, 255, 255, .05)), rgba(6, 10, 22, .24);
+  -webkit-backdrop-filter: blur(12px) saturate(1.9) brightness(1.1);
+  backdrop-filter: blur(12px) saturate(1.9) brightness(1.1);
+  box-shadow: 0 14px 40px rgba(0, 0, 0, .38), 0 2px 8px rgba(0, 0, 0, .28);
+}
+@media (hover: hover) and (pointer: fine) {
+  /* si el navegador no admite un filtro SVG aquí, descarta esta línea y se queda con la de arriba */
+  .liquid-glass { backdrop-filter: url(#lg-refract) blur(5px) saturate(1.9) brightness(1.1); }
+}
+.liquid-glass::before,
+.liquid-glass::after { content: ''; position: absolute; inset: 0; z-index: -1; border-radius: inherit; pointer-events: none; }
+.liquid-glass::before {
+  padding: 1px;
+  background: linear-gradient(125deg, rgba(255, 255, 255, .85) 0%, rgba(255, 255, 255, .22) 18%, rgba(255, 255, 255, .05) 45%, rgba(255, 255, 255, .08) 70%, rgba(255, 255, 255, .5) 100%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+}
+.liquid-glass::after {
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, .5),
+    inset 0 10px 14px -10px rgba(255, 255, 255, .32),
+    inset 0 -1px 1px rgba(255, 255, 255, .16),
+    inset 0 -12px 16px -12px rgba(0, 0, 0, .45),
+    inset 6px 0 12px -8px rgba(255, 255, 255, .14),
+    inset -6px 0 12px -8px rgba(255, 255, 255, .14);
+}
