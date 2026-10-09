@@ -1,4 +1,4 @@
-# growlab.pe en cPanel (Apache). Este archivo se copia tal cual a la raíz del sitio (public_html) al hacer `npm run build`.
+# growlab.pe en cPanel (servidor LiteSpeed, compatible con las reglas de Apache). Este archivo se copia tal cual a la raíz del sitio (public_html) al hacer `npm run build`.
 
 Options -Indexes
 AddDefaultCharset UTF-8
@@ -31,7 +31,7 @@ ErrorDocument 404 /404.html
   RewriteRule ^(.*[^/])$ $1/index.html [L]
 </IfModule>
 
-# caché: los archivos de /_astro llevan una huella en el nombre y no cambian nunca; las páginas se piden siempre de nuevo
+# caché: las páginas se piden siempre de nuevo y las imágenes duran un mes (la carpeta /_astro tiene su propia regla, en /_astro/.htaccess)
 <IfModule mod_headers.c>
   <FilesMatch "\.(html|xml|txt)$">
     Header set Cache-Control "no-cache"
@@ -39,9 +39,6 @@ ErrorDocument 404 /404.html
   <FilesMatch "\.(png|jpe?g|webp|avif|svg|ico|woff2?)$">
     Header set Cache-Control "public, max-age=2592000"
   </FilesMatch>
-  <If "%{REQUEST_URI} =~ m#^/_astro/#">
-    Header set Cache-Control "public, max-age=31536000, immutable"
-  </If>
   Header always set X-Content-Type-Options "nosniff"
   Header always set Referrer-Policy "strict-origin-when-cross-origin"
 </IfModule>

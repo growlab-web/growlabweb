@@ -16,8 +16,9 @@ const icon = 'h-[22px] w-[22px] shrink-0 text-white/45 transition-colors group-f
 const input = 'w-full bg-transparent py-4 font-body text-[1rem] text-white outline-none placeholder:text-white/40';
 ---
 
-<!-- El formulario se envía a /api/contacto.php (hosting cPanel), que guarda el lead y avisa por correo.
-     Si ese servicio no responde (p. ej. en desarrollo, donde no hay PHP), se abre el correo del visitante con el mensaje listo. -->
+<!-- El formulario se envía a /api/contacto.php (hosting cPanel), que guarda el lead y lo manda al correo de GrowLab.
+     Nunca abre el programa de correo del visitante. En local (npm run dev) no hay PHP: ahí el envío se simula para poder
+     ver la pantalla de gracias, y se avisa de que no se ha mandado ningún correo. -->
 <form data-contact-form data-email={site.email} class="grid gap-x-10 gap-y-7 sm:grid-cols-2" novalidate>
   <label class={wrap}>
     <svg class={icon} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"></path></svg>
@@ -95,6 +96,7 @@ const input = 'w-full bg-transparent py-4 font-body text-[1rem] text-white outli
 
 <!-- Pantalla de gracias: sustituye al formulario cuando el envío sale bien, con un mini juego para la espera (scripts/pong.js) -->
 <div data-form-thanks hidden class="text-center" role="status" aria-live="polite">
+  <p data-form-test hidden class="mx-auto mb-5 w-fit rounded-full border border-[#ffcf7a]/50 px-4 py-1.5 font-ui text-[.78rem] text-[#ffcf7a]">Modo de prueba: en local no se envía ningún correo</p>
   <p class="eyebrow">Mensaje enviado</p>
   <h3 class="font-display text-[clamp(1.6rem,3vw,2.6rem)] font-medium leading-[1.05] tracking-[-0.03em]">¡Gracias por tus datos!</h3>
   <p class="mx-auto mt-4 max-w-[46ch] font-body leading-relaxed text-copy">
@@ -222,13 +224,14 @@ const input = 'w-full bg-transparent py-4 font-body text-[1rem] text-white outli
       }
       if (result) return say(result.error || 'No pudimos enviar tu mensaje. Inténtalo de nuevo.', 'error');
 
-      // sin servicio de envío: se abre el programa de correo con el mensaje listo
-      const body = [
-        `Nombre: ${nombre}`, `Correo: ${email}`, `Teléfono: ${phone}`, `Servicios de interés: ${servicios.join(', ') || '-'}`, '', mensaje || '(sin mensaje)',
-      ].join('\n');
-      const subject = servicios.length ? `Información sobre ${servicios.join(', ')} · ${nombre}` : `Nuevo contacto: ${nombre}`;
-      say('Se abrirá tu correo con el mensaje listo para enviar.');
-      window.location.href = `mailto:${form.dataset.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      // el servicio no respondió
+      if (['localhost', '127.0.0.1'].includes(location.hostname)) {
+        // en local no hay PHP: se enseña la pantalla de gracias como prueba, sin enviar nada ni contar el lead
+        if (showThanks()) { const p = thanks.querySelector('[data-form-test]'); if (p) p.hidden = false; }
+        form.reset(); resetServices(); paintPrefix();
+        return say('Modo de prueba: en local no se envía el correo. El envío real funciona con el sitio subido al hosting.');
+      }
+      say(`No pudimos enviar tu mensaje. Inténtalo de nuevo en unos minutos o escríbenos a ${form.dataset.email}.`, 'error');
     });
   });
 </script>

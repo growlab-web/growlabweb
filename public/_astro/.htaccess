@@ -1,0 +1,4 @@
+# Los archivos de esta carpeta llevan una huella en el nombre (cambia cuando cambia el contenido): el navegador puede guardarlos un año.
+<IfModule mod_headers.c>
+  Header set Cache-Control "public, max-age=31536000, immutable"
+</IfModule>
