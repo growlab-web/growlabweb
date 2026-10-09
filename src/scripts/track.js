@@ -10,6 +10,7 @@
  *   hero_stage      etapas del hero al bajar    → stage (esfera, galaxia, cerebro)
  *   section_view    secciones del inicio        → section (quienes-somos, servicios, contacto)
  *   project_view    proyecto abierto            → project
+ *   thanks_game_play alguien juega tras enviar  → form_location
  *   page_not_found  página de error 404         → missing_path, referrer
  *   notfound_broken alguien rompió el 404       → (sin datos)
  *

@@ -93,13 +93,53 @@ const input = 'w-full bg-transparent py-4 font-body text-[1rem] text-white outli
   <p data-form-note class="min-h-[1.4em] font-body text-[.85rem] text-muted sm:col-span-2" role="status" aria-live="polite"></p>
 </form>
 
+<!-- Pantalla de gracias: sustituye al formulario cuando el envío sale bien, con un mini juego para la espera (scripts/pong.js) -->
+<div data-form-thanks hidden class="text-center" role="status" aria-live="polite">
+  <p class="eyebrow">Mensaje enviado</p>
+  <h3 class="font-display text-[clamp(1.6rem,3vw,2.6rem)] font-medium leading-[1.05] tracking-[-0.03em]">¡Gracias por tus datos!</h3>
+  <p class="mx-auto mt-4 max-w-[46ch] font-body leading-relaxed text-copy">
+    Recibimos tu mensaje y te responderemos en menos de 24 horas laborables. Mientras tanto, ¿una partida?
+  </p>
+
+  <div class="mx-auto mt-7 max-w-[720px]">
+    <canvas data-pong class="block h-[clamp(220px,38vh,340px)] w-full cursor-none touch-none rounded-[22px] border border-white/15 bg-white/[.03]" aria-label="Juego: para la pelota con las barras moviendo el ratón arriba y abajo"></canvas>
+    <p class="mt-3 flex flex-wrap items-center justify-between gap-x-6 gap-y-1 font-ui text-[.8rem] uppercase tracking-[.14em] text-white/55">
+      <span>Rebotes: <b data-pong-score class="font-medium text-secondary">0</b></span>
+      <span>Tu récord: <b data-pong-best class="font-medium text-white">0</b></span>
+    </p>
+  </div>
+
+  <button type="button" data-form-again class="mt-6 cursor-pointer font-body text-[.9rem] text-white/60 underline underline-offset-4 transition-colors hover:text-secondary">Enviar otro mensaje</button>
+</div>
+
 <script>
   import { track } from '../scripts/track.js';
+  import { initPong } from '../scripts/pong.js';
 
   document.querySelectorAll('[data-contact-form]').forEach((form) => {
     const note = form.querySelector('[data-form-note]');
     const button = form.querySelector('[data-form-submit]');
     const where = form.closest('[data-contact]') ? 'inicio' : 'contacto';
+
+    // pantalla de gracias con el juego: aparece en lugar del formulario y «Enviar otro mensaje» lo devuelve
+    const thanks = form.nextElementSibling && form.nextElementSibling.matches('[data-form-thanks]') ? form.nextElementSibling : null;
+    let game = null;
+    const showThanks = () => {
+      if (!thanks) return false;
+      form.hidden = true; thanks.hidden = false;
+      const scoreEl = thanks.querySelector('[data-pong-score]'), bestEl = thanks.querySelector('[data-pong-best]');
+      let played = false;
+      game = initPong(thanks.querySelector('[data-pong]'), {
+        onScore: (score, best) => { scoreEl.textContent = String(score); bestEl.textContent = String(best); },
+        onState: (state) => { if (state === 'juego' && !played) { played = true; track('thanks_game_play', { form_location: where }); } },
+      });
+      thanks.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      return true;
+    };
+    if (thanks) thanks.querySelector('[data-form-again]').addEventListener('click', () => {
+      if (game) { game.stop(); game = null; }
+      thanks.hidden = true; form.hidden = false; say('');
+    });
 
     // desplegable de servicios: se abre y cierra con el botón, y se cierra al pulsar fuera o con Escape
     const ss = form.querySelector('[data-services-select]');
@@ -167,7 +207,7 @@ const input = 'w-full bg-transparent py-4 font-body text-[1rem] text-white outli
       button.disabled = false;
 
       if (result && result.ok) {
-        say('¡Gracias! Recibimos tu mensaje y te responderemos en menos de 24 horas laborables.', 'ok');
+        if (!showThanks()) say('¡Gracias por tus datos! Recibimos tu mensaje y te responderemos en menos de 24 horas laborables.', 'ok');
         track('generate_lead', {
           form_location: where,
           lead_services: servicios.join(', ') || '(sin especificar)',
