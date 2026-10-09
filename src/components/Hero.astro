@@ -1,7 +1,6 @@
 ---
 import { services } from '../data/services.js';
 import { site } from '../data/site.js';
-import { siWhatsapp } from 'simple-icons';
 import Partners from './Partners.astro';
 import Universe from './Universe.astro';
 import AiTools from './AiTools.astro';
@@ -82,10 +81,9 @@ const stats = site.stats.map((s) => ({ n: `${s.v}${s.s}`, l: s.l }));
   <!-- en móvil el botón va debajo del texto, alineado a la izquierda -->
   <div data-actions class="absolute bottom-5 right-(--gx) z-[3] flex gap-1 max-md:left-(--gx) max-md:right-auto">
     <a href="/contacto" class="hbtn min-w-[190px] max-md:min-w-0 max-md:px-5">Agendar reunión</a>
-    <!-- WhatsApp: al hacer scroll este botón desaparece con el hero y lo releva el flotante (components/WhatsApp.astro) -->
-    <a href={site.whatsapp.href} target="_blank" rel="noopener noreferrer" data-wa-hero class="hbtn w-12 px-0 hover:!bg-[#25d366] hover:text-white max-md:hidden" aria-label={site.whatsapp.label}>
-      <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><path d={siWhatsapp.path}></path></svg>
-    </a>
+    <!-- hueco del botón de WhatsApp: el botón real es el flotante (components/WhatsApp.astro), que se coloca justo aquí
+         mientras se está arriba y se transforma en el círculo de la esquina al hacer scroll -->
+    <span data-wa-slot class="block h-12 w-12 max-md:hidden" aria-hidden="true"></span>
   </div>
 
   <!-- etapa 2: galaxia -->

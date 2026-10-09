@@ -44,7 +44,7 @@ export function initTracking() {
     const href = a.getAttribute('href') || '';
     if (href.startsWith('mailto:')) return track('contact_click', { contact_method: 'email', link_location: whereIs(a) });
     if (href.startsWith('tel:')) return track('contact_click', { contact_method: 'telefono', link_location: whereIs(a) });
-    if (/wa\.me|whatsapp\.com/i.test(href)) return track('contact_click', { contact_method: 'whatsapp', link_location: a.matches('[data-wa-float]') ? 'flotante' : whereIs(a) });
+    if (/wa\.me|whatsapp\.com/i.test(href)) return track('contact_click', { contact_method: 'whatsapp', link_location: a.classList.contains('is-morph') && window.scrollY < 60 ? 'hero' : 'flotante' });
     if (/instagram\.com/i.test(href)) return track('contact_click', { contact_method: 'instagram', link_location: whereIs(a) });
     if (/linkedin\.com/i.test(href)) return track('contact_click', { contact_method: 'linkedin', link_location: whereIs(a) });
     if (/^\/contacto\/?$/.test(href) && (a.classList.contains('hbtn') || /agendar/i.test(a.textContent || ''))) track('cta_click', { cta_location: whereIs(a), cta_text: (a.textContent || '').trim() || 'Contacto' });

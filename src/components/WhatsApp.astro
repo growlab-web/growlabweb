@@ -1,6 +1,8 @@
 ---
-// Botón flotante de WhatsApp, presente en todas las páginas (lo incluye Layout.astro).
-// En el inicio, mientras se ve el botón de WhatsApp del hero, el flotante espera; al hacer scroll toma su lugar en la esquina.
+// Botón de WhatsApp, presente en todas las páginas (lo incluye Layout.astro).
+// En el inicio (escritorio) nace como el botón cuadrado blanco del hero, junto a «Agendar reunión», y al hacer scroll
+// se transforma en el círculo verde flotante: es un único botón que cambia de forma, tamaño y color según el scroll.
+// En el resto de páginas y en móvil aparece directamente como botón flotante.
 import { siWhatsapp } from 'simple-icons';
 import { site } from '../data/site.js';
 ---
@@ -11,27 +13,56 @@ import { site } from '../data/site.js';
   rel="noopener noreferrer"
   data-wa-float
   aria-label={site.whatsapp.label}
-  class="wa-float fixed bottom-5 right-[max(1.8vw,16px)] z-[80] grid h-[54px] w-[54px] place-items-center rounded-full bg-[#25d366] text-white shadow-[0_10px_30px_rgba(0,0,0,.45)] transition-[opacity,transform,background-color] duration-300 hover:bg-[#1ebe5a] max-sm:bottom-4 max-sm:h-[50px] max-sm:w-[50px]"
+  class="wa-float fixed z-[80] grid place-items-center"
 >
-  <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor" aria-hidden="true"><path d={siWhatsapp.path}></path></svg>
+  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d={siWhatsapp.path}></path></svg>
 </a>
 
 <style is:global>
-  /* oculto hasta que le toca: entra desde abajo con un pequeño rebote */
-  .wa-float { opacity: 0; transform: translateY(18px) scale(.7); pointer-events: none; }
-  .wa-float.is-on { opacity: 1; transform: none; pointer-events: auto; transition-timing-function: cubic-bezier(.34, 1.56, .64, 1); }
-  .wa-float.is-on:hover { transform: scale(1.08); }
+  /* --p: 0 = botón cuadrado del hero · 1 = círculo flotante. Todo lo que cambia entre uno y otro se calcula a partir de --p. */
+  .wa-float {
+    --p: 1;
+    --size: calc(48px + 6px * var(--p));
+    right: calc(var(--gx, 1.8vw) * (1 - var(--p)) + max(1.8vw, 16px) * var(--p));
+    bottom: 20px;
+    width: var(--size);
+    height: var(--size);
+    border-radius: calc(2px + 25px * var(--p));
+    background: color-mix(in srgb, #25d366 calc(var(--p) * 100%), #fff);
+    color: color-mix(in srgb, #fff calc(var(--p) * 100%), #000);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, calc(.45 * var(--p)));
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(18px) scale(.7);
+    transition: opacity .3s, transform .3s, background-color .3s, color .3s;
+  }
+  .wa-float svg { width: calc(22px + 6px * var(--p)); height: calc(22px + 6px * var(--p)); }
+  .wa-float.is-on { opacity: 1; pointer-events: auto; transform: none; transition-timing-function: cubic-bezier(.34, 1.56, .64, 1); }
+  .wa-float.is-on:hover { transform: scale(1.08); background: #25d366; color: #fff; }
+  /* mientras sigue al scroll no hay transición de color ni rebote: el cambio lo marca el propio scroll */
+  .wa-float.is-morph { transition: opacity .5s, transform .3s; }
+  .wa-float.is-morph.is-on { transition-timing-function: ease; }
+  @media (max-width: 639px) { .wa-float { --size: 50px; bottom: 16px; } }
 </style>
 
 <script>
   const btn = document.querySelector<HTMLElement>('[data-wa-float]');
   if (btn) {
-    const hero = document.querySelector<HTMLElement>('[data-wa-hero]');
-    // el del hero "manda" sólo si existe y se ve (en móvil está oculto, así que ahí el flotante sale desde el principio)
-    const heroShown = () => !!hero && hero.offsetParent !== null;
-    const update = () => btn.classList.toggle('is-on', !heroShown() || window.scrollY > 60);
+    // hueco que reserva el hero para el botón (junto a «Agendar reunión»); en móvil no se muestra
+    const slot = document.querySelector<HTMLElement>('[data-wa-slot]');
+    const slotShown = () => !!slot && slot.offsetParent !== null;
+    const DIST = 170;                                  // píxeles de scroll que dura la transformación
+    const update = () => {
+      const morph = slotShown();
+      btn.classList.toggle('is-morph', morph);
+      const p = morph ? Math.min(1, Math.max(0, window.scrollY / DIST)) : 1;
+      btn.style.setProperty('--p', (p * p * (3 - 2 * p)).toFixed(3));     // con arranque y llegada suaves
+      // el hueco del hero usa --gx para su margen: el botón toma el mismo valor para caer justo encima
+      if (morph) btn.style.setProperty('--gx', getComputedStyle(slot!).getPropertyValue('--gx') || '1.8vw');
+    };
     window.addEventListener('scroll', update, { passive: true });
     window.addEventListener('resize', update);
-    setTimeout(update, 600);            // tras la entrada de la página, para que no aparezca antes que el resto
+    update();
+    setTimeout(() => btn.classList.add('is-on'), 700);  // entra con el resto de la página
   }
 </script>
