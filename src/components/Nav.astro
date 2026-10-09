@@ -141,4 +141,27 @@ const contactActive = isActive(site.contact.href);
     sheet.addEventListener('click', (e) => { if (e.target.closest('a')) set(false); });
     window.addEventListener('keydown', (e) => { if (e.key === 'Escape') set(false); });
   }
+
+  // En el inicio, el enlace marcado sigue al scroll: «Servicios» mientras esa sección ocupa el centro de la pantalla, «Inicio» en el resto
+  const section = document.querySelector('#servicios');
+  if (nav && section && location.pathname.replace(/\/$/, '') === '') {
+    const pick = (href) => [...nav.querySelectorAll(`a[href="${href}"]`)].filter((a) => !a.querySelector('img'));   // sin el logo
+    const home = pick('/'), services = pick('/#servicios');
+    const mark = (links, on, current) => links.forEach((a) => {
+      a.classList.toggle('text-secondary', on);
+      a.classList.toggle(a.closest('#nav-sheet') ? 'text-white' : 'opacity-90', !on);
+      if (on) a.setAttribute('aria-current', current); else a.removeAttribute('aria-current');
+    });
+    let inServices = null;
+    const update = () => {
+      const r = section.getBoundingClientRect(), mid = window.innerHeight / 2;
+      const now = r.top <= mid && r.bottom >= mid;
+      if (now === inServices) return;
+      inServices = now;
+      mark(home, !now, 'page'); mark(services, now, 'location');
+    };
+    window.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
+    update();
+  }
 </script>
