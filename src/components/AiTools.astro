@@ -11,9 +11,10 @@ const tools = [
   { path: chatgpt, name: 'ChatGPT' },
   { path: siGooglegemini.path, name: 'Gemini' },
 ];
+const { class: cls = 'justify-end' } = Astro.props;
 ---
 
-<ul class="flex flex-wrap items-center justify-end gap-x-6 gap-y-2 max-sm:gap-x-4">
+<ul class:list={['flex flex-wrap items-center gap-x-6 gap-y-2 max-sm:gap-x-4', cls]}>
   {
     tools.map((t) => (
       <li data-in class="flex items-center gap-2.5 text-white/85">

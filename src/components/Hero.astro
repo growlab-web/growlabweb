@@ -113,9 +113,11 @@ const stats = [
       <p data-in class="mt-10 max-md:mt-4 max-w-[27em] font-body text-[clamp(.8rem,.95vw,.95rem)] leading-snug text-[#a9afbb]">
         Nos reforzamos en la inteligencia artificial para combinar señales de comportamiento, datos first&#8209;party y modelos predictivos, y así anticipar qué necesita cada cliente y activarlo con el mensaje, el canal y el momento precisos.
       </p>
+      <!-- escritorio: los logos van bajo el texto; en pantallas menores siguen sobre el cierre -->
+      <AiTools class="mt-8 justify-start max-lg:hidden" />
     </div>
     <div class="absolute bottom-[4%] right-(--gx) flex flex-col items-end gap-6 max-sm:gap-4">
-      <AiTools />
+      <AiTools class="justify-end lg:hidden" />
       <h3 data-in class="display-xl text-right max-md:text-[2.2rem]">
         Predice, activa<br />y convierte.
       </h3>
