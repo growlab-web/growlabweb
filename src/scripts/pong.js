@@ -31,11 +31,14 @@ export function initPong(canvas, { onScore = () => {}, onState = () => {} } = {}
     ball.x = w / 2; ball.y = h / 2; ball.trail.length = 0;
     const speed = Math.max(260, w * 0.5), a = (Math.random() * 0.7 - 0.35), dir = Math.random() < 0.5 ? -1 : 1;
     ball.vx = Math.cos(a) * speed * dir; ball.vy = Math.sin(a) * speed;
-    state = 'juego'; onState(state);
+    state = 'juego'; canvas.dataset.state = state; onState(state);
+    // si la página venía desplazándose (scroll suave o inercia), se detiene en seco donde está
+    const lenis = window.__lenis;
+    if (lenis && lenis.scrollTo) lenis.scrollTo(window.scrollY, { immediate: true, force: true });
   }
 
   function over() {
-    state = 'fin'; onState(state);
+    state = 'fin'; canvas.dataset.state = state; onState(state);
     if (score > best) { best = score; try { localStorage.setItem('gl-pong-best', String(best)); } catch (e) { /* sin almacenamiento */ } }
     onScore(score, best);
   }
@@ -96,9 +99,13 @@ export function initPong(canvas, { onScore = () => {}, onState = () => {} } = {}
 
   const move = (e) => { const r = canvas.getBoundingClientRect(); paddle.target = e.clientY - r.top; };
   const press = (e) => { move(e); if (state !== 'juego') serve(); };
+  // durante la partida la página no se desplaza: con trackpad es fácil rozar con dos dedos y que todo se mueva (y se pierda la pelota).
+  // Se captura antes que el scroll suave del sitio; al terminar la partida el scroll vuelve a funcionar.
+  const holdScroll = (e) => { if (state === 'juego') { e.preventDefault(); e.stopImmediatePropagation(); } };
   window.addEventListener('pointermove', move, { passive: true });
   canvas.addEventListener('pointerdown', press);
   window.addEventListener('resize', resize);
+  window.addEventListener('wheel', holdScroll, { passive: false, capture: true });
   resize(); onScore(score, best); onState(state);
   raf = requestAnimationFrame(frame);
 
@@ -106,6 +113,7 @@ export function initPong(canvas, { onScore = () => {}, onState = () => {} } = {}
     stop() {
       alive = false; cancelAnimationFrame(raf);
       window.removeEventListener('pointermove', move); canvas.removeEventListener('pointerdown', press); window.removeEventListener('resize', resize);
+      window.removeEventListener('wheel', holdScroll, { capture: true });
     },
   };
 }

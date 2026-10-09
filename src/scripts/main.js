@@ -34,6 +34,7 @@ const isApp = document.body.hasAttribute('data-app');       // portafolio 3D: ma
 const lenis = isApp
   ? { on() {}, raf() {}, stop() {}, start() {}, scrollTo() {}, resize() {} }
   : new Lenis({ lerp: 0.14, smoothWheel: !reduceMotion, virtualScroll: limitWheel });
+window.__lenis = lenis;          // para piezas sueltas que necesitan frenar el scroll suave (el juego del formulario)
 if (!isApp) {
   lenis.on('scroll', ScrollTrigger.update);
   gsap.ticker.add((t) => lenis.raf(t * 1000));
