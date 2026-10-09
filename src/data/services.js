@@ -2,7 +2,7 @@
  * Servicios de GrowLab (se muestran en la sección «Servicios» del inicio y en la línea que se va escribiendo bajo el titular).
  * Los nombres van en inglés porque así los conoce el mercado.
  *
- * icon → nombre del icono (ver components/Icon.astro).  art → dibujo de la tarjeta (bars, bars-rev, rings, dots, shapes, chips, mail).
+ * icon → nombre del icono (ver components/Icon.astro).  art → dibujo de la tarjeta (bars, bars-rev, rings, dots, shapes, chips, mail, search).
  * ⚠ Las descripciones (`short`) son borradores: revísalas y ajústalas a cómo describe GrowLab cada servicio.
  */
 export const services = [
@@ -15,8 +15,16 @@ export const services = [
     short: 'Campañas en Meta, Google y TikTok que atraen tráfico cualificado y lo convierten en ventas.',
   },
   {
-    slug: 'web-development',
+    slug: 'seo',
     n: '02',
+    name: 'SEO',
+    icon: 'search',
+    art: 'search',
+    short: 'Posicionamiento orgánico en Google y en buscadores con IA: SEO técnico, contenido y autoridad para atraer tráfico que no depende de la pauta.',
+  },
+  {
+    slug: 'web-development',
+    n: '03',
     name: 'Web Development & Ecommerce',
     icon: 'app-window',
     art: 'chips',
@@ -24,7 +32,7 @@ export const services = [
   },
   {
     slug: 'ux-ui-design',
-    n: '03',
+    n: '04',
     name: 'UX/UI Design',
     icon: 'palette',
     art: 'shapes',
@@ -32,7 +40,7 @@ export const services = [
   },
   {
     slug: 'ai-automation',
-    n: '04',
+    n: '05',
     name: 'AI Automation',
     icon: 'bot',
     art: 'dots',
@@ -40,7 +48,7 @@ export const services = [
   },
   {
     slug: 'email-marketing',
-    n: '05',
+    n: '06',
     name: 'Email Marketing',
     icon: 'mail',
     art: 'mail',
@@ -48,7 +56,7 @@ export const services = [
   },
   {
     slug: 'data-analytics',
-    n: '06',
+    n: '07',
     name: 'Data Analytics',
     icon: 'chart-column',
     art: 'rings',
@@ -56,7 +64,7 @@ export const services = [
   },
   {
     slug: 'tracking-attribution',
-    n: '07',
+    n: '08',
     name: 'Tracking & Attribution',
     icon: 'radar',
     art: 'bars-rev',
@@ -64,7 +72,7 @@ export const services = [
   },
   {
     slug: 'reporting-dashboards',
-    n: '08',
+    n: '09',
     name: 'Reporting & Dashboards',
     icon: 'layout-dashboard',
     art: 'bars',
