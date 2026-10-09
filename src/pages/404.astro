@@ -1,6 +1,7 @@
 ---
 // Página de error: mismos colores que el resto del sitio (fondo oscuro, blanco y verde menta), pero sin menú ni pie y con otro tono.
-// El 404 gigante está hecho de partículas que huyen del cursor y vuelven a su sitio; un clic o un toque las hace estallar.
+// El 404 gigante está hecho de partículas que huyen del cursor y vuelven a su sitio; un clic o un toque lo rompe para siempre
+// (queda hecho pedazos hasta que se recarga la página).
 import Layout from '../layouts/Layout.astro';
 import { site } from '../data/site.js';
 
@@ -31,7 +32,7 @@ const metrics = [
     <div class="relative z-[1] min-h-[100px] w-full flex-1">
       <canvas data-notfound-canvas class="absolute inset-0 h-full w-full touch-manipulation" aria-hidden="true"></canvas>
       <p class="pointer-events-none absolute inset-x-0 bottom-0 text-center font-display text-[.66rem] uppercase tracking-[.2em] text-white/45 max-sm:text-[.56rem]">
-        <span class="nf-fine">Pasa el cursor por el número · haz clic para romperlo</span><span class="nf-coarse">Toca el número para romperlo</span>
+        <span data-notfound-hint><span class="nf-fine">Pasa el cursor por el número · haz clic para romperlo</span><span class="nf-coarse">Toca el número para romperlo</span></span>
       </p>
     </div>
 
@@ -90,7 +91,7 @@ const metrics = [
     const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     type Dot = { x: number; y: number; hx: number; hy: number; vx: number; vy: number; r: number };
-    let w = 0, h = 0, dots: Dot[] = [];
+    let w = 0, h = 0, dots: Dot[] = [], broken = false;
     const mouse = { x: -9999, y: -9999 };
 
     // las partículas salen de dibujar «404» en un lienzo oculto y quedarse con los puntos que caen dentro de las letras
@@ -98,6 +99,7 @@ const metrics = [
       w = canvas!.clientWidth; h = canvas!.clientHeight;
       canvas!.width = w * dpr; canvas!.height = h * dpr;
       ctx!.setTransform(dpr, 0, 0, dpr, 0, 0);
+      if (broken) return;                                            // ya roto: al cambiar el tamaño no se recompone
       const off = document.createElement('canvas'); off.width = w; off.height = h;
       const o = off.getContext('2d', { willReadFrequently: true });
       if (!o) return;
@@ -134,18 +136,24 @@ const metrics = [
       for (const d of dots) {
         const dx = d.x - mouse.x, dy = d.y - mouse.y, dist = Math.hypot(dx, dy);
         if (dist < 90) { const f = ((90 - dist) / 90) * 2.4; d.vx += (dx / (dist || 1)) * f; d.vy += (dy / (dist || 1)) * f; }   // huyen del cursor
-        d.vx += (d.hx - d.x) * 0.02; d.vy += (d.hy - d.y) * 0.02;                                                             // y vuelven a su sitio
-        d.vx *= 0.88; d.vy *= 0.88;
+        if (!broken) { d.vx += (d.hx - d.x) * 0.02; d.vy += (d.hy - d.y) * 0.02; }                                            // y vuelven a su sitio… mientras no se rompa
+        d.vx *= broken ? 0.93 : 0.88; d.vy *= broken ? 0.93 : 0.88;
         d.x += d.vx; d.y += d.vy;
+        if (broken) {                                                                                                         // los pedazos rebotan en los bordes y se quedan donde caen
+          if (d.x < d.r) { d.x = d.r; d.vx *= -0.6; } else if (d.x > w - d.r) { d.x = w - d.r; d.vx *= -0.6; }
+          if (d.y < d.r) { d.y = d.r; d.vy *= -0.6; } else if (d.y > h - d.r) { d.y = h - d.r; d.vy *= -0.6; }
+        }
       }
       draw();
     }
 
-    // clic o toque: el número estalla desde ese punto
+    // clic o toque: el número estalla desde ese punto y ya no se recompone
+    const hint = document.querySelector('[data-notfound-hint]');
     function burst(cx: number, cy: number) {
+      if (!broken) { broken = true; if (hint) hint.textContent = 'Listo, lo rompiste. Recarga la página si lo quieres de vuelta'; track('notfound_broken'); }
       for (const d of dots) {
         const dx = d.x - cx, dy = d.y - cy, dist = Math.hypot(dx, dy) || 1, f = Math.max(0, 1 - dist / (w * 0.7)) * (16 + Math.random() * 22);
-        d.vx += (dx / dist) * f; d.vy += (dy / dist) * f;
+        d.vx += (dx / dist) * f + (Math.random() - 0.5) * 3; d.vy += (dy / dist) * f + (Math.random() - 0.5) * 3;   // con algo de azar, para que no queden filas
       }
     }
     const at = (e: PointerEvent) => { const r = canvas.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; };
