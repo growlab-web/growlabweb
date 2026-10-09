@@ -43,6 +43,9 @@ const link = 'transition-colors hover:text-secondary';
 
   <div class="flex flex-wrap items-center justify-between gap-x-8 gap-y-3 border-t border-white/10 py-6 text-[.85rem]">
     <span>© {year} {site.name}® Agencia de marketing digital</span>
-    <a href={site.privacy.href} class={link}>{site.privacy.label}</a>
+    <span class="flex flex-wrap gap-x-6 gap-y-2">
+      {site.gtm && <a href="#cookies" data-consent-open class={link}>Preferencias de cookies</a>}
+      <a href={site.privacy.href} class={link}>{site.privacy.label}</a>
+    </span>
   </div>
 </footer>

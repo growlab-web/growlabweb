@@ -9,6 +9,7 @@ import * as THREE from 'three';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import BRAIN_DATA from '../data/brainData.js';
+import { trackOnce } from './track.js';
 import { buildShape, isServiceShape } from './shapes.js';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -627,7 +628,11 @@ export function initHero3D() {
       scrollTrigger: {
         trigger: hero, start: 'top top', end: MOB ? '+=170%' : '+=260%', pin: true,   // en móvil, menos recorrido de dedo entre etapas
         scrub: 0.35, anticipatePin: 1,
-        onUpdate: (self) => cueDots.forEach((d, i) => d.classList.toggle('is-on', i === (self.progress < 0.23 ? 0 : self.progress < 0.72 ? 1 : 2))),   // punto de la etapa actual en la señal de scroll
+        onUpdate: (self) => {
+          const stage = self.progress < 0.23 ? 0 : self.progress < 0.72 ? 1 : 2;
+          cueDots.forEach((d, i) => d.classList.toggle('is-on', i === stage));     // punto de la etapa actual en la señal de scroll
+          if (stage) trackOnce('hero:' + stage, 'hero_stage', { stage: ['esfera', 'galaxia', 'cerebro'][stage] });   // medición: hasta qué etapa llega cada visita
+        },
         // cada etapa se engancha sola: un gesto de scroll basta para pasar a la siguiente
         // en móvil el enganche espera a que el dedo y la inercia terminen, para no pelearse con el scroll del teléfono
         snap: MOB

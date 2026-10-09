@@ -66,3 +66,12 @@ git push -u origin main
 
 En [vercel.com](https://vercel.com) → **Add New… → Project** → importa el repositorio.
 Vercel detecta Astro automáticamente (comando `npm run build`, carpeta de salida `dist`); no hace falta configurar nada más.
+
+## Publicación en growlab.pe (cPanel)
+
+1. `npm run build` y subir **todo el contenido** de `dist/` a `public_html` (incluido el archivo oculto `.htaccess`).
+2. **Formulario** (`public/api/contacto.php`): envía los leads a `hola.grow.lab@gmail.com` y los guarda en `growlab-leads/leads.csv`, una carpeta que se crea sola junto a `public_html` (no es accesible desde el navegador). Para que el correo no caiga en spam, crear la cuenta `web@growlab.pe` en cPanel y comprobar en «Email Deliverability» que SPF y DKIM estén correctos.
+3. **Tag Manager**: poner el ID del contenedor en `src/data/site.js` (`gtm: 'GTM-XXXXXXX'`) y volver a generar. Con eso se cargan GTM y el aviso de cookies. GA4 y los píxeles se configuran dentro de GTM; los eventos que deja el sitio están descritos en `src/scripts/track.js`.
+4. **Buscadores**: dar de alta `growlab.pe` en Google Search Console y enviar `https://growlab.pe/sitemap-index.xml`.
+5. **Política de privacidad**: completar razón social, RUC y domicilio en `src/data/site.js` (`legal`) y revisar el texto de `src/pages/privacidad.astro` con asesoría legal.
+

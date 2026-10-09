@@ -4,46 +4,64 @@ import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
 import { site } from '../data/site.js';
 
-// ⚠ BORRADOR: describe lo que hace hoy este sitio (formulario que abre el correo del visitante, sin cookies ni analítica).
-//   Falta que GrowLab lo revise con asesoría legal y añada la razón social, el domicilio y la ley de protección de datos de su país.
-//   Si se instalan píxeles, analítica o un formulario con servidor, hay que actualizar este texto.
+// ⚠ BORRADOR para revisar con asesoría legal. Describe lo que hace el sitio: formulario que se envía al servidor de growlab.pe,
+//   y cookies de medición sólo si hay Tag Manager configurado (site.gtm). Marco legal: Perú (Ley N.° 29733 y su reglamento).
+//   Falta completar en data/site.js → legal: razón social, RUC y domicilio del responsable.
 const updated = 'Octubre de 2026';
+const { legal } = site;
+const who = [legal.name, legal.ruc && `RUC ${legal.ruc}`, legal.address && `con domicilio en ${legal.address}`].filter(Boolean).join(', ');
 const sections = [
   {
     t: 'Quién es el responsable',
-    p: [`${site.name} es responsable del tratamiento de los datos personales que nos envías a través de este sitio. Para cualquier consulta sobre tus datos puedes escribirnos a ${site.email}.`],
+    p: [
+      `${site.name}${who ? ` (${who})` : ''} es responsable del tratamiento de los datos personales que nos envías a través de este sitio, conforme a la Ley N.° 29733, Ley de Protección de Datos Personales del Perú, y su reglamento.`,
+      `Para cualquier consulta sobre tus datos puedes escribirnos a ${site.email}.`,
+    ],
   },
   {
     t: 'Qué datos recopilamos',
     p: [
-      'Solo los que tú decides enviarnos al contactarnos: nombre, correo electrónico, teléfono (opcional), los servicios que te interesan y el contenido de tu mensaje.',
-      'El formulario de contacto no guarda tus datos en este sitio: prepara un mensaje en tu propio programa de correo y eres tú quien lo envía a nuestra dirección.',
+      'Los que tú decides enviarnos en el formulario de contacto: nombre, correo electrónico, teléfono (opcional), los servicios que te interesan y el contenido de tu mensaje. También registramos la fecha del envío y la página desde la que se hizo.',
+      'No pedimos datos sensibles ni datos de menores de edad.',
     ],
   },
   {
     t: 'Para qué los usamos',
-    p: ['Para responder a tu consulta, preparar una propuesta y mantener la comunicación relacionada con los servicios que nos pides. No usamos tus datos para otros fines sin tu consentimiento.'],
+    p: [
+      'Para responder a tu consulta, preparar una propuesta y mantener la comunicación relacionada con los servicios que nos pides. Tratamos tus datos con tu consentimiento, que nos das al marcar la casilla del formulario antes de enviarlo.',
+      'No usamos tus datos para otros fines sin pedírtelo antes.',
+    ],
   },
   {
-    t: 'Con quién los compartimos',
+    t: 'Dónde se guardan y con quién se comparten',
     p: [
-      'No vendemos ni cedemos tus datos a terceros. Solo acceden a ellos las personas del equipo que atienden tu solicitud y los proveedores que usamos para trabajar (por ejemplo, el servicio de correo electrónico), que los tratan por encargo nuestro.',
+      'Tu mensaje se guarda en el servidor que aloja este sitio y nos llega por correo electrónico. Solo acceden a él las personas del equipo que atienden tu solicitud.',
+      'No vendemos ni cedemos tus datos a terceros. Los proveedores que usamos para trabajar (alojamiento web y correo electrónico) los tratan por encargo nuestro; algunos pueden tener sus servidores fuera del Perú.',
     ],
   },
   {
     t: 'Cuánto tiempo los conservamos',
-    p: ['Mientras dure la relación contigo o sea necesario para atender tu solicitud. Después, los eliminamos, salvo que debamos conservarlos por una obligación legal.'],
+    p: ['Mientras dure la relación contigo o sea necesario para atender tu solicitud. Después los eliminamos, salvo que debamos conservarlos por una obligación legal.'],
   },
   {
     t: 'Tus derechos',
-    p: [`Puedes pedirnos en cualquier momento acceder a tus datos, corregirlos, eliminarlos u oponerte a su uso, así como retirar tu consentimiento. Escríbenos a ${site.email} indicando tu solicitud y te responderemos lo antes posible.`],
+    p: [
+      `Puedes ejercer en cualquier momento tus derechos de acceso, rectificación, cancelación y oposición, así como revocar tu consentimiento, escribiendo a ${site.email} e indicando tu solicitud.`,
+      'Si consideras que no hemos atendido tu solicitud, puedes acudir a la Autoridad Nacional de Protección de Datos Personales, del Ministerio de Justicia y Derechos Humanos.',
+    ],
   },
   {
-    t: 'Cookies y servicios de terceros',
-    p: [
-      'Este sitio no utiliza cookies de publicidad ni de analítica. Las tipografías se cargan desde Google Fonts, por lo que tu navegador se conecta a los servidores de Google al abrir la página.',
-      'Los enlaces a redes sociales te llevan a sitios externos que tienen sus propias políticas de privacidad.',
-    ],
+    t: 'Cookies y medición',
+    p: site.gtm
+      ? [
+          'Usamos Google Tag Manager y Google Analytics para saber cómo se usa el sitio (páginas vistas, secciones recorridas, formularios enviados) y, si corresponde, medir el resultado de nuestras campañas publicitarias. Estas herramientas utilizan cookies.',
+          'Al entrar por primera vez puedes aceptar esas cookies o seguir solo con las necesarias, y cambiar tu elección cuando quieras desde «Preferencias de cookies», al pie de la página. Tu nombre, correo y teléfono no se envían a Google Analytics.',
+          'Las tipografías se cargan desde Google Fonts, por lo que tu navegador se conecta a los servidores de Google al abrir la página. Los enlaces a redes sociales te llevan a sitios externos con sus propias políticas.',
+        ]
+      : [
+          'Este sitio no utiliza cookies de publicidad ni de analítica. Las tipografías se cargan desde Google Fonts, por lo que tu navegador se conecta a los servidores de Google al abrir la página.',
+          'Los enlaces a redes sociales te llevan a sitios externos que tienen sus propias políticas de privacidad.',
+        ],
   },
   {
     t: 'Cambios en esta política',

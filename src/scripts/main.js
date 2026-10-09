@@ -11,10 +11,12 @@ import { startRain } from './loaderRain.js';
 import { initDataFlow } from './dataflow.js';
 import { initDust } from './dust.js';
 import { initCursor } from './cursor.js';
+import { initTracking } from './track.js';
 
 gsap.registerPlugin(ScrollTrigger);
 
 initCursor();
+initTracking();
 
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const isTouch = window.matchMedia('(pointer: coarse)').matches || window.innerWidth < 800;

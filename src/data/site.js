@@ -1,6 +1,16 @@
 // Datos generales del sitio: se editan aquí y se usan en el menú, el pie y la página de contacto.
 export const site = {
   name: 'GrowLab',
+  url: 'https://growlab.pe',
+  country: 'Perú',
+  /* --- Medición ---
+     gtm: ID del contenedor de Google Tag Manager (formato GTM-XXXXXXX). Mientras esté vacío no se carga GTM ni se muestra el aviso de cookies.
+     GA4 y los píxeles se configuran DENTRO de Tag Manager; el sitio sólo deja los eventos preparados (ver scripts/track.js).
+     consentDefault: 'denied' = no se mide con cookies hasta que el visitante acepta; 'granted' = se mide desde el principio. */
+  gtm: '',
+  consentDefault: 'denied',
+  // datos legales del responsable, para la política de privacidad (si se dejan vacíos, no se muestran)
+  legal: { name: '', ruc: '', address: '' },
   email: 'hola.grow.lab@gmail.com', // correo al que llegan los mensajes del formulario
   nav: [
     { href: '/', label: 'Inicio' },

@@ -9,6 +9,7 @@ import * as THREE from 'three';
 import gsap from 'gsap';
 import { projects, getProject } from '../data/projects.js';
 import { makeArt, projectImageKinds } from './projectArt.js';
+import { track } from './track.js';
 
 const N = projects.length;
 let CARD_W = 3.6, CARD_H = 2.25;                  // en móvil se cambian a un formato vertical (ver initPortfolio)
@@ -438,6 +439,7 @@ export async function initPortfolio(root) {
     document.body.classList.add('pf-open');
     S.target = Math.round(S.pos) + wrapD(projects.indexOf(p) - Math.round(S.pos)); S.lastInput = performance.now();
     document.title = `${p.name} · Portafolio · GrowLab`;
+    track('project_view', { project: slug });
     if (push && location.pathname !== `/portafolio/${slug}`) { try { history.pushState({ slug }, '', `/portafolio/${slug}`); } catch (e) { /* entorno sin historial (vista previa) */ } }
     if (wasOpen) {
       gsap.to(panel, { opacity: 0, y: 14, duration: 0.2, onComplete: () => { fillProject(p); gsap.to(panel, { opacity: 1, y: 0, duration: 0.45, ease: 'power3.out' }); } });

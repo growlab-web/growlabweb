@@ -1,0 +1,52 @@
+# growlab.pe en cPanel (Apache). Este archivo se copia tal cual a la raíz del sitio (public_html) al hacer `npm run build`.
+
+Options -Indexes
+AddDefaultCharset UTF-8
+ErrorDocument 404 /404.html
+
+<IfModule mod_dir.c>
+  # las carpetas no añaden la barra final por su cuenta: de eso se encargan las reglas de abajo
+  DirectorySlash Off
+</IfModule>
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # 1) siempre https y sin www (sólo en el dominio real: no afecta a pruebas en otras direcciones)
+  RewriteCond %{HTTP_HOST} ^(www\.)?growlab\.pe$ [NC]
+  RewriteCond %{HTTPS}:%{HTTP_HOST} !^on:growlab\.pe$ [NC]
+  RewriteRule ^ https://growlab.pe%{REQUEST_URI} [R=301,L]
+
+  # 2) la antigua página de servicios es ahora una sección del inicio
+  RewriteRule ^servicios/?$ /#servicios [R=301,NE,L]
+
+  # 3) direcciones sin barra final: /nosotros/ → /nosotros
+  RewriteCond %{THE_REQUEST} \s/([^?\s]*[^/?\s])/+(\?[^\s]*)?\s
+  RewriteCond %{DOCUMENT_ROOT}/%1/index.html -f
+  RewriteRule ^ /%1 [R=301,L]
+
+  # 4) /nosotros se sirve desde /nosotros/index.html, sin redirección
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteCond %{REQUEST_FILENAME}/index.html -f
+  RewriteRule ^(.*[^/])$ $1/index.html [L]
+</IfModule>
+
+# caché: los archivos de /_astro llevan una huella en el nombre y no cambian nunca; las páginas se piden siempre de nuevo
+<IfModule mod_headers.c>
+  <FilesMatch "\.(html|xml|txt)$">
+    Header set Cache-Control "no-cache"
+  </FilesMatch>
+  <FilesMatch "\.(png|jpe?g|webp|avif|svg|ico|woff2?)$">
+    Header set Cache-Control "public, max-age=2592000"
+  </FilesMatch>
+  <If "%{REQUEST_URI} =~ m#^/_astro/#">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </If>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# compresión de texto
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css text/plain text/xml text/javascript application/xml application/javascript application/json image/svg+xml
+</IfModule>

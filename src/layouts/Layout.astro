@@ -1,25 +1,74 @@
 ---
 import '../styles/global.css';
 import Loader from '../components/Loader.astro';
+import Consent from '../components/Consent.astro';
+import { site } from '../data/site.js';
+import { services } from '../data/services.js';
 
 interface Props {
   title: string;
   description: string;
   app?: boolean; // página a pantalla completa (portafolio 3D): sin scroll de documento ni Lenis
+  image?: string; // imagen al compartir el enlace (por defecto, la general del sitio)
+  noindex?: boolean; // páginas que no deben salir en buscadores (p. ej. la de error)
 }
-const { title, description, app = false } = Astro.props;
+const { title, description, app = false, image = '/og.jpg', noindex = false } = Astro.props;
+
+// dirección oficial de la página (sin barra final) e imagen para redes, siempre con el dominio completo
+const canonical = new URL(Astro.url.pathname.replace(/\/$/, '') || '/', site.url).href;
+const ogImage = new URL(image, site.url).href;
+
+// datos estructurados: le dicen a Google y a los buscadores con IA quién es GrowLab, dónde opera y qué servicios ofrece
+const schema = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'ProfessionalService',
+      '@id': `${site.url}/#organizacion`,
+      name: site.name,
+      description: 'Agencia de marketing digital orientada a datos.',
+      url: site.url,
+      logo: `${site.url}/logo.png`,
+      image: `${site.url}/og.jpg`,
+      email: site.email,
+      areaServed: { '@type': 'Country', name: site.country },
+      sameAs: site.social.map((s) => s.href),
+      hasOfferCatalog: {
+        '@type': 'OfferCatalog',
+        name: 'Servicios',
+        itemListElement: services.map((s) => ({ '@type': 'Offer', itemOffered: { '@type': 'Service', name: s.name, description: s.short } })),
+      },
+    },
+    { '@type': 'WebSite', '@id': `${site.url}/#sitio`, url: site.url, name: site.name, inLanguage: 'es-PE', publisher: { '@id': `${site.url}/#organizacion` } },
+  ],
+};
+const gtm = /^GTM-[A-Z0-9]+$/.test(site.gtm) ? site.gtm : '';
 ---
 
 <!doctype html>
-<html lang="es">
+<html lang="es-PE">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
     <meta name="theme-color" content="#000000" />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex" />}
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:locale" content="es_PE" />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <script type="application/ld+json" set:html={JSON.stringify(schema)} />
     <link rel="icon" type="image/png" href="/favicon.png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -29,6 +78,20 @@ const { title, description, app = false } = Astro.props;
       rel="stylesheet"
     />
     <title>{title}</title>
+    {
+      gtm && (
+        /* Google Tag Manager, con el consentimiento fijado ANTES de que cargue (Consent Mode v2): lo ya elegido por el visitante o el valor por defecto */
+        <script is:inline define:vars={{ gtm, consentDefault: site.consentDefault }}>
+          window.dataLayer = window.dataLayer || [];
+          function gtag() { dataLayer.push(arguments); }
+          var choice = null;
+          try { choice = localStorage.getItem('gl-consent'); } catch (e) {}
+          var state = choice === 'all' ? 'granted' : choice === 'necessary' ? 'denied' : consentDefault === 'granted' ? 'granted' : 'denied';
+          gtag('consent', 'default', { ad_storage: state, ad_user_data: state, ad_personalization: state, analytics_storage: state, wait_for_update: 500 });
+          (function (w, d, s, l, i) { w[l] = w[l] || []; w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' }); var f = d.getElementsByTagName(s)[0], j = d.createElement(s); j.async = true; j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i; f.parentNode.insertBefore(j, f); })(window, document, 'script', 'dataLayer', gtm);
+        </script>
+      )
+    }
     <!-- evita el parpadeo de la pantalla de carga si ya se vio en esta sesión -->
     <script is:inline>
       try { if (sessionStorage.getItem('gl-intro') === '1') document.documentElement.classList.add('intro-seen'); } catch (e) {}
@@ -45,8 +108,10 @@ const { title, description, app = false } = Astro.props;
     </script>
   </head>
   <body class:list={['bg-black font-body text-white antialiased', app ? 'h-screen overflow-hidden' : 'overflow-x-hidden']} data-app={app ? '' : undefined}>
+    {gtm && <noscript><iframe src={`https://www.googletagmanager.com/ns.html?id=${gtm}`} height="0" width="0" style="display:none;visibility:hidden" title="Google Tag Manager"></iframe></noscript>}
     <Loader />
     <slot />
+    {gtm && <Consent />}
     <script>
       import '../scripts/main.js';
     </script>

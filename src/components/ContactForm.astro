@@ -8,7 +8,8 @@ const icon = 'h-[22px] w-[22px] shrink-0 text-white/45 transition-colors group-f
 const input = 'w-full bg-transparent py-4 font-body text-[1rem] text-white outline-none placeholder:text-white/40';
 ---
 
-<!-- Al enviar abre el correo del visitante con el mensaje listo (sin servidor). -->
+<!-- El formulario se envía a /api/contacto.php (hosting cPanel), que guarda el lead y avisa por correo.
+     Si ese servicio no responde (p. ej. en desarrollo, donde no hay PHP), se abre el correo del visitante con el mensaje listo. -->
 <form data-contact-form data-email={site.email} class="grid gap-x-10 gap-y-7 sm:grid-cols-2" novalidate>
   <label class={wrap}>
     <svg class={icon} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"></path></svg>
@@ -53,8 +54,13 @@ const input = 'w-full bg-transparent py-4 font-body text-[1rem] text-white outli
     <textarea class={input + ' min-h-[110px] resize-none'} name="mensaje" placeholder="¿Cómo podemos ayudar? ¡No dudes en ponerte en contacto con nosotros!" required></textarea>
   </label>
 
+  <!-- campo trampa para robots: las personas no lo ven ni llegan a él con el teclado -->
+  <div class="absolute -left-[9999px] h-0 w-0 overflow-hidden" aria-hidden="true">
+    <label>No rellenes este campo <input type="text" name="website" tabindex="-1" autocomplete="off" /></label>
+  </div>
+
   <div class="flex flex-wrap items-center gap-x-8 gap-y-4 pt-3 sm:col-span-2">
-    <button type="submit" class="inline-flex h-[54px] cursor-pointer items-center gap-3 bg-secondary px-8 font-display text-[.85rem] font-semibold uppercase tracking-[.12em] text-black transition-colors hover:bg-white">
+    <button type="submit" data-form-submit class="inline-flex h-[54px] cursor-pointer disabled:cursor-wait disabled:opacity-60 items-center gap-3 bg-secondary px-8 font-display text-[.85rem] font-semibold uppercase tracking-[.12em] text-black transition-colors hover:bg-white">
       <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21 3-9.5 18-2.5-7.5L1.5 11 21 3Z"></path><path d="M21 3 9 13.5"></path></svg>
       Enviar
     </button>
@@ -68,42 +74,83 @@ const input = 'w-full bg-transparent py-4 font-body text-[1rem] text-white outli
 </form>
 
 <script>
+  import { track } from '../scripts/track.js';
+
   document.querySelectorAll('[data-contact-form]').forEach((form) => {
     const note = form.querySelector('[data-form-note]');
+    const button = form.querySelector('[data-form-submit]');
+    const where = form.closest('[data-contact]') ? 'inicio' : 'contacto';
 
     // desplegable de servicios: se abre y cierra con el botón, y se cierra al pulsar fuera o con Escape
     const ss = form.querySelector('[data-services-select]');
+    let resetServices = () => {};
     if (ss) {
       const toggle = ss.querySelector('[data-ss-toggle]'), panel = ss.querySelector('[data-ss-panel]');
       const label = ss.querySelector('[data-ss-label]'), chevron = ss.querySelector('[data-ss-chevron]');
       const empty = label.textContent;
       const open = (on) => { panel.hidden = !on; toggle.setAttribute('aria-expanded', String(on)); chevron.style.transform = on ? 'rotate(180deg)' : ''; };
-      toggle.addEventListener('click', () => open(panel.hidden));
-      document.addEventListener('pointerdown', (e) => { if (!panel.hidden && !ss.contains(e.target)) open(false); });
-      ss.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !panel.hidden) { open(false); toggle.focus(); } });
-      panel.addEventListener('change', () => {
+      const paint = () => {
         const picked = [...panel.querySelectorAll('input:checked')].map((i) => i.value);
         label.textContent = picked.length ? picked.join(', ') : empty;
         label.classList.toggle('text-white/40', !picked.length);
         label.classList.toggle('text-white', picked.length > 0);
-      });
+      };
+      toggle.addEventListener('click', () => open(panel.hidden));
+      document.addEventListener('pointerdown', (e) => { if (!panel.hidden && !ss.contains(e.target)) open(false); });
+      ss.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !panel.hidden) { open(false); toggle.focus(); } });
+      panel.addEventListener('change', paint);
+      resetServices = () => { open(false); paint(); };
     }
-    form.addEventListener('submit', (e) => {
+
+    // medición: primer campo que toca el visitante
+    form.addEventListener('focusin', () => track('form_start', { form_location: where }), { once: true });
+
+    const say = (msg, kind) => { note.textContent = msg; note.style.color = kind === 'error' ? '#ff9a9a' : kind === 'ok' ? '#6df2c0' : ''; };
+
+    form.addEventListener('submit', async (e) => {
       e.preventDefault();
       const f = new FormData(form);
       const nombre = String(f.get('nombre') || '').trim();
       const email = String(f.get('email') || '').trim();
+      const telefono = String(f.get('telefono') || '').trim();
       const mensaje = String(f.get('mensaje') || '').trim();
       const servicios = f.getAll('servicios').map(String);
-      const fail = (msg) => { note.textContent = msg; note.style.color = '#ff9a9a'; };
-      if (!nombre || !/^\S+@\S+\.\S+$/.test(email) || !mensaje) return fail('Completa tu nombre, un correo válido y el mensaje.');
-      if (!f.get('consent')) return fail('Para enviar el mensaje debes aceptar que se recopilen tus datos.');
+      if (!nombre || !/^\S+@\S+\.\S+$/.test(email) || !mensaje) return say('Completa tu nombre, un correo válido y el mensaje.', 'error');
+      if (!f.get('consent')) return say('Para enviar el mensaje debes aceptar que se recopilen tus datos.', 'error');
+
+      f.set('pagina', location.href);
+      button.disabled = true;
+      say('Enviando…');
+
+      let result = null;          // respuesta del servidor; null = el servicio no está disponible
+      try {
+        const res = await fetch('/api/contacto.php', { method: 'POST', body: f, headers: { Accept: 'application/json' } });
+        const data = await res.json();
+        if (data && typeof data.ok === 'boolean') result = data;
+      } catch (err) { /* sin servidor o respuesta que no es JSON: se usa el correo del visitante */ }
+      button.disabled = false;
+
+      if (result && result.ok) {
+        say('¡Gracias! Recibimos tu mensaje y te responderemos en menos de 24 horas laborables.', 'ok');
+        track('generate_lead', {
+          form_location: where,
+          lead_services: servicios.join(', ') || '(sin especificar)',
+          lead_services_count: servicios.length,
+          // sólo para conversiones mejoradas (Google Ads / Meta); no se envía a GA4, ver scripts/track.js
+          user_data: { email: email.toLowerCase(), phone_number: telefono || undefined },
+        });
+        form.reset();
+        resetServices();
+        return;
+      }
+      if (result) return say(result.error || 'No pudimos enviar tu mensaje. Inténtalo de nuevo.', 'error');
+
+      // sin servicio de envío: se abre el programa de correo con el mensaje listo
       const body = [
-        `Nombre: ${nombre}`, `Correo: ${email}`, `Teléfono: ${f.get('telefono') || '-'}`, `Servicios de interés: ${servicios.join(', ') || '-'}`, '', mensaje,
+        `Nombre: ${nombre}`, `Correo: ${email}`, `Teléfono: ${telefono || '-'}`, `Servicios de interés: ${servicios.join(', ') || '-'}`, '', mensaje,
       ].join('\n');
       const subject = servicios.length ? `Información sobre ${servicios.join(', ')} · ${nombre}` : `Nuevo contacto: ${nombre}`;
-      note.textContent = 'Se abrirá tu correo con el mensaje listo para enviar.';
-      note.style.color = '';
+      say('Se abrirá tu correo con el mensaje listo para enviar.');
       window.location.href = `mailto:${form.dataset.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     });
   });

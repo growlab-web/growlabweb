@@ -1,0 +1,45 @@
+---
+// Aviso de cookies: sólo se muestra si hay Tag Manager (site.gtm) y el visitante aún no ha elegido.
+// La elección se guarda en el navegador y se comunica a Google (Consent Mode v2); el estado inicial lo fija Layout.astro.
+import { site } from '../data/site.js';
+---
+
+<div
+  data-consent
+  hidden
+  role="dialog"
+  aria-label="Aviso de cookies"
+  class="fixed inset-x-3 bottom-3 z-[90] mx-auto max-w-[560px] rounded-[22px] border border-white/15 bg-[#0b1120]/[.97] p-5 font-ui text-[.9rem] text-copy shadow-[0_24px_60px_rgba(0,0,0,.6)] sm:inset-x-auto sm:left-5 sm:bottom-5 sm:mx-0"
+>
+  <p class="leading-relaxed">
+    Usamos cookies para medir las visitas y mejorar el sitio. Puedes aceptarlas o seguir solo con las necesarias.
+    <a href={site.privacy.href} class="text-white underline underline-offset-2 transition-colors hover:text-secondary">Más información</a>.
+  </p>
+  <div class="mt-4 flex flex-wrap gap-3">
+    <button type="button" data-consent-set="all" class="cursor-pointer rounded-full bg-secondary px-5 py-2.5 font-display text-[.85rem] font-medium text-black transition-colors hover:bg-white">Aceptar</button>
+    <button type="button" data-consent-set="necessary" class="cursor-pointer rounded-full border border-white/30 px-5 py-2.5 font-display text-[.85rem] text-white transition-colors hover:border-white">Solo necesarias</button>
+  </div>
+</div>
+
+<script>
+  const box = document.querySelector<HTMLElement>('[data-consent]');
+  if (box) {
+    const KEY = 'gl-consent';
+    const w = window as any;
+    w.dataLayer = w.dataLayer || [];
+    const gtag = function () { w.dataLayer.push(arguments); } as (...args: unknown[]) => void;
+    let saved: string | null = null;
+    try { saved = localStorage.getItem(KEY); } catch (e) { /* sin almacenamiento */ }
+    if (!saved) box.hidden = false;
+
+    box.querySelectorAll<HTMLElement>('[data-consent-set]').forEach((btn) => btn.addEventListener('click', () => {
+      const all = btn.dataset.consentSet === 'all', v = all ? 'granted' : 'denied';
+      try { localStorage.setItem(KEY, all ? 'all' : 'necessary'); } catch (e) { /* sin almacenamiento */ }
+      gtag('consent', 'update', { ad_storage: v, ad_user_data: v, ad_personalization: v, analytics_storage: v });
+      w.dataLayer.push({ event: 'consent_update', consent_choice: all ? 'all' : 'necessary' });
+      box.hidden = true;
+    }));
+    // enlace «Preferencias de cookies» del pie: vuelve a mostrar el aviso
+    document.querySelectorAll('[data-consent-open]').forEach((el) => el.addEventListener('click', (e) => { e.preventDefault(); box.hidden = false; }));
+  }
+</script>
