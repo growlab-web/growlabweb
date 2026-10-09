@@ -1,5 +1,6 @@
 ---
 import { site } from '../data/site.js';
+import { services } from '../data/services.js';
 
 // Campos con línea inferior e icono, como un formulario editorial
 const wrap = 'group relative flex items-center gap-3 border-b border-white/20 transition-colors focus-within:border-secondary';
@@ -27,11 +28,24 @@ const input = 'w-full bg-transparent py-4 font-body text-[1rem] text-white outli
     <input class={input} name="telefono" type="tel" placeholder="Teléfono" autocomplete="tel" />
   </label>
 
-  <label class={wrap}>
-    <svg class={icon} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v5M12 8v.01"></path></svg>
-    <span class="sr-only">Asunto</span>
-    <input class={input} name="asunto" type="text" placeholder="Asunto" />
-  </label>
+  <!-- Servicios de interés: desplegable en el que se pueden marcar varios -->
+  <div data-services-select class={wrap + ' z-20'}>
+    <svg class={icon} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"></path></svg>
+    <button type="button" data-ss-toggle aria-haspopup="true" aria-expanded="false" class="flex w-full cursor-pointer items-center justify-between gap-3 bg-transparent py-4 text-left font-body text-[1rem] outline-none">
+      <span data-ss-label class="truncate text-white/40">Servicios de interés</span>
+      <svg data-ss-chevron class="h-4 w-4 shrink-0 text-white/45 transition-transform duration-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
+    </button>
+    <div data-ss-panel data-lenis-prevent hidden role="group" aria-label="Servicios de interés" class="absolute inset-x-0 top-full z-20 mt-2 max-h-[300px] overflow-y-auto overscroll-contain rounded-2xl border border-white/15 bg-[#0b1226] p-2 shadow-[0_24px_60px_rgba(0,0,0,.6)]">
+      {
+        services.map((s) => (
+          <label class="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 font-body text-[.95rem] text-white/85 transition-colors hover:bg-white/[.06]">
+            <input type="checkbox" name="servicios" value={s.name} class="h-[18px] w-[18px] shrink-0 cursor-pointer accent-secondary" />
+            <span>{s.name}</span>
+          </label>
+        ))
+      }
+    </div>
+  </div>
 
   <label class={wrap + ' items-start sm:col-span-2'}>
     <svg class={icon + ' mt-4'} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20l1-4L16.5 4.5a2 2 0 0 1 3 0l0 0a2 2 0 0 1 0 3L8 19l-4 1Z"></path><path d="m14 7 3 3"></path></svg>
@@ -56,19 +70,38 @@ const input = 'w-full bg-transparent py-4 font-body text-[1rem] text-white outli
 <script>
   document.querySelectorAll('[data-contact-form]').forEach((form) => {
     const note = form.querySelector('[data-form-note]');
+
+    // desplegable de servicios: se abre y cierra con el botón, y se cierra al pulsar fuera o con Escape
+    const ss = form.querySelector('[data-services-select]');
+    if (ss) {
+      const toggle = ss.querySelector('[data-ss-toggle]'), panel = ss.querySelector('[data-ss-panel]');
+      const label = ss.querySelector('[data-ss-label]'), chevron = ss.querySelector('[data-ss-chevron]');
+      const empty = label.textContent;
+      const open = (on) => { panel.hidden = !on; toggle.setAttribute('aria-expanded', String(on)); chevron.style.transform = on ? 'rotate(180deg)' : ''; };
+      toggle.addEventListener('click', () => open(panel.hidden));
+      document.addEventListener('pointerdown', (e) => { if (!panel.hidden && !ss.contains(e.target)) open(false); });
+      ss.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !panel.hidden) { open(false); toggle.focus(); } });
+      panel.addEventListener('change', () => {
+        const picked = [...panel.querySelectorAll('input:checked')].map((i) => i.value);
+        label.textContent = picked.length ? picked.join(', ') : empty;
+        label.classList.toggle('text-white/40', !picked.length);
+        label.classList.toggle('text-white', picked.length > 0);
+      });
+    }
     form.addEventListener('submit', (e) => {
       e.preventDefault();
       const f = new FormData(form);
       const nombre = String(f.get('nombre') || '').trim();
       const email = String(f.get('email') || '').trim();
       const mensaje = String(f.get('mensaje') || '').trim();
+      const servicios = f.getAll('servicios').map(String);
       const fail = (msg) => { note.textContent = msg; note.style.color = '#ff9a9a'; };
       if (!nombre || !/^\S+@\S+\.\S+$/.test(email) || !mensaje) return fail('Completa tu nombre, un correo válido y el mensaje.');
       if (!f.get('consent')) return fail('Para enviar el mensaje debes aceptar que se recopilen tus datos.');
       const body = [
-        `Nombre: ${nombre}`, `Correo: ${email}`, `Teléfono: ${f.get('telefono') || '-'}`, `Asunto: ${f.get('asunto') || '-'}`, '', mensaje,
+        `Nombre: ${nombre}`, `Correo: ${email}`, `Teléfono: ${f.get('telefono') || '-'}`, `Servicios de interés: ${servicios.join(', ') || '-'}`, '', mensaje,
       ].join('\n');
-      const subject = String(f.get('asunto') || '').trim() || `Nuevo contacto: ${nombre}`;
+      const subject = servicios.length ? `Información sobre ${servicios.join(', ')} · ${nombre}` : `Nuevo contacto: ${nombre}`;
       note.textContent = 'Se abrirá tu correo con el mensaje listo para enviar.';
       note.style.color = '';
       window.location.href = `mailto:${form.dataset.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;

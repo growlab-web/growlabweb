@@ -1,8 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import Nav from '../components/Nav.astro';
-import PageHero from '../components/PageHero.astro';
-import ContactSection from '../components/ContactSection.astro';
+import ContactForm from '../components/ContactForm.astro';
 import Footer from '../components/Footer.astro';
 import { site } from '../data/site.js';
 import Icon from '../components/Icon.astro';
@@ -14,30 +13,47 @@ import Icon from '../components/Icon.astro';
 >
   <Nav />
   <main class="page-in">
-    <PageHero
-      compact
-      shape="tracking"
-      eyebrow="Contacto"
-      lines={['Hablemos de tu', 'próximo proyecto.']}
-      text="Cuéntanos qué quieres lograr. Revisamos tu caso y te respondemos en menos de 24 horas laborables con una propuesta clara."
-    />
-
-    <ContactSection />
-
-    <section class="grid gap-10 border-t border-white/10 px-(--pad) py-[9vh] sm:grid-cols-3">
-      <div data-reveal>
-        <p class="mb-3 flex items-center gap-2 font-display text-[.78rem] uppercase tracking-[.14em] text-white/50"><Icon name="mail" size={18} class="text-secondary" />Correo</p>
-        <a class="font-display text-[1.3rem] transition-colors hover:text-secondary" href={`mailto:${site.email}`}>{site.email}</a>
+    <!-- Una sola sección con un único fondo: título y descripción al centro, formulario y datos de contacto debajo -->
+    <section class="relative overflow-hidden bg-[linear-gradient(175deg,#030814_0%,#000_55%,#000_100%)]">
+      <div class="pointer-events-none absolute -left-[16vw] -top-[10vw] h-[30vw] w-[62vw] rotate-[-16deg] opacity-45 blur-[80px] max-sm:h-[80vw] max-sm:w-[130vw]" aria-hidden="true">
+        <i class="aurora-blob aurora-blob--a bg-[radial-gradient(closest-side,#386fde,#1d3f94_55%,transparent)]"></i>
       </div>
-      <div data-reveal>
-        <p class="mb-3 flex items-center gap-2 font-display text-[.78rem] uppercase tracking-[.14em] text-white/50"><Icon name="clock" size={18} class="text-secondary" />Horario</p>
-        <p class="text-muted">Lunes a viernes, 9:00 – 18:00</p>
+      <div class="pointer-events-none absolute -right-[14vw] top-[38%] h-[26vw] w-[60vw] opacity-20 blur-[90px] max-sm:h-[70vw] max-sm:w-[120vw]" aria-hidden="true">
+        <i class="aurora-blob aurora-blob--b bg-[radial-gradient(closest-side,#6df2c0,#1f8f68_55%,transparent)]"></i>
       </div>
-      <div data-reveal>
-        <p class="mb-3 flex items-center gap-2 font-display text-[.78rem] uppercase tracking-[.14em] text-white/50"><Icon name="share-2" size={18} class="text-secondary" />Síguenos</p>
-        <p class="flex flex-wrap gap-x-5 gap-y-1 text-muted">
-          {site.social.map((s) => <a href={s.href} target="_blank" rel="noopener noreferrer" class="transition-colors hover:text-secondary">{s.label}</a>)}
-        </p>
+
+      <div class="relative z-[1] mx-auto max-w-[960px] px-(--pad) pb-[10vh] pt-[clamp(130px,20vh,210px)]">
+        <header class="mb-[clamp(3rem,8vh,5.5rem)] text-center">
+          <p data-reveal class="eyebrow">Contacto</p>
+          <h1 data-reveal class="display-xl !text-[clamp(2.2rem,4.4vw,4.8rem)]">
+            <span class="block">Hablemos de tu</span>
+            <span class="block">próximo proyecto.</span>
+          </h1>
+          <p data-reveal class="mx-auto mt-8 max-w-[52ch] font-body text-[clamp(.95rem,1.15vw,1.1rem)] leading-relaxed text-[#d4d8e0]">
+            Cuéntanos qué quieres lograr. Revisamos tu caso y te respondemos en menos de 24 horas laborables con una propuesta clara.
+          </p>
+        </header>
+
+        <div data-reveal class="relative z-[2]">
+          <ContactForm />
+        </div>
+
+        <div class="mt-[8vh] grid gap-10 border-t border-white/10 pt-[6vh] sm:grid-cols-3">
+          <div data-reveal>
+            <p class="mb-3 flex items-center gap-2 font-display text-[.78rem] uppercase tracking-[.14em] text-white/50"><Icon name="mail" size={18} class="text-secondary" />Correo</p>
+            <a class="font-display text-[1.05rem] break-words transition-colors hover:text-secondary" href={`mailto:${site.email}`}>{site.email}</a>
+          </div>
+          <div data-reveal>
+            <p class="mb-3 flex items-center gap-2 font-display text-[.78rem] uppercase tracking-[.14em] text-white/50"><Icon name="clock" size={18} class="text-secondary" />Horario</p>
+            <p class="text-muted">Lunes a viernes, 9:00 – 18:00</p>
+          </div>
+          <div data-reveal>
+            <p class="mb-3 flex items-center gap-2 font-display text-[.78rem] uppercase tracking-[.14em] text-white/50"><Icon name="share-2" size={18} class="text-secondary" />Síguenos</p>
+            <p class="flex flex-wrap gap-x-5 gap-y-1 text-muted">
+              {site.social.map((s) => <a href={s.href} target="_blank" rel="noopener noreferrer" class="transition-colors hover:text-secondary">{s.label}</a>)}
+            </p>
+          </div>
+        </div>
       </div>
     </section>
   </main>
