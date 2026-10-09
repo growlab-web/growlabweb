@@ -1,23 +1,156 @@
 ---
+// Página de error: a propósito es lo contrario del resto del sitio (fondo menta, todo en negro, sin menú ni pie).
+// El 404 gigante está hecho de partículas que huyen del cursor y vuelven a su sitio; un clic o un toque las hace estallar.
 import Layout from '../layouts/Layout.astro';
-import Nav from '../components/Nav.astro';
-import Footer from '../components/Footer.astro';
+import { site } from '../data/site.js';
+
+const metrics = [
+  { v: '1', l: 'Visita', n: 'la tuya' },
+  { v: '0', l: 'Clics', n: 'aquí no hay nada que pulsar' },
+  { v: '0', l: 'Conversiones', n: 'ni una sola' },
+  { v: '100%', l: 'Tasa de rebote', n: 'si te vas ahora', count: 100 },
+];
 ---
 
-<Layout title="Página no encontrada · GrowLab" description="La página que buscas no existe o cambió de dirección." noindex>
-  <Nav />
-  <main class="page-in">
-    <section class="mx-auto flex min-h-[78vh] max-w-[820px] flex-col items-center justify-center px-(--pad) pb-[10vh] pt-[clamp(130px,20vh,210px)] text-center">
-      <p class="eyebrow">Error 404</p>
-      <h1 class="display-xl !text-[clamp(2.2rem,4.4vw,4.8rem)]">Esta página no existe.</h1>
-      <p class="mx-auto mt-8 max-w-[46ch] font-body text-[clamp(.95rem,1.15vw,1.1rem)] leading-relaxed text-copy">
-        Puede que la dirección haya cambiado o que el enlace esté mal escrito. Vuelve al inicio o cuéntanos qué buscabas.
+<Layout title="404 · Esta página tiene un ROAS de 0x · GrowLab" description="La página que buscas no existe o cambió de dirección." noindex>
+  <main data-notfound class="relative flex min-h-[100svh] flex-col overflow-hidden bg-secondary text-black lining-nums">
+    <header class="relative z-[2] flex items-center justify-between px-(--pad) pt-7">
+      <a href="/" aria-label="GrowLab, ir al inicio"><img src="/logo.png" alt="GrowLab" width="1046" height="205" class="h-[22px] w-auto brightness-0" /></a>
+      <span class="font-display text-[.72rem] uppercase tracking-[.22em] text-black/60">Error 404</span>
+    </header>
+
+    <!-- el 404 de partículas ocupa la parte de arriba; el texto real va oculto para lectores de pantalla -->
+    <div class="relative z-[1] h-[clamp(200px,40vh,440px)] w-full max-sm:h-[200px]">
+      <canvas data-notfound-canvas class="absolute inset-0 h-full w-full touch-manipulation" aria-hidden="true"></canvas>
+      <p class="pointer-events-none absolute inset-x-0 bottom-1 text-center font-display text-[.7rem] uppercase tracking-[.2em] text-black/45">
+        <span class="nf-fine">Pasa el cursor por el número · haz clic para romperlo</span><span class="nf-coarse">Toca el número para romperlo</span>
       </p>
+    </div>
+
+    <section class="relative z-[2] mx-auto w-full max-w-[1100px] flex-1 px-(--pad) pb-12 pt-6 text-center">
+      <h1 class="mx-auto max-w-[16em] font-accent text-[clamp(1.9rem,4.6vw,4.2rem)] font-bold uppercase leading-[1.02] tracking-[-0.02em]">
+        <span class="sr-only">Error 404. </span>Esta página tiene un ROAS de 0x.
+      </h1>
+      <p class="mx-auto mt-6 max-w-[52ch] font-body text-[clamp(1rem,1.2vw,1.15rem)] leading-relaxed text-black/75">
+        La buscamos en Analytics, en Tag Manager y hasta en la carpeta de spam. Nada: ni una impresión, ni un clic. Lo bueno es que el resto del sitio sí convierte.
+      </p>
+
+      <!-- "reporte" de la página perdida -->
+      <dl class="mx-auto mt-10 grid max-w-[880px] grid-cols-2 border-y-2 border-black md:grid-cols-4">
+        {
+          metrics.map((m, i) => (
+            <div class:list={['px-3 py-5', i % 2 === 1 && 'border-l-2 border-black', i >= 2 && 'max-md:border-t-2 max-md:border-black', i === 2 && 'md:border-l-2']}>
+              <dd class="font-accent text-[clamp(2rem,4vw,3.4rem)] font-bold leading-none tracking-[-0.03em]" data-count={m.count} data-suffix={m.count ? '%' : undefined}>{m.v}</dd>
+              <dt class="mt-2 font-display text-[.78rem] font-medium uppercase tracking-[.14em]">{m.l}</dt>
+              <p class="mt-1 font-body text-[.8rem] text-black/60">{m.n}</p>
+            </div>
+          ))
+        }
+      </dl>
+
       <div class="mt-10 flex flex-wrap justify-center gap-4">
-        <a href="/" class="btn">Ir al inicio</a>
-        <a href="/contacto" class="inline-flex items-center rounded-full border border-white/30 px-7 py-4 font-display font-medium transition-colors hover:border-white">Contacto</a>
+        <a href="/" class="inline-flex items-center gap-3 rounded-full bg-black px-8 py-4 font-display font-medium text-secondary transition-transform duration-200 hover:-translate-y-0.5">Volver al inicio</a>
+        <a href={site.contact.href} class="inline-flex items-center rounded-full border-2 border-black px-8 py-4 font-display font-medium transition-colors hover:bg-black hover:text-secondary">Avísanos del enlace roto</a>
       </div>
     </section>
+
+    <!-- cinta de "noticias" al pie -->
+    <div class="relative z-[2] overflow-hidden border-t-2 border-black bg-black py-3 text-secondary" aria-hidden="true">
+      <div class="nf-ticker flex w-max whitespace-nowrap font-accent text-[.95rem] font-bold uppercase tracking-[.06em]">
+        {[0, 1].map(() => <span class="pr-10">Página no encontrada ✦ CTR 0 % ✦ Presupuesto gastado: 0 ✦ Leads generados: 0 ✦ Seguimos optimizando ✦ La culpa fue del enlace ✦ </span>)}
+      </div>
+    </div>
   </main>
-  <Footer />
 </Layout>
+
+<style is:global>
+  /* sólo en esta página: fondo menta también detrás del rebote del scroll, y el puntero propio en negro para que se vea */
+  html:has([data-notfound]), html:has([data-notfound]) body { background: var(--color-secondary); }
+  html:has([data-notfound]) .gl-cursor { filter: brightness(0); }
+  .nf-coarse { display: none; }
+  @media (pointer: coarse) { .nf-fine { display: none; } .nf-coarse { display: inline; } }
+  .nf-ticker { animation: nf-ticker 22s linear infinite; }
+  @keyframes nf-ticker { to { transform: translateX(-50%); } }
+</style>
+
+<script>
+  import { track } from '../scripts/track.js';
+
+  // medición: qué direcciones rotas se están visitando y desde dónde
+  track('page_not_found', { missing_path: location.pathname, referrer: document.referrer || '(directo)' });
+
+  const canvas = document.querySelector<HTMLCanvasElement>('[data-notfound-canvas]');
+  const ctx = canvas && canvas.getContext('2d');
+  if (canvas && ctx) {
+    const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    type Dot = { x: number; y: number; hx: number; hy: number; vx: number; vy: number; r: number };
+    let w = 0, h = 0, dots: Dot[] = [];
+    const mouse = { x: -9999, y: -9999 };
+
+    // las partículas salen de dibujar «404» en un lienzo oculto y quedarse con los puntos que caen dentro de las letras
+    function build() {
+      w = canvas!.clientWidth; h = canvas!.clientHeight;
+      canvas!.width = w * dpr; canvas!.height = h * dpr;
+      ctx!.setTransform(dpr, 0, 0, dpr, 0, 0);
+      const off = document.createElement('canvas'); off.width = w; off.height = h;
+      const o = off.getContext('2d', { willReadFrequently: true });
+      if (!o) return;
+      let size = h * 1.02;
+      o.font = `800 ${size}px Syne, system-ui, sans-serif`;
+      const fit = (w * 0.9) / o.measureText('404').width;
+      if (fit < 1) size *= fit;                                     // en pantallas estrechas manda el ancho
+      o.font = `800 ${size}px Syne, system-ui, sans-serif`;
+      o.textAlign = 'center'; o.textBaseline = 'middle'; o.fillStyle = '#000';
+      o.fillText('404', w / 2, h * 0.5);
+      const data = o.getImageData(0, 0, w, h).data, gap = w < 600 ? 4 : 5, old = dots;
+      dots = [];
+      for (let y = 0; y < h; y += gap) for (let x = 0; x < w; x += gap) {
+        if (data[(y * w + x) * 4 + 3] < 128) continue;
+        const prev = old[dots.length];                               // al redimensionar, cada partícula viaja a su nuevo sitio
+        dots.push({ hx: x, hy: y, x: prev ? prev.x : Math.random() * w, y: prev ? prev.y : -20 - Math.random() * h, vx: 0, vy: 0, r: gap * (0.3 + Math.random() * 0.22) });
+      }
+      if (still) { dots.forEach((d) => { d.x = d.hx; d.y = d.hy; }); draw(); }
+    }
+
+    function draw() {
+      ctx!.clearRect(0, 0, w, h);
+      ctx!.fillStyle = '#000';
+      ctx!.beginPath();
+      for (const d of dots) { ctx!.moveTo(d.x + d.r, d.y); ctx!.arc(d.x, d.y, d.r, 0, 6.283); }
+      ctx!.fill();
+    }
+
+    function frame() {
+      requestAnimationFrame(frame);
+      for (const d of dots) {
+        const dx = d.x - mouse.x, dy = d.y - mouse.y, dist = Math.hypot(dx, dy);
+        if (dist < 90) { const f = ((90 - dist) / 90) * 2.4; d.vx += (dx / (dist || 1)) * f; d.vy += (dy / (dist || 1)) * f; }   // huyen del cursor
+        d.vx += (d.hx - d.x) * 0.02; d.vy += (d.hy - d.y) * 0.02;                                                             // y vuelven a su sitio
+        d.vx *= 0.88; d.vy *= 0.88;
+        d.x += d.vx; d.y += d.vy;
+      }
+      draw();
+    }
+
+    // clic o toque: el número estalla desde ese punto
+    function burst(cx: number, cy: number) {
+      for (const d of dots) {
+        const dx = d.x - cx, dy = d.y - cy, dist = Math.hypot(dx, dy) || 1, f = Math.max(0, 1 - dist / (w * 0.7)) * (16 + Math.random() * 22);
+        d.vx += (dx / dist) * f; d.vy += (dy / dist) * f;
+      }
+    }
+    const at = (e: PointerEvent) => { const r = canvas.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; };
+
+    (document.fonts ? document.fonts.load('800 100px Syne') : Promise.resolve()).catch(() => {}).then(() => {
+      build();
+      if (still) return;
+      window.addEventListener('pointermove', (e) => { const p = at(e); mouse.x = p.x; mouse.y = p.y; }, { passive: true });
+      window.addEventListener('pointerleave', () => { mouse.x = mouse.y = -9999; });
+      canvas.addEventListener('pointerdown', (e) => { const p = at(e); burst(p.x, p.y); if (e.pointerType !== 'mouse') mouse.x = mouse.y = -9999; });
+      requestAnimationFrame(frame);
+    });
+    let timer = 0;
+    window.addEventListener('resize', () => { clearTimeout(timer); timer = window.setTimeout(build, 200); });
+  }
+</script>

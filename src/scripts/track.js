@@ -10,6 +10,7 @@
  *   hero_stage      etapas del hero al bajar    → stage (esfera, galaxia, cerebro)
  *   section_view    secciones del inicio        → section (quienes-somos, servicios, contacto)
  *   project_view    proyecto abierto            → project
+ *   page_not_found  página de error 404         → missing_path, referrer
  *
  * ⚠ Datos personales: el nombre, el correo y el teléfono NO deben enviarse a GA4 (Google lo prohíbe).
  *   En generate_lead viajan dentro de `user_data` sólo para las conversiones mejoradas de Google Ads / Meta,
