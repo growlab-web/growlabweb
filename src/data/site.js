@@ -13,6 +13,8 @@ export const site = {
   legal: { name: '', ruc: '', address: '' },
   email: 'hola.grow.lab@gmail.com', // correo al que llegan los mensajes del formulario
   phone: { href: 'tel:+51989134545', label: '+51 989 134 545' },   // teléfono de la empresa (contacto y pie)
+  // WhatsApp (botón del hero y botón flotante): abre el chat con un mensaje ya escrito
+  whatsapp: { href: 'https://wa.me/51989134545?text=' + encodeURIComponent('Hola GrowLab, quiero más información sobre sus servicios.'), label: 'Escríbenos por WhatsApp' },
   nav: [
     { href: '/', label: 'Inicio' },
     { href: '/#servicios', label: 'Servicios' },

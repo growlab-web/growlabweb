@@ -2,6 +2,7 @@
 import '../styles/global.css';
 import Loader from '../components/Loader.astro';
 import Consent from '../components/Consent.astro';
+import WhatsApp from '../components/WhatsApp.astro';
 import { site } from '../data/site.js';
 import { services } from '../data/services.js';
 
@@ -112,6 +113,7 @@ const gtm = /^GTM-[A-Z0-9]+$/.test(site.gtm) ? site.gtm : '';
     {gtm && <noscript><iframe src={`https://www.googletagmanager.com/ns.html?id=${gtm}`} height="0" width="0" style="display:none;visibility:hidden" title="Google Tag Manager"></iframe></noscript>}
     <Loader />
     <slot />
+    <WhatsApp />
     {gtm && <Consent />}
     <script>
       import '../scripts/main.js';

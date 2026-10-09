@@ -1,0 +1,37 @@
+---
+// Botón flotante de WhatsApp, presente en todas las páginas (lo incluye Layout.astro).
+// En el inicio, mientras se ve el botón de WhatsApp del hero, el flotante espera; al hacer scroll toma su lugar en la esquina.
+import { siWhatsapp } from 'simple-icons';
+import { site } from '../data/site.js';
+---
+
+<a
+  href={site.whatsapp.href}
+  target="_blank"
+  rel="noopener noreferrer"
+  data-wa-float
+  aria-label={site.whatsapp.label}
+  class="wa-float fixed bottom-5 right-[max(1.8vw,16px)] z-[80] grid h-[54px] w-[54px] place-items-center rounded-full bg-[#25d366] text-white shadow-[0_10px_30px_rgba(0,0,0,.45)] transition-[opacity,transform,background-color] duration-300 hover:bg-[#1ebe5a] max-sm:bottom-4 max-sm:h-[50px] max-sm:w-[50px]"
+>
+  <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor" aria-hidden="true"><path d={siWhatsapp.path}></path></svg>
+</a>
+
+<style is:global>
+  /* oculto hasta que le toca: entra desde abajo con un pequeño rebote */
+  .wa-float { opacity: 0; transform: translateY(18px) scale(.7); pointer-events: none; }
+  .wa-float.is-on { opacity: 1; transform: none; pointer-events: auto; transition-timing-function: cubic-bezier(.34, 1.56, .64, 1); }
+  .wa-float.is-on:hover { transform: scale(1.08); }
+</style>
+
+<script>
+  const btn = document.querySelector<HTMLElement>('[data-wa-float]');
+  if (btn) {
+    const hero = document.querySelector<HTMLElement>('[data-wa-hero]');
+    // el del hero "manda" sólo si existe y se ve (en móvil está oculto, así que ahí el flotante sale desde el principio)
+    const heroShown = () => !!hero && hero.offsetParent !== null;
+    const update = () => btn.classList.toggle('is-on', !heroShown() || window.scrollY > 60);
+    window.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
+    setTimeout(update, 600);            // tras la entrada de la página, para que no aparezca antes que el resto
+  }
+</script>
