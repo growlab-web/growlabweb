@@ -9,6 +9,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Lenis from 'lenis';
 import { startRain } from './loaderRain.js';
 import { initDataFlow } from './dataflow.js';
+import { initDust } from './dust.js';
 import { initCursor } from './cursor.js';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -22,6 +23,9 @@ const $$ = (s, root = document) => Array.from(root.querySelectorAll(s));
 
 /* ---------- Red de datos del panel de contacto ---------- */
 $$('[data-flow]').forEach((c) => initDataFlow(c));
+
+/* ---------- Partículas flotando en fondos sin objeto 3D (contacto) ---------- */
+$$('[data-dust]').forEach((c) => initDust(c));
 
 /* ---------- Scroll suave (Lenis) sincronizado con GSAP ---------- */
 const isApp = document.body.hasAttribute('data-app');       // portafolio 3D: maneja su propia rueda/arrastre
