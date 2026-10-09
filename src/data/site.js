@@ -12,6 +12,7 @@ export const site = {
   // datos legales del responsable, para la política de privacidad (si se dejan vacíos, no se muestran)
   legal: { name: '', ruc: '', address: '' },
   email: 'hola.grow.lab@gmail.com', // correo al que llegan los mensajes del formulario
+  phone: { href: 'tel:+51989134545', label: '+51 989 134 545' },   // teléfono de la empresa (contacto y pie)
   nav: [
     { href: '/', label: 'Inicio' },
     { href: '/#servicios', label: 'Servicios' },

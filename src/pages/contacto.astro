@@ -40,10 +40,14 @@ import Icon from '../components/Icon.astro';
           <ContactForm />
         </div>
 
-        <div class="mt-[8vh] grid gap-10 border-t border-white/10 pt-[6vh] sm:grid-cols-3">
+        <div class="mt-[8vh] grid gap-10 border-t border-white/10 pt-[6vh] sm:grid-cols-2">
           <div data-reveal>
             <p class="mb-3 flex items-center gap-2 font-display text-[.78rem] uppercase tracking-[.14em] text-white/50"><Icon name="mail" size={18} class="text-secondary" />Correo</p>
             <a class="font-display text-[1.05rem] break-words transition-colors hover:text-secondary" href={`mailto:${site.email}`}>{site.email}</a>
+          </div>
+          <div data-reveal>
+            <p class="mb-3 flex items-center gap-2 font-display text-[.78rem] uppercase tracking-[.14em] text-white/50"><Icon name="phone" size={18} class="text-secondary" />Teléfono</p>
+            <a class="font-display text-[1.05rem] whitespace-nowrap transition-colors hover:text-secondary" href={site.phone.href}>{site.phone.label}</a>
           </div>
           <div data-reveal>
             <p class="mb-3 flex items-center gap-2 font-display text-[.78rem] uppercase tracking-[.14em] text-white/50"><Icon name="clock" size={18} class="text-secondary" />Horario</p>

@@ -15,7 +15,8 @@ const link = 'transition-colors hover:text-secondary';
         <img src="/logo.png" alt="GrowLab" width="1046" height="205" loading="lazy" class="h-[26px] w-auto" />
       </a>
       <p class="mt-6 max-w-[32ch] leading-relaxed">Agencia de marketing digital. Creatividad y datos para hacer crecer tu negocio.</p>
-      <a href={`mailto:${site.email}`} class={`mt-5 inline-block break-all text-white/85 ${link}`}>{site.email}</a>
+      <a href={`mailto:${site.email}`} class={`mt-5 block w-fit break-all text-white/85 ${link}`}>{site.email}</a>
+      <a href={site.phone.href} class={`mt-2 block w-fit whitespace-nowrap text-white/85 ${link}`}>{site.phone.label}</a>
     </div>
 
     <nav aria-label="Pie de página">
