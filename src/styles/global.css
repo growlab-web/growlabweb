@@ -241,13 +241,27 @@ html.has-cursor, html.has-cursor * { cursor: none !important; }
 .gl-cursor.is-down .gl-cursor__ring::before { transform: scale(.8); }
 
 /* ---------- Servicios en móvil/tablet: carrusel que se desliza con el dedo (en escritorio sigue el scroll con pin) ---------- */
-.services-hint { display: none; }
+.services-hint { display: flex; align-items: center; gap: 1rem; }
+.hint-swipe { display: none; }
+.hint-arrow { animation: hint-nudge 1.4s ease-in-out infinite; }
+.hint-wheel { animation: hint-wheel 1.4s ease-in-out infinite; }
+@keyframes hint-nudge { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(5px); } }
+@keyframes hint-wheel { 0% { transform: translateY(-1px); opacity: 1; } 70%, 100% { transform: translateY(4px); opacity: 0; } }
+
+/* señal de scroll del hero: una gota de luz que baja por la línea y tres puntos, uno por etapa */
+.cue-drop { animation: cue-drop 1.8s cubic-bezier(.6, 0, .3, 1) infinite; }
+@keyframes cue-drop { 0% { transform: translateY(-110%); } 70%, 100% { transform: translateY(310%); } }
+.cue-dot { display: block; width: 5px; height: 5px; border-radius: 9999px; background: rgba(255, 255, 255, .3); transition: background .3s, transform .3s; }
+.cue-dot.is-on { background: var(--color-secondary); transform: scale(1.5); }
+.cue-coarse { display: none; }
+@media (pointer: coarse) { .cue-fine { display: none; } .cue-coarse { display: inline; } }
 @media (max-width: 1023px), (pointer: coarse) {
   [data-services-pin] { height: auto; overflow: visible; padding-block: 10vh; gap: 2rem; }
   [data-services-track] { width: auto; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scroll-padding-inline: var(--pad); -webkit-overflow-scrolling: touch; scrollbar-width: none; gap: 1rem; will-change: auto; }
   [data-services-track]::-webkit-scrollbar { display: none; }
   [data-services-track] > * { flex: 0 0 auto; scroll-snap-align: start; width: min(78vw, 340px); }
-  .services-hint { display: flex; align-items: center; gap: 1rem; }
+  .hint-scroll { display: none; }
+  .hint-swipe { display: inline; }
 }
 
 /* ---------- Móvil y táctil: degradados baratos de dibujar ----------
@@ -320,3 +334,17 @@ html.has-cursor, html.has-cursor * { cursor: none !important; }
     inset 6px 0 12px -8px rgba(255, 255, 255, .14),
     inset -6px 0 12px -8px rgba(255, 255, 255, .14);
 }
+
+/* ---------- Autocompletado del navegador ----------
+   Chrome y Safari pintan los campos rellenados con un fondo claro propio. El fondo no se puede anular directamente,
+   así que se aplaza indefinidamente su transición: el campo conserva el fondo transparente y el texto blanco del formulario. */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+select:-webkit-autofill {
+  -webkit-text-fill-color: #fff;
+  caret-color: #fff;
+  transition: background-color 99999s ease-out 0s, color 99999s ease-out 0s;
+}
+input:autofill, textarea:autofill { background-color: transparent !important; color: #fff !important; }

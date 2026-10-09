@@ -289,7 +289,8 @@ function initPage() {
     const getDist = () => track.scrollWidth - window.innerWidth;
     if (!swipeServices) gsap.to(track, {
       x: () => -getDist(), ease: 'none',
-      scrollTrigger: { trigger: '[data-services-pin]', start: 'top top', end: () => '+=' + getDist(), pin: true, scrub: 0.4, invalidateOnRefresh: true, anticipatePin: 1 },
+      scrollTrigger: { trigger: '[data-services-pin]', start: 'top top', end: () => '+=' + getDist(), pin: true, scrub: 0.4, invalidateOnRefresh: true, anticipatePin: 1,
+        onUpdate: (self) => { const bar = $('[data-services-bar]'); if (bar) bar.style.transform = `scaleX(${Math.max(0.08, self.progress)})`; } },   // la barra bajo las tarjetas marca cuánto falta
     });
     gsap.from('[data-services-head] > *', {
       y: 60, opacity: 0, stagger: 0.15, duration: 1, ease: 'expo.out',

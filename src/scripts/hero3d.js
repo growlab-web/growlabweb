@@ -621,11 +621,13 @@ export function initHero3D() {
     const hide = { autoAlpha: 0, y: -40, duration: 0.7, ease: 'power2.in' };
     const show = { autoAlpha: 1, y: 0, duration: 0.8, ease: 'power2.out' };
     const E = 'power1.inOut';
+    const cueDots = [...hero.querySelectorAll('[data-cue-dot]')];
     const tl = gsap.timeline({
       defaults: { ease: 'none' },
       scrollTrigger: {
         trigger: hero, start: 'top top', end: MOB ? '+=170%' : '+=260%', pin: true,   // en móvil, menos recorrido de dedo entre etapas
         scrub: 0.35, anticipatePin: 1,
+        onUpdate: (self) => cueDots.forEach((d, i) => d.classList.toggle('is-on', i === (self.progress < 0.23 ? 0 : self.progress < 0.72 ? 1 : 2))),   // punto de la etapa actual en la señal de scroll
         // cada etapa se engancha sola: un gesto de scroll basta para pasar a la siguiente
         // en móvil el enganche espera a que el dedo y la inercia terminen, para no pelearse con el scroll del teléfono
         snap: MOB
