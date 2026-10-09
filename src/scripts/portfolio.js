@@ -29,7 +29,7 @@ const $$ = (s, r) => Array.from(r.querySelectorAll(s));
 
 export async function initPortfolio(root) {
   // móvil (< 700 px): paneles verticales, más grandes en pantalla
-  const PORTRAIT = window.innerWidth < 700;
+  const PORTRAIT = false;   // los proyectos se ven con el mismo formato que en escritorio en todos los tamaños (la cámara se aleja en móvil)
   if (PORTRAIT) { CARD_W = 2.4; CARD_H = 3.0; GAP = 0.75; SPACING = CARD_W + GAP;   // móvil: más aire entre proyectos
                   DTH = SPACING / RC; SPH = { rx2: 4.6, ry2: 5.4, amp: 0.8, back: 0.1 }; }
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -193,7 +193,8 @@ export async function initPortfolio(root) {
     renderer.setSize(width, height, false);
     const aspect = width / height;
     camera.aspect = aspect; camera.updateProjectionMatrix();
-    cam.baseZ = aspect >= 1.25 ? 8 : PORTRAIT ? 10.6 : 8 + (1.25 - aspect) * 9;
+    // móvil vertical: la cámara se coloca para que el proyecto central ocupe ~86 % del ancho y los vecinos queden casi fuera
+    cam.baseZ = aspect >= 1.25 ? 8 : aspect >= 0.8 ? 8 + (1.25 - aspect) * 9 : (CARD_W / 0.86) / (2 * Math.tan((camera.fov * Math.PI) / 360) * aspect);
     cam.offX = aspect >= 1.25 ? 0.3 : 0;
   }
   window.addEventListener('resize', resize);
