@@ -133,6 +133,9 @@ h1, h2, h3 { font-weight: 700 !important; letter-spacing: -0.02em !important; }
 
 .intro-seen #loader { display: none; }
 
+/* llegada con ancla: el contenido espera oculto hasta estar colocado en su sección (lo muestra main.js) */
+.hash-pending main, .hash-pending footer { opacity: 0; }
+
 @media (prefers-reduced-motion: reduce) {
   * {
     animation-duration: 0.01ms !important;

@@ -32,6 +32,16 @@ const { title, description, app = false } = Astro.props;
     <!-- evita el parpadeo de la pantalla de carga si ya se vio en esta sesión -->
     <script is:inline>
       try { if (sessionStorage.getItem('gl-intro') === '1') document.documentElement.classList.add('intro-seen'); } catch (e) {}
+      // llegada con ancla (p. ej. /#servicios): el navegador no salta por su cuenta, porque las posiciones aún no son las finales;
+      // la página queda oculta un instante y main.js la muestra ya colocada en la sección (ver scrollToHash)
+      try {
+        if (location.hash.length > 1) {
+          window.__glHash = location.hash;
+          history.replaceState(null, '', location.pathname + location.search);
+          document.documentElement.classList.add('hash-pending');
+          setTimeout(function () { document.documentElement.classList.remove('hash-pending'); }, 4500);   // por si el script principal no llega a ejecutarse
+        }
+      } catch (e) {}
     </script>
   </head>
   <body class:list={['bg-black font-body text-white antialiased', app ? 'h-screen overflow-hidden' : 'overflow-x-hidden']} data-app={app ? '' : undefined}>

@@ -30,7 +30,7 @@ $$('[data-dust]').forEach((c) => initDust(c));
 /* ---------- Scroll suave (Lenis) sincronizado con GSAP ---------- */
 const isApp = document.body.hasAttribute('data-app');       // portafolio 3D: maneja su propia rueda/arrastre
 const lenis = isApp
-  ? { on() {}, raf() {}, stop() {}, start() {}, scrollTo() {} }
+  ? { on() {}, raf() {}, stop() {}, start() {}, scrollTo() {}, resize() {} }
   : new Lenis({ lerp: 0.14, smoothWheel: !reduceMotion, virtualScroll: limitWheel });
 if (!isApp) {
   lenis.on('scroll', ScrollTrigger.update);
@@ -174,15 +174,25 @@ function initTypewriter() {
   });
 }
 
-/* ---------- Si la URL trae #ancla (p. ej. /#servicios), baja hasta esa sección cuando todo está medido ---------- */
+/* ---------- Si la URL trae #ancla (p. ej. /#servicios), la página aparece ya colocada en esa sección ---------- */
+// El ancla se retira de la URL al cargar (Layout.astro) para que el navegador no salte antes de tiempo: con el hero fijo, la sección
+// queda mucho más abajo de donde está al principio, y ese primer salto se veía como un tirón (sección → hero → sección otra vez).
 function scrollToHash() {
-  const id = location.hash;
-  if (!id || id.length < 2) return;
-  const target = $(id);
-  if (!target) return;
-  // las posiciones cambian mientras terminan de medirse los pines y las fuentes: se corrige hasta quedar justo en la sección
-  const go = () => { ScrollTrigger.refresh(); lenis.scrollTo(target, { immediate: true, force: true }); };
-  [300, 1100, 2200].forEach((ms) => setTimeout(() => { if (Math.abs(target.getBoundingClientRect().top) > 4) go(); }, ms));
+  const root = document.documentElement, id = window.__glHash || location.hash;
+  const show = () => {
+    if (!root.classList.contains('hash-pending')) return;
+    root.classList.remove('hash-pending');
+    gsap.fromTo('main, footer', { opacity: 0 }, { opacity: 1, duration: 0.45, ease: 'power1.out', clearProps: 'opacity' });
+  };
+  if (window.__glHash) { history.replaceState(null, '', id); window.__glHash = null; }      // la URL recupera su ancla (sin provocar salto)
+  const target = id && id.length > 1 ? $(id) : null;
+  if (!target) return show();
+  // Lenis mide el alto de la página con retraso: se le pide que lo actualice antes, o recortaría el salto al alto anterior a los pines
+  const go = () => { lenis.resize(); lenis.scrollTo(target, { immediate: true, force: true }); ScrollTrigger.update(); };
+  go();
+  show();
+  // si algo termina de medirse después (imágenes, fuentes), se corrige hasta quedar justo en la sección
+  [400, 1200].forEach((ms) => setTimeout(() => { if (Math.abs(target.getBoundingClientRect().top) > 4) { ScrollTrigger.refresh(); go(); } }, ms));
 }
 
 /* ---------- Página ---------- */
