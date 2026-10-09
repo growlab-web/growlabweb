@@ -267,3 +267,17 @@ html.has-cursor, html.has-cursor * { cursor: none !important; }
 .pf-arrow:hover { color: var(--color-secondary); }
 .pf-arrow--next { animation: pf-nudge 2.4s ease-in-out infinite; }   /* empujoncito: hay más a la derecha */
 @keyframes pf-nudge { 0%, 70%, 100% { transform: translateX(0); } 80% { transform: translateX(5px); } 90% { transform: translateX(0); } }
+
+/* ---------- Degradados de fondo en móvil ----------
+   Medidos en vw, en un teléfono quedaban de ~100 px de alto con 80 px de desenfoque: el desenfoque se los comía.
+   Aquí son mucho más grandes y con menos desenfoque, para que se vean como en escritorio. */
+@media (max-width: 767px) {
+  [data-aurora], .pf-aurora { filter: blur(46px) !important; }
+  [data-aurora="a"] { width: 150vw !important; height: 95vw !important; left: -60vw !important; top: -25vw !important; }
+  [data-aurora="b"] { width: 160vw !important; height: 90vw !important; right: -60vw !important; bottom: -20vw !important; }
+  [data-aurora="c"] { width: 130vw !important; height: 100vw !important; left: -40vw !important; top: 10vw !important; }
+  .pf-aurora--a { width: 150vw; height: 95vw; left: -60vw; top: -25vw; }
+  .pf-aurora--b { width: 160vw; height: 90vw; right: -60vw; bottom: -20vw; }
+  .pf-aurora--c { width: 110vw; height: 80vw; left: 10vw; top: -30vw; }
+  [data-contact-glow] { width: 140vw !important; height: 90vw !important; filter: blur(46px) !important; }
+}
