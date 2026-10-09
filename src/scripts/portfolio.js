@@ -12,7 +12,7 @@ import { makeArt, projectImageKinds } from './projectArt.js';
 
 const N = projects.length;
 let CARD_W = 3.6, CARD_H = 2.25;                  // en móvil se cambian a un formato vertical (ver initPortfolio)
-const GAP = 0.2;
+let GAP = 0.2;
 // esfera imaginaria que empuja la hoja: radios al cuadrado en x e y, empuje máximo y caída hacia el fondo de la derecha
 let SPH = { rx2: 10, ry2: 5.4, amp: 1.15, back: 0.15 };
 const RC = 10;                       // radio del cilindro: los paneles forman una tira continua y curva
@@ -30,7 +30,8 @@ const $$ = (s, r) => Array.from(r.querySelectorAll(s));
 export async function initPortfolio(root) {
   // móvil (< 700 px): paneles verticales, más grandes en pantalla
   const PORTRAIT = window.innerWidth < 700;
-  if (PORTRAIT) { CARD_W = 2.4; CARD_H = 3.0; SPACING = CARD_W + GAP; DTH = SPACING / RC; SPH = { rx2: 4.6, ry2: 5.4, amp: 0.8, back: 0.1 }; }
+  if (PORTRAIT) { CARD_W = 2.4; CARD_H = 3.0; GAP = 0.75; SPACING = CARD_W + GAP;   // móvil: más aire entre proyectos
+                  DTH = SPACING / RC; SPH = { rx2: 4.6, ry2: 5.4, amp: 0.8, back: 0.1 }; }
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const canvas = $('[data-pf-canvas]', root);
   const labelsEl = $('[data-pf-labels]', root);
