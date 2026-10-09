@@ -262,7 +262,7 @@ html.has-cursor, html.has-cursor * { cursor: none !important; }
 [data-hero][data-pin] { height: 100svh; }
 
 /* ---------- Portafolio: flechas y contador de la barra inferior ---------- */
-.pf-arrows { position: absolute; left: 0; top: 0; z-index: 3; display: flex; gap: 22px; transform-origin: 50% 0; will-change: transform, opacity; }
+.pf-arrows { display: flex; justify-content: center; gap: 22px; }
 .pf-arrow { display: grid; place-items: center; width: 36px; height: 36px; padding: 0; border: 0; background: none; color: rgba(255,255,255,.85); cursor: pointer; transition: color .25s; }
 .pf-arrow:hover { color: var(--color-secondary); }
 .pf-arrow--next { animation: pf-nudge 2.4s ease-in-out infinite; }   /* empujoncito: hay más a la derecha */

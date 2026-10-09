@@ -14,15 +14,6 @@ const { open } = Astro.props;
   <canvas data-pf-canvas class="absolute inset-0 z-[2] h-full w-full touch-none" aria-hidden="true"></canvas>
   <div data-pf-labels class="pointer-events-none absolute inset-0 z-[3] overflow-hidden"></div>
 
-  <!-- flechas: van pegadas debajo del proyecto del centro -->
-  <div data-pf-arrows class="pf-arrows" style="opacity:0">
-    <button type="button" data-pf-step="-1" class="pf-arrow" aria-label="Proyecto anterior">
-      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6" /></svg>
-    </button>
-    <button type="button" data-pf-step="1" class="pf-arrow pf-arrow--next" aria-label="Proyecto siguiente">
-      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
-    </button>
-  </div>
 
   <!-- vista «Todos» -->
   <div data-pf-full hidden class="pointer-events-none absolute inset-0 z-[4] grid place-items-center px-[8vw]">
@@ -38,11 +29,19 @@ const { open } = Astro.props;
     </ul>
   </div>
 
-  <!-- barra inferior: Destacados / Todos y, debajo, el mismo botón del inicio (todo centrado) -->
+  <!-- barra inferior, todo centrado: flechas, Destacados / Todos y el botón del inicio -->
   <!-- capa: por encima del fondo y por debajo de los proyectos (los toques le llegan desde el lienzo) -->
   <div data-pf-ui class="pointer-events-none absolute inset-x-0 bottom-0 z-[1] flex flex-col items-center gap-4 px-[1.8vw] pb-6 opacity-0">
     <div class="flex items-center gap-5">
-      <div class="flex flex-col items-center gap-1.5">
+      <div class="flex flex-col items-center gap-3">
+        <div data-pf-arrows class="pf-arrows">
+          <button type="button" data-pf-step="-1" class="pf-arrow pointer-events-auto" aria-label="Proyecto anterior">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6" /></svg>
+          </button>
+          <button type="button" data-pf-step="1" class="pf-arrow pf-arrow--next pointer-events-auto" aria-label="Proyecto siguiente">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+          </button>
+        </div>
         <div class="pf-modes pointer-events-auto flex items-center gap-2">
           <button type="button" data-pf-mode="featured" class="is-on">Destacados</button>
           <span aria-hidden="true">/</span>
