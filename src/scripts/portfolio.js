@@ -361,6 +361,12 @@ export async function initPortfolio(root) {
       tags[i].label.style.opacity = vis.toFixed(3);
       tags[i].plus.style.opacity = visPlus.toFixed(3);
       tags[i].label.style.pointerEvents = vis > 0.4 ? 'auto' : 'none';
+      if (arrowsEl && i === mod(Math.round(S.pos), N)) {            // flechas bajo el proyecto del centro
+        place(arrowsEl, 0, -CARD_H / 2 - 0.16, 'translate(-50%,0)');
+        const va = e * S.mode * (1 - S.dim);
+        arrowsEl.style.opacity = va.toFixed(3);
+        arrowsEl.style.pointerEvents = va > 0.5 ? 'auto' : 'none';
+      }
       tags[i].plus.style.pointerEvents = visPlus > 0.4 ? 'auto' : 'none';
     });
 
@@ -393,6 +399,7 @@ export async function initPortfolio(root) {
     S.target = Math.round(S.target) + Number(b.dataset.pfStep); S.lastInput = performance.now();
   }));
   const counterEl = $('[data-pf-counter]', root);
+  const arrowsEl = $('[data-pf-arrows]', root);
   let counterIdx = -1;
   $$('[data-pf-full-item]', fullEl).forEach((a) => a.addEventListener('click', (e) => { e.preventDefault(); openProject(a.dataset.slug); }));
 
