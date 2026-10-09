@@ -9,6 +9,7 @@ export const site = {
     { href: '/nosotros', label: 'Nosotros' },
   ],
   contact: { href: '/contacto', label: 'Contacto' },
+  privacy: { href: '/privacidad', label: 'Política de privacidad y protección de datos' },   // enlace del pie y del formulario
   cta: 'Agendar reunión', // texto del botón del menú (lleva a la página de contacto)
   social: [
     { label: 'Instagram', href: 'https://www.instagram.com/lab.grow/' },   // @lab.grow

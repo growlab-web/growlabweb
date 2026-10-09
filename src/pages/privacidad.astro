@@ -1,0 +1,82 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import { site } from '../data/site.js';
+
+// ⚠ BORRADOR: describe lo que hace hoy este sitio (formulario que abre el correo del visitante, sin cookies ni analítica).
+//   Falta que GrowLab lo revise con asesoría legal y añada la razón social, el domicilio y la ley de protección de datos de su país.
+//   Si se instalan píxeles, analítica o un formulario con servidor, hay que actualizar este texto.
+const updated = 'Octubre de 2026';
+const sections = [
+  {
+    t: 'Quién es el responsable',
+    p: [`${site.name} es responsable del tratamiento de los datos personales que nos envías a través de este sitio. Para cualquier consulta sobre tus datos puedes escribirnos a ${site.email}.`],
+  },
+  {
+    t: 'Qué datos recopilamos',
+    p: [
+      'Solo los que tú decides enviarnos al contactarnos: nombre, correo electrónico, teléfono (opcional), los servicios que te interesan y el contenido de tu mensaje.',
+      'El formulario de contacto no guarda tus datos en este sitio: prepara un mensaje en tu propio programa de correo y eres tú quien lo envía a nuestra dirección.',
+    ],
+  },
+  {
+    t: 'Para qué los usamos',
+    p: ['Para responder a tu consulta, preparar una propuesta y mantener la comunicación relacionada con los servicios que nos pides. No usamos tus datos para otros fines sin tu consentimiento.'],
+  },
+  {
+    t: 'Con quién los compartimos',
+    p: [
+      'No vendemos ni cedemos tus datos a terceros. Solo acceden a ellos las personas del equipo que atienden tu solicitud y los proveedores que usamos para trabajar (por ejemplo, el servicio de correo electrónico), que los tratan por encargo nuestro.',
+    ],
+  },
+  {
+    t: 'Cuánto tiempo los conservamos',
+    p: ['Mientras dure la relación contigo o sea necesario para atender tu solicitud. Después, los eliminamos, salvo que debamos conservarlos por una obligación legal.'],
+  },
+  {
+    t: 'Tus derechos',
+    p: [`Puedes pedirnos en cualquier momento acceder a tus datos, corregirlos, eliminarlos u oponerte a su uso, así como retirar tu consentimiento. Escríbenos a ${site.email} indicando tu solicitud y te responderemos lo antes posible.`],
+  },
+  {
+    t: 'Cookies y servicios de terceros',
+    p: [
+      'Este sitio no utiliza cookies de publicidad ni de analítica. Las tipografías se cargan desde Google Fonts, por lo que tu navegador se conecta a los servidores de Google al abrir la página.',
+      'Los enlaces a redes sociales te llevan a sitios externos que tienen sus propias políticas de privacidad.',
+    ],
+  },
+  {
+    t: 'Cambios en esta política',
+    p: ['Podemos actualizar este texto si cambia el sitio o la normativa aplicable. La versión vigente es siempre la publicada en esta página.'],
+  },
+];
+---
+
+<Layout
+  title="Política de privacidad · GrowLab"
+  description="Cómo trata GrowLab los datos personales que recibe a través de este sitio y cómo puedes ejercer tus derechos."
+>
+  <Nav />
+  <main class="page-in">
+    <section class="mx-auto max-w-[820px] px-(--pad) pb-[12vh] pt-[clamp(130px,20vh,210px)]">
+      <p data-reveal class="eyebrow">Legal</p>
+      <h1 data-reveal class="display-xl !text-[clamp(2rem,3.8vw,4rem)]">Política de privacidad y protección de datos</h1>
+      <p data-reveal class="mt-6 text-[.9rem] text-white/50">Última actualización: {updated}</p>
+
+      <div class="mt-[7vh] grid gap-12">
+        {
+          sections.map((s, i) => (
+            <article data-reveal class="border-t border-white/10 pt-8">
+              <h2 class="mb-4 flex items-baseline gap-4 text-[clamp(1.15rem,1.7vw,1.5rem)] font-medium tracking-[-0.02em]">
+                <span class="font-display text-[.85rem] font-medium text-secondary">{String(i + 1).padStart(2, '0')}</span>
+                {s.t}
+              </h2>
+              {s.p.map((t) => <p class="mb-3 max-w-[68ch] leading-relaxed text-muted last:mb-0">{t}</p>)}
+            </article>
+          ))
+        }
+      </div>
+    </section>
+  </main>
+  <Footer />
+</Layout>

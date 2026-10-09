@@ -1,24 +1,48 @@
 ---
 import { site } from '../data/site.js';
+import { projects } from '../data/projects.js';
 const year = new Date().getFullYear();
 const links = [...site.nav, site.contact];
+const latest = projects.slice(0, 4);       // los primeros de data/projects.js son los más recientes
+const head = 'mb-5 font-display text-[.74rem] uppercase tracking-[.16em] text-white/45';
+const link = 'transition-colors hover:text-secondary';
 ---
 
-<footer class="flex flex-wrap items-center justify-between gap-x-8 gap-y-4 border-t border-white/10 px-(--pad) py-8 text-[.9rem] text-muted">
-  <span>© {year} {site.name}® Agencia de marketing digital</span>
+<footer class="border-t border-white/10 px-(--pad) text-[.95rem] text-muted">
+  <div class="grid gap-x-10 gap-y-12 py-[clamp(3rem,8vh,5rem)] sm:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_1fr]">
+    <div>
+      <a href="/" aria-label="GrowLab, ir al inicio" class="inline-flex">
+        <img src="/logo.png" alt="GrowLab" width="1046" height="205" loading="lazy" class="h-[26px] w-auto" />
+      </a>
+      <p class="mt-6 max-w-[32ch] leading-relaxed">Agencia de marketing digital. Creatividad y datos para hacer crecer tu negocio.</p>
+      <a href={`mailto:${site.email}`} class={`mt-5 inline-block break-all text-white/85 ${link}`}>{site.email}</a>
+    </div>
 
-  <nav class="flex flex-wrap gap-x-6 gap-y-2" aria-label="Pie de página">
-    {links.map((l) => <a href={l.href} class="transition-colors hover:text-secondary">{l.label}</a>)}
-  </nav>
+    <nav aria-label="Pie de página">
+      <p class={head}>Navegación</p>
+      <ul class="grid gap-3">
+        {links.map((l) => <li><a href={l.href} class={link}>{l.label}</a></li>)}
+      </ul>
+    </nav>
 
-  <span>
-    {
-      site.social.map((s, i) => (
-        <>
-          <a href={s.href} target="_blank" rel="noopener noreferrer" class="transition-colors hover:text-secondary">{s.label}</a>
-          {i < site.social.length - 1 && ' · '}
-        </>
-      ))
-    }
-  </span>
+    <nav aria-label="Últimos proyectos">
+      <p class={head}>Últimos proyectos</p>
+      <ul class="grid gap-3">
+        {latest.map((p) => <li><a href={`/portafolio/${p.slug}`} class={link}>{p.name}</a></li>)}
+        <li><a href="/portafolio" class={`text-white/85 ${link}`}>Ver todos →</a></li>
+      </ul>
+    </nav>
+
+    <div>
+      <p class={head}>Síguenos</p>
+      <ul class="grid gap-3">
+        {site.social.map((s) => <li><a href={s.href} target="_blank" rel="noopener noreferrer" class={link}>{s.label}</a></li>)}
+      </ul>
+    </div>
+  </div>
+
+  <div class="flex flex-wrap items-center justify-between gap-x-8 gap-y-3 border-t border-white/10 py-6 text-[.85rem]">
+    <span>© {year} {site.name}® Agencia de marketing digital</span>
+    <a href={site.privacy.href} class={link}>{site.privacy.label}</a>
+  </div>
 </footer>
