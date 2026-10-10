@@ -3,9 +3,12 @@
 import { projects } from '../data/projects.js';
 interface Props { open?: string }
 const { open } = Astro.props;
+const current = projects.find((x) => x.slug === open);
 ---
 
 <main data-portfolio data-open={open} class="fixed inset-0 z-[1] overflow-hidden bg-black">
+  <!-- H1 para buscadores y lectores de pantalla: la escena 3D no tiene un titular visible -->
+  <h1 class="sr-only">{current ? `${current.name}: proyecto de GrowLab` : 'Portafolio de proyectos de GrowLab'}</h1>
   <!-- degradados del fondo (se mueven despacio) -->
   <div class="pf-aurora pf-aurora--a" aria-hidden="true"></div>
   <div class="pf-aurora pf-aurora--b" aria-hidden="true"></div>
