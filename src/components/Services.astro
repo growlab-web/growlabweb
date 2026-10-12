@@ -64,8 +64,7 @@ import Icon from './Icon.astro';
     padding: 0 2rem 2rem;
   }
   /* barras */
-  .art-bars i,
-  .art-bars-rev i {
+  .art-bars i {
     width: 22px;
     border-radius: 6px 6px 0 0;
     background: linear-gradient(var(--color-secondary), transparent);
@@ -75,12 +74,6 @@ import Icon from './Icon.astro';
   .art-bars i:nth-child(3) { height: 42%; }
   .art-bars i:nth-child(4) { height: 75%; }
   .art-bars i:nth-child(5) { height: 100%; }
-  .art-bars-rev i { background: linear-gradient(var(--color-sky), transparent); }
-  .art-bars-rev i:nth-child(1) { height: 100%; }
-  .art-bars-rev i:nth-child(2) { height: 75%; }
-  .art-bars-rev i:nth-child(3) { height: 60%; }
-  .art-bars-rev i:nth-child(4) { height: 45%; }
-  .art-bars-rev i:nth-child(5) { height: 30%; }
   /* anillos */
   .art-rings { padding: 0; }
   .art-rings i {
@@ -171,4 +164,22 @@ import Icon from './Icon.astro';
     transform: rotate(45deg);
   }
   .art-search i:nth-child(n + 2) { display: none; }
+  /* recorrido (tracking): tres puntos de contacto unidos hasta la conversión */
+  .art-path i { position: absolute; border-radius: 50%; }
+  .art-path i:nth-child(1) { right: 170px; bottom: 32px; width: 22px; height: 22px; border: 2px solid var(--color-sky); }
+  .art-path i:nth-child(2) { right: 100px; bottom: 76px; width: 22px; height: 22px; border: 2px solid var(--color-primary); }
+  .art-path i:nth-child(3) { right: 32px; bottom: 116px; width: 30px; height: 30px; background: var(--color-secondary); }
+  .art-path i:nth-child(4),
+  .art-path i:nth-child(5) { height: 2px; border-radius: 0; background: rgba(255, 255, 255, 0.28); transform-origin: 100% 50%; }
+  .art-path i:nth-child(4) { right: 122px; bottom: 86px; width: 57px; transform: rotate(-32.2deg); }
+  .art-path i:nth-child(5) { right: 62px; bottom: 130px; width: 48px; transform: rotate(-34.5deg); }
+  /* panel (reporting): un tablero con un gráfico y dos indicadores */
+  .art-dash i { position: absolute; border-radius: 12px; }
+  .art-dash i:nth-child(1) { right: 104px; bottom: 32px; width: 104px; height: 112px; border: 2px solid var(--color-sky); }
+  .art-dash i:nth-child(2) { right: 32px; bottom: 92px; width: 62px; height: 52px; background: var(--color-secondary); }
+  .art-dash i:nth-child(3) { right: 32px; bottom: 32px; width: 62px; height: 50px; border: 2px solid var(--color-primary); }
+  .art-dash i:nth-child(4),
+  .art-dash i:nth-child(5) { right: 120px; height: 6px; border-radius: 3px; background: var(--color-sky); }
+  .art-dash i:nth-child(4) { bottom: 50px; width: 72px; }
+  .art-dash i:nth-child(5) { bottom: 66px; width: 44px; opacity: 0.55; }
 </style>

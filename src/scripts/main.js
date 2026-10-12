@@ -307,10 +307,10 @@ function initPage() {
     const jump = (x) => { svcTrack.style.scrollSnapType = 'none'; svcTrack.scrollLeft = x; svcTrack.style.scrollSnapType = ''; };
     const settle = () => { const w = setW(), x = svcTrack.scrollLeft; if (x < w - 2) jump(x + w); else if (x >= 2 * w - 2) jump(x - w); };   // siempre de vuelta a la serie real (la del medio)
     const upd = () => { const w = setW(); if (bar) bar.style.transform = `scaleX(${Math.max(0.08, (((svcTrack.scrollLeft % w) + w) % w) / w)})`; };
-    // cada flecha avanza las tarjetas que caben enteras en pantalla (al menos una)
+    // cada flecha pasa una "página": tantas tarjetas como se ven a la vez
     const move = (dir) => {
       settle();
-      svcTrack.scrollBy({ left: dir * Math.max(1, Math.floor(svcTrack.clientWidth / step())) * step(), behavior: reduceMotion ? 'auto' : 'smooth' });
+      svcTrack.scrollBy({ left: dir * Math.max(1, Math.round((svcTrack.clientWidth + gap()) / step())) * step(), behavior: reduceMotion ? 'auto' : 'smooth' });
       track('services_slide', { direction: dir > 0 ? 'siguiente' : 'anterior' });
     };
     if (prev) prev.addEventListener('click', () => move(-1));

@@ -2,7 +2,7 @@
  * Servicios de GrowLab (se muestran en la sección «Servicios» del inicio y en la línea que se va escribiendo bajo el titular).
  * Los nombres van en inglés porque así los conoce el mercado.
  *
- * icon → nombre del icono (ver components/Icon.astro).  art → dibujo de la tarjeta (bars, bars-rev, rings, dots, shapes, chips, mail, search).
+ * icon → nombre del icono (ver components/Icon.astro).  art → dibujo de la tarjeta, uno distinto por servicio (bars, search, chips, shapes, dots, mail, rings, path, dash).
  * ⚠ Las descripciones (`short`) son borradores: revísalas y ajústalas a cómo describe GrowLab cada servicio.
  */
 export const services = [
@@ -67,7 +67,7 @@ export const services = [
     n: '08',
     name: 'Tracking & Attribution',
     icon: 'radar',
-    art: 'bars-rev',
+    art: 'path',
     short: 'Medición fiable con GA4, píxeles y API de conversiones para saber qué canal genera cada venta.',
   },
   {
@@ -75,7 +75,7 @@ export const services = [
     n: '09',
     name: 'Reporting & Dashboards',
     icon: 'layout-dashboard',
-    art: 'bars',
+    art: 'dash',
     short: 'Dashboards en Looker Studio y reportes claros, con las métricas que importan a tu negocio.',
   },
 ];
