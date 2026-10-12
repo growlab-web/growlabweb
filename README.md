@@ -22,7 +22,7 @@ Web de una sola página hecha con **Astro 7**, **Tailwind CSS 4** y **GSAP** (Sc
 growlabweb/
 ├── public/                  # archivos estáticos (favicon y logo.png)
 ├── src/
-│   ├── components/          # Loader, Nav, Hero, Marquee, Manifesto, Services, Cases, Process, Cta, Footer
+│   ├── components/          # Loader, Nav, Hero, Marquee, Manifesto, Services, Cta, Footer
 │   ├── data/brainData.js    # mapa de densidad del cerebro 3D (silueta + surcos)
 │   ├── layouts/Layout.astro # <head>, fuentes, SEO básico
 │   ├── pages/index.astro    # la página (ensambla los componentes)

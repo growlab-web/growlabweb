@@ -79,5 +79,3 @@ export const services = [
     short: 'Dashboards en Looker Studio y reportes claros, con las métricas que importan a tu negocio.',
   },
 ];
-
-export const getService = (slug) => services.find((s) => s.slug === slug);

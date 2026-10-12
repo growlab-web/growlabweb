@@ -5,7 +5,7 @@
  *  - Etiqueta y botón "+" pegados a cada panel (proyectados desde 3D a pantalla).
  *  - Vista «Todos» (lista de nombres) y página de proyecto (panel blanco) con URL propia /portafolio/<slug>.
  */
-import * as THREE from 'three';
+import { AdditiveBlending, BufferAttribute, BufferGeometry, CanvasTexture, Mesh, PerspectiveCamera, PlaneGeometry, Points, Raycaster, SRGBColorSpace, Scene, ShaderMaterial, TextureLoader, Vector2, Vector3, Vector4, VideoTexture, WebGLRenderer } from 'three';
 import gsap from 'gsap';
 import { projects, getProject } from '../data/projects.js';
 import { makeArt, projectImageKinds } from './projectArt.js';
@@ -40,21 +40,21 @@ export async function initPortfolio(root) {
   const loaderEl = $('[data-pf-loader]', root);
 
   /* ===================== Renderer y cámara ===================== */
-  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
+  const renderer = new WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
   const PR = Math.min(window.devicePixelRatio || 1, 1.75);
   renderer.setPixelRatio(PR);
   renderer.setClearColor(0x000000, 0);
-  const scene = new THREE.Scene();
+  const scene = new Scene();
   // el suelo y el polvo de partículas van en otro lienzo, detrás de la barra inferior (los proyectos quedan delante de todo)
   const bgCanvas = document.createElement('canvas');
   bgCanvas.className = 'pointer-events-none absolute inset-0 z-0 h-full w-full';
   bgCanvas.setAttribute('aria-hidden', 'true');
   canvas.before(bgCanvas);
-  const bgRenderer = new THREE.WebGLRenderer({ canvas: bgCanvas, antialias: false, alpha: true });
+  const bgRenderer = new WebGLRenderer({ canvas: bgCanvas, antialias: false, alpha: true });
   bgRenderer.setPixelRatio(PR);
   bgRenderer.setClearColor(0x000000, 0);
-  const bgScene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 80);
+  const bgScene = new Scene();
+  const camera = new PerspectiveCamera(34, 1, 0.1, 80);
   const cam = { baseZ: 8, offX: 0.3 };
 
   /* ===================== Fuentes (para dibujar las imágenes) ===================== */
@@ -100,27 +100,27 @@ export async function initPortfolio(root) {
       c += smoothstep(-0.06, 0.0, d) * 0.1;                       // borde claro
       gl_FragColor = vec4(c, mask * uOpacity);
     }`;
-  const geo = new THREE.PlaneGeometry(CARD_W, CARD_H, 56, 28);
+  const geo = new PlaneGeometry(CARD_W, CARD_H, 56, 28);
   const maxAniso = renderer.capabilities.getMaxAnisotropy();
   const cards = projects.map((p, i) => {
     // imagen dibujada por código: sólo si el proyecto no tiene portada o si ésta no llega a cargar.
     // Dibujarla para todos de entrada bloqueaba la página medio segundo al abrir el portafolio, y se sustituía enseguida.
-    const drawn = () => new THREE.CanvasTexture(PORTRAIT ? makeArt(p, 'cover', 960, 1200) : makeArt(p, 'cover', 1280, 800));
+    const drawn = () => new CanvasTexture(PORTRAIT ? makeArt(p, 'cover', 960, 1200) : makeArt(p, 'cover', 1280, 800));
     const flat = () => {                                             // provisional mientras carga la portada: un color liso del proyecto
       const c = document.createElement('canvas'); c.width = c.height = 4;
       const g = c.getContext('2d'); g.fillStyle = (p.palette && p.palette.bg) || '#10131c'; g.fillRect(0, 0, 4, 4);
-      return new THREE.CanvasTexture(c);
+      return new CanvasTexture(c);
     };
     let videoOn = false;                                             // true cuando la portada ya es el vídeo (la imagen no debe pisarlo)
     const tex = p.cover ? flat() : drawn();
     tex.anisotropy = maxAniso;
     if (p.cover) {
-      new THREE.TextureLoader().load(p.cover, (img) => {
+      new TextureLoader().load(p.cover, (img) => {
         img.anisotropy = maxAniso;
         if (PORTRAIT) { img.repeat.set(CARD_W / CARD_H / (img.image.width / img.image.height), 1); img.offset.set((1 - img.repeat.x) / 2, 0); }   // recorte centrado
         // las capturas de webs reales (proyectos con `url`) se muestran con sus tonos tal cual, igual que las portadas en vídeo;
         // las maquetas de ejemplo conservan la conversión de color con la que se diseñaron, que las oscurece
-        if (!p.coverVideo && !p.url) img.colorSpace = THREE.SRGBColorSpace || img.colorSpace;
+        if (!p.coverVideo && !p.url) img.colorSpace = SRGBColorSpace || img.colorSpace;
         if (!videoOn) mat.uniforms.uMap.value = img;
       }, undefined, () => { const t = drawn(); t.anisotropy = maxAniso; mat.uniforms.uMap.value = t; });
     }
@@ -133,21 +133,21 @@ export async function initPortfolio(root) {
       // el vídeo sustituye a la imagen la primera vez que está reproduciéndose de verdad; arrancarlo y pararlo es cosa del
       // bucle de dibujo (sólo corre cerca del centro del carrusel), así que aquí no se llama a play()
       video.addEventListener('playing', () => {
-        const vt = new THREE.VideoTexture(video);
+        const vt = new VideoTexture(video);
         vt.anisotropy = maxAniso;
         if (PORTRAIT) { vt.repeat.set(CARD_W / CARD_H / (video.videoWidth / video.videoHeight), 1); vt.offset.set((1 - vt.repeat.x) / 2, 0); }   // mismo recorte centrado que las imágenes
         videoOn = true; mat.uniforms.uMap.value = vt;
       }, { once: true });
       video.src = p.coverVideo;
     }
-    const mat = new THREE.ShaderMaterial({
+    const mat = new ShaderMaterial({
       transparent: true, depthWrite: false, vertexShader: cardVert, fragmentShader: cardFrag,
-      uniforms: { uMap: { value: tex }, uBend: { value: BEND_R }, uBright: { value: 1 }, uOpacity: { value: 1 }, uHover: { value: 0 }, uSize: { value: new THREE.Vector2(CARD_W, CARD_H) }, uTime: { value: 0 }, uFlag: { value: 0 }, uPhase: { value: 0 }, uLean: { value: 0 }, uSph: { value: new THREE.Vector4(SPH.rx2, SPH.ry2, SPH.amp, SPH.back) }, uCy: { value: 0 }, uMouseUV: { value: new THREE.Vector2(0.5, 0.5) } },
+      uniforms: { uMap: { value: tex }, uBend: { value: BEND_R }, uBright: { value: 1 }, uOpacity: { value: 1 }, uHover: { value: 0 }, uSize: { value: new Vector2(CARD_W, CARD_H) }, uTime: { value: 0 }, uFlag: { value: 0 }, uPhase: { value: 0 }, uLean: { value: 0 }, uSph: { value: new Vector4(SPH.rx2, SPH.ry2, SPH.amp, SPH.back) }, uCy: { value: 0 }, uMouseUV: { value: new Vector2(0.5, 0.5) } },
     });
-    const mesh = new THREE.Mesh(geo, mat);
+    const mesh = new Mesh(geo, mat);
     mesh.userData.i = i;
     scene.add(mesh);
-    return { mesh, mat, hover: 0, p, muv: new THREE.Vector2(0.5, 0.5), video: coverVideo };
+    return { mesh, mat, hover: 0, p, muv: new Vector2(0.5, 0.5), video: coverVideo };
   });
 
   /* ===================== Partículas: suelo en perspectiva + polvo ===================== */
@@ -155,11 +155,11 @@ export async function initPortfolio(root) {
   const SP = 0.55, NX = 61, NZ = 52;
   const xz = new Float32Array(NX * NZ * 2);
   for (let a = 0, k = 0; a < NX; a++) for (let b = 0; b < NZ; b++, k += 2) { xz[k] = (a - NX / 2) * SP; xz[k + 1] = 6 - b * SP; }
-  const floorGeo = new THREE.BufferGeometry();
-  floorGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(NX * NZ * 3), 3));
-  floorGeo.setAttribute('aXZ', new THREE.BufferAttribute(xz, 2));
-  const floorMat = new THREE.ShaderMaterial({
-    transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+  const floorGeo = new BufferGeometry();
+  floorGeo.setAttribute('position', new BufferAttribute(new Float32Array(NX * NZ * 3), 3));
+  floorGeo.setAttribute('aXZ', new BufferAttribute(xz, 2));
+  const floorMat = new ShaderMaterial({
+    transparent: true, depthWrite: false, blending: AdditiveBlending,
     uniforms: { uTime: { value: 0 }, uOffset: { value: 0 }, uPR: { value: PR }, uFade: { value: 1 } },
     vertexShader: `${noiseless}
       attribute vec2 aXZ; varying float vA; varying vec3 vC;
@@ -177,17 +177,17 @@ export async function initPortfolio(root) {
     fragmentShader: `uniform float uFade; varying float vA; varying vec3 vC;
       void main(){ float d = length(gl_PointCoord - 0.5); float a = smoothstep(0.5, 0.1, d); gl_FragColor = vec4(vC, a * vA * uFade); }`,
   });
-  const floor = new THREE.Points(floorGeo, floorMat);
+  const floor = new Points(floorGeo, floorMat);
   floor.frustumCulled = false;
   bgScene.add(floor);
 
   const DUST = 700, dpos = new Float32Array(DUST * 3), dseed = new Float32Array(DUST);
   for (let i = 0; i < DUST; i++) { dpos[i * 3] = (Math.random() - 0.5) * 26; dpos[i * 3 + 1] = -1.4 + Math.random() * 6.5; dpos[i * 3 + 2] = 5 - Math.random() * 22; dseed[i] = Math.random(); }
-  const dustGeo = new THREE.BufferGeometry();
-  dustGeo.setAttribute('position', new THREE.BufferAttribute(dpos, 3));
-  dustGeo.setAttribute('aSeed', new THREE.BufferAttribute(dseed, 1));
-  const dustMat = new THREE.ShaderMaterial({
-    transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+  const dustGeo = new BufferGeometry();
+  dustGeo.setAttribute('position', new BufferAttribute(dpos, 3));
+  dustGeo.setAttribute('aSeed', new BufferAttribute(dseed, 1));
+  const dustMat = new ShaderMaterial({
+    transparent: true, depthWrite: false, blending: AdditiveBlending,
     uniforms: { uTime: { value: 0 }, uPR: { value: PR }, uOffset: { value: 0 } },
     vertexShader: `uniform float uTime, uPR, uOffset; attribute float aSeed; varying float vA; varying float vS;
       void main(){
@@ -205,7 +205,7 @@ export async function initPortfolio(root) {
       void main(){ float d = length(gl_PointCoord - 0.5); float a = smoothstep(0.5, 0.05, d);
         vec3 c = mix(vec3(0.5, 0.7, 1.0), vec3(0.75, 0.95, 0.55), step(0.82, vS)); gl_FragColor = vec4(c, a * vA * 0.8); }`,
   });
-  const dust = new THREE.Points(dustGeo, dustMat);
+  const dust = new Points(dustGeo, dustMat);
   dust.frustumCulled = false;
   bgScene.add(dust);
 
@@ -299,9 +299,9 @@ export async function initPortfolio(root) {
   });
 
   /* ===================== Bucle de render ===================== */
-  const raycaster = new THREE.Raycaster();
-  const ndc = new THREE.Vector2();
-  const v3 = new THREE.Vector3();
+  const raycaster = new Raycaster();
+  const ndc = new Vector2();
+  const v3 = new Vector3();
   let last = performance.now(), time = 0, running = true;
 
   function frame(now) {
@@ -425,7 +425,8 @@ export async function initPortfolio(root) {
     S.target = Math.round(S.target) + Number(b.dataset.pfStep); S.lastInput = performance.now();
   }));
 
-  $$('[data-pf-full-item]', fullEl).forEach((a) => a.addEventListener('click', (e) => { e.preventDefault(); openProject(a.dataset.slug); }));
+  // el nombre es un enlace real (por si falla el script); aquí se intercepta para abrir la ficha sin recargar la página
+  $$('[data-pf-full-item] a[data-slug]', fullEl).forEach((a) => a.addEventListener('click', (e) => { e.preventDefault(); openProject(a.dataset.slug); }));
 
   /* ===================== Página de proyecto (panel blanco) ===================== */
   const panel = $('[data-pf-panel]', modal);

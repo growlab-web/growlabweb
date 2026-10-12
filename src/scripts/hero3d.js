@@ -5,12 +5,11 @@
  * El cerebro se construye con la silueta y los surcos de data/brainData.js.
  * Los degradados del fondo ([data-aurora]) derivan solos y cambian con cada etapa.
  */
-import * as THREE from 'three';
+import { AdditiveBlending, BufferAttribute, BufferGeometry, CanvasTexture, Group, PerspectiveCamera, Points, PointsMaterial, Scene, ShaderMaterial, Sprite, SpriteMaterial, Vector2, Vector3, Vector4, WebGLRenderer } from 'three';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import BRAIN_DATA from '../data/brainData.js';
 import { trackOnce } from './track.js';
-import { buildShape, isServiceShape } from './shapes.js';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -19,13 +18,13 @@ export function initHero3D() {
   const canvas = hero && hero.querySelector('#hero3d');
   if (!canvas) return { start() {}, ready: Promise.resolve() };
 
-  const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: true, powerPreference: 'high-performance' });
+  const renderer = new WebGLRenderer({ canvas, antialias: false, alpha: true, powerPreference: 'high-performance' });
   const PR = Math.min(window.devicePixelRatio || 1, window.innerWidth < 800 ? 1.25 : 2);   // en móvil se dibuja a menos resolución: va bastante más fluido
   renderer.setPixelRatio(PR);
   renderer.setClearColor(0x000000, 0);
 
-  const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 50);
+  const scene = new Scene();
+  const camera = new PerspectiveCamera(40, 1, 0.1, 50);
   camera.position.z = 5;
 
   const clamp01 = (v) => Math.min(1, Math.max(0, v));
@@ -48,7 +47,6 @@ export function initHero3D() {
   const P0 = mk(), NR0 = mk(), P1 = mk(), C1 = mk(), P2 = mk(), N2v = mk();
   const SC = mk(), VIS = mk(), RN = new Float32Array(COUNT);
   const PATH = new Float32Array(COUNT).fill(-1);          // posición a lo largo de una línea (pulsos de datos), -1 = estática
-  const serviceShape = isServiceShape(hero.dataset.shape || ''); // páginas de servicio: la forma 2 es su estructura propia
   const set3 = (arr, i, x, y, z) => { arr[i * 3] = x; arr[i * 3 + 1] = y; arr[i * 3 + 2] = z; };
   const copy3 = (arr, to, from) => { arr[to * 3] = arr[from * 3]; arr[to * 3 + 1] = arr[from * 3 + 1]; arr[to * 3 + 2] = arr[from * 3 + 2]; };
   const fill = (n, arrs) => { for (let i = n; i < COUNT; i++) { const s = (Math.random() * n) | 0; arrs.forEach((a) => copy3(a, i, s)); } };
@@ -75,7 +73,7 @@ export function initHero3D() {
   const GAL_SPIN = 0.16;                                  // giro del núcleo y los brazos (rad/s)
   const dustSpeed = (rr) => 0.05 + 0.14 / (rr + 0.6);     // polvo suelto: gira más lento cuanto más lejos del núcleo
   // Las plataformas en órbita (Universe.astro) son un planeta más del disco: piden aquí la posición en pantalla de un punto de la galaxia
-  const orbitV = new THREE.Vector3();
+  const orbitV = new Vector3();
   const galaxyOrbit = (window.__galaxyOrbit = {
     t: 0, unit: 1, speed: dustSpeed, tilt: 0.27, yaw: 0, roll: 0,   // unit: píxeles por unidad de la galaxia
     project(r, th, out) {                                            // mismo camino que el sombreador: yaw (Y) → inclinación (X) → roll (Z) → grupo → cámara
@@ -89,7 +87,7 @@ export function initHero3D() {
     },
   });
   const VIO = [0.56, 0.36, 1.0], DEEP = [0.27, 0.24, 0.82], GCY = [0.32, 0.78, 1.0], GTL = [0.16, 0.82, 0.72], GGR = [0.43, 0.95, 0.75];   // GGR = verde del sitio #6df2c0
-  if (!serviceShape) for (let i = 0; i < N1; i++) {
+  for (let i = 0; i < N1; i++) {
     const q = Math.random();
     let rr, th = Math.random() * Math.PI * 2, y = 0, col, spd, gsz = 1;
     if (q < 0.055) {                          // núcleo: punto fijo muy denso y luminoso
@@ -119,14 +117,6 @@ export function initHero3D() {
     set3(P1, i, Math.cos(th) * rr, y, Math.sin(th) * rr);
     set3(C1, i, col[0], col[1], col[2]);
     SPD[i] = spd; GSZ[i] = gsz;
-  }
-  if (serviceShape) {                      // estructura propia del servicio (embudo, red, panel…)
-    const sh = buildShape(hero.dataset.shape, N1);
-    for (let i = 0; i < N1; i++) {
-      set3(P1, i, sh.pos[i * 3], sh.pos[i * 3 + 1], sh.pos[i * 3 + 2]);
-      set3(C1, i, sh.col[i * 3], sh.col[i * 3 + 1], sh.col[i * 3 + 2]);
-      PATH[i] = sh.path[i];
-    }
   }
   for (let i = N1; i < COUNT; i++) { const k = (Math.random() * N1) | 0; copy3(P1, i, k); copy3(C1, i, k); PATH[i] = PATH[k]; SPD[i] = SPD[k]; GSZ[i] = GSZ[k]; }
 
@@ -201,8 +191,8 @@ export function initHero3D() {
     fill(N2, [P2, N2v]);
   })();
 
-  const geo = new THREE.BufferGeometry();
-  const attr = (name, arr, n) => geo.setAttribute(name, new THREE.BufferAttribute(arr, n || 3));
+  const geo = new BufferGeometry();
+  const attr = (name, arr, n) => geo.setAttribute(name, new BufferAttribute(arr, n || 3));
   attr('position', P0); attr('normal', NR0);
   attr('aP1', P1); attr('aC1', C1); attr('aP2', P2); attr('aN2', N2v);
   attr('aScatter', SC); attr('aVis', VIS); attr('aRand', RN, 1); attr('aPath', PATH, 1); attr('aSpd', SPD, 1); attr('aSz', GSZ, 1);
@@ -233,19 +223,19 @@ export function initHero3D() {
     }`;
 
   const CAN_HOVER = window.matchMedia('(hover: hover) and (pointer: fine)').matches;   // solo con ratón: en táctil el efecto no aporta y cuesta rendimiento
-  const mat = new THREE.ShaderMaterial({
-    transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+  const mat = new ShaderMaterial({
+    transparent: true, depthWrite: false, blending: AdditiveBlending,
     defines: { ...(CAN_HOVER ? { HOVER: 1 } : {}), ...(MOB ? { LITE: 1 } : {}) },   // LITE: móvil, sin los ruidos secundarios
     uniforms: {
-      uTime: { value: 0 }, uIntro: { value: 0 }, uPR: { value: PR }, uSize: { value: MOB ? 2.4 : 2.3 }, uSm: { value: MOB ? new THREE.Vector3(0.85, 0.58, 0.72) : new THREE.Vector3(1.0, 0.92, 1.1) },
-      uMouse: { value: new THREE.Vector3(99, 99, 0) }, uPush: { value: 0 }, uRadius: { value: 0.7 },
-      uMorph: { value: 0 }, uGal: { value: serviceShape ? 0 : 1 },
-      uTilt: { value: new THREE.Vector3(1.2, 0.26, 0.0) },
-      uGrad: { value: new THREE.Vector2(-0.15, 0.86) },          // centro y escala del objeto: el degradado de color lo recorre entero en cualquier pantalla
-      uYaw: { value: new THREE.Vector3(0, 0, 0) },
-      uRoll: { value: new THREE.Vector3(0, 0, 0) },
-      uSpark: { value: Array.from({ length: 8 }, () => new THREE.Vector4(0, 0, 0, -1)) },
-      uVoice: { value: 0 }, uVDir: { value: new THREE.Vector3(0, 1, 0) }, uVDir2: { value: new THREE.Vector3(1, 0, 0) },
+      uTime: { value: 0 }, uIntro: { value: 0 }, uPR: { value: PR }, uSize: { value: MOB ? 2.4 : 2.3 }, uSm: { value: MOB ? new Vector3(0.85, 0.58, 0.72) : new Vector3(1.0, 0.92, 1.1) },
+      uMouse: { value: new Vector3(99, 99, 0) }, uPush: { value: 0 }, uRadius: { value: 0.7 },
+      uMorph: { value: 0 }, uGal: { value: 1 },
+      uTilt: { value: new Vector3(1.2, 0.26, 0.0) },
+      uGrad: { value: new Vector2(-0.15, 0.86) },          // centro y escala del objeto: el degradado de color lo recorre entero en cualquier pantalla
+      uYaw: { value: new Vector3(0, 0, 0) },
+      uRoll: { value: new Vector3(0, 0, 0) },
+      uSpark: { value: Array.from({ length: 8 }, () => new Vector4(0, 0, 0, -1)) },
+      uVoice: { value: 0 }, uVDir: { value: new Vector3(0, 1, 0) }, uVDir2: { value: new Vector3(1, 0, 0) },
     },
     vertexShader: `
       uniform float uTime, uIntro, uPR, uSize, uPush, uRadius, uMorph, uGal, uVoice;
@@ -406,23 +396,23 @@ export function initHero3D() {
         gl_FragColor = vec4(vColor, a * vAlpha);
       }`,
   });
-  const points = new THREE.Points(geo, mat);
+  const points = new Points(geo, mat);
   points.frustumCulled = false;
-  const group = new THREE.Group();
+  const group = new Group();
   group.add(points);
   scene.add(group);
 
   /* ---- Polvo flotante de fondo (redondo) ---- */
   const DUST = 160, dp = new Float32Array(DUST * 3);
   for (let i = 0; i < DUST; i++) { dp[i * 3] = (Math.random() - 0.5) * 12; dp[i * 3 + 1] = (Math.random() - 0.5) * 7; dp[i * 3 + 2] = (Math.random() - 0.5) * 6; }
-  const dg = new THREE.BufferGeometry();
-  dg.setAttribute('position', new THREE.BufferAttribute(dp, 3));
+  const dg = new BufferGeometry();
+  dg.setAttribute('position', new BufferAttribute(dp, 3));
   const dotCanvas = document.createElement('canvas'); dotCanvas.width = dotCanvas.height = 64;
   const dctx = dotCanvas.getContext('2d');
   const dgr = dctx.createRadialGradient(32, 32, 0, 32, 32, 32);
   dgr.addColorStop(0, 'rgba(255,255,255,1)'); dgr.addColorStop(0.45, 'rgba(255,255,255,.85)'); dgr.addColorStop(1, 'rgba(255,255,255,0)');
   dctx.fillStyle = dgr; dctx.fillRect(0, 0, 64, 64);
-  const dust = new THREE.Points(dg, new THREE.PointsMaterial({ size: 0.06, map: new THREE.CanvasTexture(dotCanvas), color: 0x8fb0ff, transparent: true, opacity: 0.6, depthWrite: false, blending: THREE.AdditiveBlending }));
+  const dust = new Points(dg, new PointsMaterial({ size: 0.06, map: new CanvasTexture(dotCanvas), color: 0x8fb0ff, transparent: true, opacity: 0.6, depthWrite: false, blending: AdditiveBlending }));
   scene.add(dust);
 
   /* ---- Orbe gris-lila que sigue al cursor ---- */
@@ -431,7 +421,7 @@ export function initHero3D() {
   const grd = og.createRadialGradient(64, 64, 0, 64, 64, 64);
   grd.addColorStop(0, 'rgba(215,228,250,.9)'); grd.addColorStop(0.5, 'rgba(150,180,235,.5)'); grd.addColorStop(1, 'rgba(110,150,230,0)');
   og.fillStyle = grd; og.fillRect(0, 0, 128, 128);
-  const orb = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(orbCanvas), transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0 }));
+  const orb = new Sprite(new SpriteMaterial({ map: new CanvasTexture(orbCanvas), transparent: true, depthWrite: false, blending: AdditiveBlending, opacity: 0 }));
   orb.scale.setScalar(0.22);
   scene.add(orb);
 
@@ -441,7 +431,7 @@ export function initHero3D() {
   const pinned = hero.hasAttribute('data-pin');                       // inicio: secuencia completa con scroll
   const SHAPES = { sphere: 0, galaxy: 1, brain: 2 };                // páginas interiores: una forma fija
   const galaxyK = () => (window.innerWidth < 520 ? 0.62 : window.innerWidth < 1000 ? 0.78 : 1);
-  const state = { scale: 1, morph: pinned ? 0 : serviceShape ? 1 : (SHAPES[hero.dataset.shape] ?? 0) };
+  const state = { scale: 1, morph: pinned ? 0 : (SHAPES[hero.dataset.shape] ?? 0) };
   let lastW = 0, lastH = 0;
   function resize() {
     const w = hero.clientWidth, h = hero.clientHeight;
@@ -466,9 +456,9 @@ export function initHero3D() {
       galaxyOrbit.unit = (h / (2 * Math.tan((camera.fov * Math.PI) / 360) * camera.position.z)) * base.gal;
       group.position.y = base.y;
     } else {                                                               // cabeceras de páginas interiores
-      group.position.x = narrow ? 0 : serviceShape ? 1.55 : 1.8;
+      group.position.x = narrow ? 0 : 1.8;
       group.position.y = base.y = base.galY = narrow ? (phone ? -1.05 : -0.95) : -0.15;
-      base.scale = narrow ? (phone ? 0.4 : 0.5) : serviceShape ? 0.68 : shape === 'galaxy' ? 0.46 : 0.7;
+      base.scale = narrow ? (phone ? 0.4 : 0.5) : shape === 'galaxy' ? 0.46 : 0.7;
       base.gal = base.scale * galaxyK();
     }
     group.scale.setScalar(base.scale * state.scale);
@@ -476,7 +466,7 @@ export function initHero3D() {
 
   /* ---- Ratón ---- */
   const mouse = { x: 0, y: 0, tx: 0, ty: 0, inside: false, speed: 0, ox: 0, oy: 0 };
-  const ndc = new THREE.Vector3();
+  const ndc = new Vector3();
   if (CAN_HOVER) window.addEventListener('pointermove', (e) => {
     if (e.pointerType && e.pointerType !== 'mouse') return;
     const rect = hero.getBoundingClientRect();
@@ -493,7 +483,7 @@ export function initHero3D() {
 
   /* ---- "Voz" de la esfera: ráfagas tipo habla (sílabas y pausas) con dirección aleatoria en cada golpe ---- */
   const reduceMo = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const voice = { v: 0, target: 0, next: 0, phraseEnd: 0, talking: false, d1: new THREE.Vector3(0, 1, 0), d2: new THREE.Vector3(1, 0, 0), t1: new THREE.Vector3(0, 1, 0), t2: new THREE.Vector3(1, 0, 0), last: 0 };
+  const voice = { v: 0, target: 0, next: 0, phraseEnd: 0, talking: false, d1: new Vector3(0, 1, 0), d2: new Vector3(1, 0, 0), t1: new Vector3(0, 1, 0), t2: new Vector3(1, 0, 0), last: 0 };
   const randDir = (v) => { const u = Math.random() * 2 - 1, a = Math.random() * Math.PI * 2, q = Math.sqrt(1 - u * u); return v.set(q * Math.cos(a), u * 0.8, q * Math.sin(a)).normalize(); };
   function updateVoice(t) {
     const dt = Math.min(0.05, t - voice.last); voice.last = t;
@@ -580,10 +570,10 @@ export function initHero3D() {
     orb.material.opacity += (0 - orb.material.opacity) * 0.08;   // sin resplandor: el puntero propio ya marca la posición
 
     // orientación de cada forma (inclinación mínima hacia el cursor)
-    mat.uniforms.uTilt.value.set(1.2 - mouse.y * 0.1, serviceShape ? 0.12 - mouse.y * 0.06 : (base.galTilt || 0.27) + Math.sin(t * 0.23) * 0.025 - mouse.y * 0.08, -0.05 - mouse.y * 0.05);
-    mat.uniforms.uYaw.value.set(mouse.x * 0.14 + t * 0.12, serviceShape ? Math.sin(t * 0.32) * 0.5 + mouse.x * 0.25 : mouse.x * 0.3, 0.12 + Math.sin(t * 0.3) * 0.3 + mouse.x * 0.3);
+    mat.uniforms.uTilt.value.set(1.2 - mouse.y * 0.1, (base.galTilt || 0.27) + Math.sin(t * 0.23) * 0.025 - mouse.y * 0.08, -0.05 - mouse.y * 0.05);
+    mat.uniforms.uYaw.value.set(mouse.x * 0.14 + t * 0.12, mouse.x * 0.3, 0.12 + Math.sin(t * 0.3) * 0.3 + mouse.x * 0.3);
 
-    mat.uniforms.uRoll.value.y = serviceShape ? 0 : mouse.x * 0.02;
+    mat.uniforms.uRoll.value.y = mouse.x * 0.02;
     if (pinned) { galaxyOrbit.t = t; galaxyOrbit.tilt = mat.uniforms.uTilt.value.y; galaxyOrbit.yaw = mat.uniforms.uYaw.value.y; galaxyOrbit.roll = mat.uniforms.uRoll.value.y; }
     dust.rotation.y = t * 0.02;
     dust.position.y = Math.sin(t * 0.3) * 0.1;

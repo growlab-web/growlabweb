@@ -301,40 +301,6 @@ function initPage() {
     });
   }
 
-  /* PORTAFOLIO: tarjetas apiladas que se encogen al llegar la siguiente */
-  const cases = $$('[data-case]');
-  if (cases.length) {
-    gsap.from('[data-cases-head] > *', {
-      y: 60, opacity: 0, stagger: 0.15, duration: 1, ease: 'expo.out',
-      scrollTrigger: { trigger: '[data-cases-head]', start: isTouch ? 'top 95%' : 'top 80%' },
-    });
-    cases.forEach((c, i) => {
-      const inner = $('[data-case-inner]', c);
-      gsap.from(inner, { y: 120, opacity: 0, scale: 0.94, duration: 1.2, ease: 'expo.out', scrollTrigger: { trigger: c, start: isTouch ? 'top 95%' : 'top 85%' } });
-      if (cases[i + 1]) {
-        gsap.to(inner, {
-          scale: 0.9, opacity: 0.35, filter: 'blur(4px)', ease: 'none',
-          scrollTrigger: { trigger: cases[i + 1], start: 'top 90%', end: 'top 12%', scrub: true },
-        });
-      }
-    });
-  }
-
-  /* PROCESO: línea de progreso + pasos que aparecen */
-  if ($('[data-process]')) {
-    gsap.to('[data-process-line]', {
-      scaleX: 1, ease: 'none',
-      scrollTrigger: { trigger: '[data-process-steps]', start: 'top 60%', end: 'bottom 70%', scrub: true },
-    });
-    $$('[data-process-steps] > li').forEach((li) => {
-      gsap.from(li.children, { y: 60, opacity: 0, stagger: 0.1, duration: 1, ease: 'expo.out', scrollTrigger: { trigger: li, start: isTouch ? 'top 95%' : 'top 80%' } });
-    });
-    gsap.from('[data-process-left] > *', {
-      y: 50, opacity: 0, stagger: 0.12, duration: 1, ease: 'expo.out',
-      scrollTrigger: { trigger: '[data-process]', start: isTouch ? 'top 95%' : 'top 70%' },
-    });
-  }
-
   /* CTA: texto gigante que crece y se asienta */
   if ($('[data-cta]')) {
     gsap.from('[data-cta-line]', { yPercent: 100, duration: 1.2, ease: 'expo.out', scrollTrigger: { trigger: '[data-cta]', start: isTouch ? 'top 95%' : 'top 60%' } });
