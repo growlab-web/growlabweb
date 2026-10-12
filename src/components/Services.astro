@@ -168,15 +168,27 @@ import Icon from './Icon.astro';
     transform: rotate(45deg);
   }
   .art-search i:nth-child(n + 2) { display: none; }
-  /* recorrido (tracking): tres puntos de contacto unidos hasta la conversión */
+  /* atribución (tracking): dos puntos de contacto confluyen en uno, y éste lleva a la conversión (el punto grande) */
   .art-path i { position: absolute; border-radius: 50%; }
-  .art-path i:nth-child(1) { right: 170px; bottom: 32px; width: 22px; height: 22px; border: 2px solid var(--color-sky); }
-  .art-path i:nth-child(2) { right: 100px; bottom: 76px; width: 22px; height: 22px; border: 2px solid var(--color-primary); }
-  .art-path i:nth-child(3) { right: 32px; bottom: 116px; width: 30px; height: 30px; background: var(--color-secondary); }
-  .art-path i:nth-child(4),
-  .art-path i:nth-child(5) { height: 2px; border-radius: 0; background: rgba(255, 255, 255, 0.28); transform-origin: 100% 50%; }
-  .art-path i:nth-child(4) { right: 122px; bottom: 86px; width: 57px; transform: rotate(-32.2deg); }
-  .art-path i:nth-child(5) { right: 62px; bottom: 130px; width: 48px; transform: rotate(-34.5deg); }
+  .art-path i:nth-child(1) { right: 181px; bottom: 101px; width: 18px; height: 18px; border: 2px solid var(--color-sky); }
+  .art-path i:nth-child(2) { right: 181px; bottom: 41px; width: 18px; height: 18px; border: 2px solid var(--color-primary); }
+  .art-path i:nth-child(3) { right: 104px; bottom: 69px; width: 22px; height: 22px; border: 2px solid var(--color-secondary); }
+  .art-path i:nth-child(4) { right: 32px; bottom: 60px; width: 40px; height: 40px; background: var(--color-secondary); }
+  .art-path i:nth-child(5) { display: none; }
+  /* las líneas salen del centro de cada punto hacia el siguiente, sin tocar los círculos */
+  .art-path i:nth-child(-n + 3)::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    height: 2px;
+    margin-top: -1px;
+    background: rgba(255, 255, 255, 0.3);
+    transform-origin: 0 50%;
+  }
+  .art-path i:nth-child(1)::after { width: 57px; transform: rotate(21.8deg) translateX(11px); }
+  .art-path i:nth-child(2)::after { width: 57px; transform: rotate(-21.8deg) translateX(11px); }
+  .art-path i:nth-child(3)::after { width: 28px; transform: translateX(13px); }
   /* panel (reporting): un tablero con un gráfico y dos indicadores */
   .art-dash i { position: absolute; border-radius: 12px; }
   .art-dash i:nth-child(1) { right: 104px; bottom: 32px; width: 104px; height: 112px; border: 2px solid var(--color-sky); }
