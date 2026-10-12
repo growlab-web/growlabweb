@@ -4,12 +4,12 @@ import { projects } from '../data/projects.js';
 const year = new Date().getFullYear();
 const links = [...site.nav, site.contact];
 const latest = projects.slice(0, 4);       // los primeros de data/projects.js son los más recientes
-const head = 'mb-5 font-display text-[.74rem] uppercase tracking-[.16em] text-white/45';
+const head = 'font-display text-[.74rem] uppercase tracking-[.16em] text-white/45';
 const link = 'transition-colors hover:text-secondary';
 ---
 
 <footer class="border-t border-white/10 px-(--pad) text-[.95rem] text-muted">
-  <div class="grid gap-x-10 gap-y-12 py-[clamp(3rem,8vh,5rem)] sm:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_1fr]">
+  <div class="grid gap-x-10 gap-y-12 py-[clamp(3rem,8vh,5rem)] max-sm:gap-y-0 max-sm:pb-4 sm:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_1fr]">
     <div>
       <a href="/" aria-label="GrowLab, ir al inicio" class="inline-flex">
         <img src="/logo.png" alt="GrowLab" width="1046" height="205" loading="lazy" class="h-[26px] w-auto" />
@@ -19,27 +19,33 @@ const link = 'transition-colors hover:text-secondary';
       <a href={site.phone.href} class={`mt-2 block w-fit whitespace-nowrap text-white/85 ${link}`}>{site.phone.label}</a>
     </div>
 
-    <nav aria-label="Pie de página">
-      <p class={head}>Navegación</p>
-      <ul class="grid gap-3">
-        {links.map((l) => <li><a href={l.href} class={link}>{l.label}</a></li>)}
-      </ul>
-    </nav>
+    <!-- Los tres grupos son desplegables: en móvil empiezan cerrados para no alargar el pie (los cierra el script de abajo);
+         en pantallas mayores están siempre abiertos y el título no se puede pulsar. -->
+    <details class="ft-group" open>
+      <summary class={head}>Navegación <svg class="ft-chevron" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></summary>
+      <nav aria-label="Pie de página">
+        <ul class="grid gap-3">
+          {links.map((l) => <li><a href={l.href} class={link}>{l.label}</a></li>)}
+        </ul>
+      </nav>
+    </details>
 
-    <nav aria-label="Últimos proyectos">
-      <p class={head}>Últimos proyectos</p>
-      <ul class="grid gap-3">
-        {latest.map((p) => <li><a href={`/portafolio/${p.slug}`} class={link}>{p.name}</a></li>)}
-        <li><a href="/portafolio" class={`text-white/85 ${link}`}>Ver todos →</a></li>
-      </ul>
-    </nav>
+    <details class="ft-group" open>
+      <summary class={head}>Últimos proyectos <svg class="ft-chevron" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></summary>
+      <nav aria-label="Últimos proyectos">
+        <ul class="grid gap-3">
+          {latest.map((p) => <li><a href={`/portafolio/${p.slug}`} class={link}>{p.name}</a></li>)}
+          <li><a href="/portafolio" class={`text-white/85 ${link}`}>Ver todos →</a></li>
+        </ul>
+      </nav>
+    </details>
 
-    <div>
-      <p class={head}>Síguenos</p>
+    <details class="ft-group" open>
+      <summary class={head}>Síguenos <svg class="ft-chevron" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></summary>
       <ul class="grid gap-3">
         {site.social.map((s) => <li><a href={s.href} target="_blank" rel="noopener noreferrer" class={link}>{s.label}</a></li>)}
       </ul>
-    </div>
+    </details>
   </div>
 
   <div class="flex flex-wrap items-center justify-between gap-x-8 gap-y-3 border-t border-white/10 py-6 text-[.85rem]">
@@ -50,3 +56,33 @@ const link = 'transition-colors hover:text-secondary';
     </span>
   </div>
 </footer>
+
+<style>
+  .ft-group > summary { display: flex; align-items: center; justify-content: space-between; list-style: none; margin-bottom: 1.25rem; }
+  .ft-group > summary::-webkit-details-marker { display: none; }
+  .ft-chevron { transition: transform 0.25s; }
+  .ft-group[open] .ft-chevron { transform: rotate(180deg); }
+  /* pantallas mayores: columnas siempre abiertas, sin flecha ni clic */
+  @media (min-width: 640px) {
+    .ft-group > summary { pointer-events: none; }
+    .ft-chevron { display: none; }
+  }
+  /* móvil: cada grupo es una fila que se despliega al tocarla */
+  @media (max-width: 639px) {
+    .ft-group { border-top: 1px solid rgba(255, 255, 255, 0.1); }
+    .ft-group:first-of-type { margin-top: 2.25rem; }
+    .ft-group > summary { margin: 0; padding-block: 1.05rem; cursor: pointer; color: rgba(255, 255, 255, 0.8); }
+    .ft-group[open] > summary { color: var(--color-secondary); }
+    .ft-group > :not(summary) { padding-bottom: 1.35rem; }
+  }
+</style>
+
+<script>
+  // en móvil los grupos del pie empiezan cerrados; al pasar a una pantalla mayor se abren todos
+  const groups = document.querySelectorAll<HTMLDetailsElement>('.ft-group');
+  const small = window.matchMedia('(max-width: 639px)');
+  const apply = () => groups.forEach((g) => { g.open = !small.matches; });
+  apply();
+  small.addEventListener('change', apply);
+</script>
+

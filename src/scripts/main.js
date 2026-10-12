@@ -50,13 +50,14 @@ if ($('[data-hero][data-pin]') || isApp) lenis.stop();
 // la inercia del trackpad sigue mandando scroll un buen rato después de soltar: sin esto, un gesto rápido cruza toda la página
 // Paradas: las etapas del hero y las secciones marcadas con data-stop (sólo en páginas con pin)
 let stops = [];
+let touchStops = [];        // en táctil sólo se frena dentro del hero (sus tres etapas); el resto de la página se desliza libre
 const gesture = { t: 0, dir: 0, limit: null, held: false, heldAt: 0, low: 0 };
 function measureStops() {
-  const max = ScrollTrigger.maxScroll(window), out = [];
+  const max = ScrollTrigger.maxScroll(window), out = [], heroStops = [];
   const pins = ScrollTrigger.getAll().filter((st) => st.pin);
   pins.forEach((st) => {
     const span = st.end - st.start, tl = st.animation, labels = tl && tl.labels ? Object.values(tl.labels) : [];
-    if (labels.length) return labels.forEach((time) => out.push(st.start + (span * time) / tl.duration()));
+    if (labels.length) return labels.forEach((time) => { const y = st.start + (span * time) / tl.duration(); out.push(y); heroStops.push(Math.round(y)); });
     const n = Math.max(1, Math.round(span / window.innerHeight));       // sin etiquetas: tramos de más o menos una pantalla
     for (let i = 0; i <= n; i++) out.push(st.start + (span * i) / n);
   });
@@ -65,9 +66,11 @@ function measureStops() {
     out.push(el.dataset.stop === 'center' ? top + r.height / 2 - window.innerHeight / 2 : top);
   });
   stops = [...new Set(out.map((v) => Math.round(Math.min(max, Math.max(0, v)))))].sort((a, b) => a - b);
+  touchStops = [...new Set(heroStops)].sort((a, b) => a - b);
 }
 // Táctil: el scroll es el nativo del teléfono y no se puede recortar gesto a gesto como la rueda. Mientras el dedo arrastra, manda el dedo;
-// al soltar empieza la inercia, y si esa inercia alcanza la siguiente parada (contando desde donde se soltó) se corta ahí.
+// al soltar empieza la inercia, y si esa inercia alcanza la siguiente etapa del hero (contando desde donde se soltó) se corta ahí.
+// Sólo dentro del hero: frenar también en las secciones de después hacía que la página pareciera atascarse al seguir bajando.
 if (window.matchMedia('(pointer: coarse)').matches && !isApp) {
   const root = document.documentElement;
   let coasting = false, from = 0, lastY = 0, idle = 0, hold = null;
@@ -80,7 +83,8 @@ if (window.matchMedia('(pointer: coarse)').matches && !isApp) {
   };
   window.addEventListener('touchstart', () => { coasting = false; hold = null; }, { passive: true });
   const release = (e) => {
-    if (e.touches.length || !stops.length) return;
+    if (e.touches.length || !touchStops.length) return;
+    if (window.scrollY > touchStops[touchStops.length - 1] + 4) return;      // ya se salió del hero: scroll libre
     coasting = true; from = lastY = window.scrollY;
     clearTimeout(idle); idle = setTimeout(() => { coasting = false; }, 160);
   };
@@ -97,7 +101,7 @@ if (window.matchMedia('(pointer: coarse)').matches && !isApp) {
     clearTimeout(idle); idle = setTimeout(() => { coasting = false; }, 160);
     const dir = Math.sign(y - lastY); lastY = y;
     if (!dir) return;
-    const limit = dir > 0 ? stops.find((s) => s > from + 2) : stops.findLast((s) => s < from - 2);
+    const limit = dir > 0 ? touchStops.find((s) => s > from + 2) : touchStops.findLast((s) => s < from - 2);
     if (limit != null && (y - limit) * dir >= 0) halt(limit);
   }, { passive: true });
 }
