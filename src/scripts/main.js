@@ -295,7 +295,7 @@ function initPage() {
   const svcTrack = $('[data-services-track]');
   const svcCards = svcTrack ? [...svcTrack.children] : [];        // las tarjetas reales (las copias se añaden abajo)
   if (svcTrack && svcCards.length) {
-    const bar = $('[data-services-bar]'), prev = $('[data-services-prev]'), next = $('[data-services-next]');
+    const bars = $$('[data-services-bar]'), prev = $('[data-services-prev]'), next = $('[data-services-next]');
     // Sin fin: la serie se repite antes y después con copias (ocultas para lectores de pantalla). Se empieza en la serie del medio y,
     // cada vez que el desplazamiento se detiene dentro de una copia, se salta sin que se note al mismo punto de la serie real.
     const copy = (c) => { const n = c.cloneNode(true); n.setAttribute('aria-hidden', 'true'); n.inert = true; return n; };
@@ -306,7 +306,13 @@ function initPage() {
     const setW = () => step() * svcCards.length;                  // ancho de una serie completa
     const jump = (x) => { svcTrack.style.scrollSnapType = 'none'; svcTrack.scrollLeft = x; svcTrack.style.scrollSnapType = ''; };
     const settle = () => { const w = setW(), x = svcTrack.scrollLeft; if (x < w - 2) jump(x + w); else if (x >= 2 * w - 2) jump(x - w); };   // siempre de vuelta a la serie real (la del medio)
-    const upd = () => { const w = setW(); if (bar) bar.style.transform = `scaleX(${Math.max(0.08, (((svcTrack.scrollLeft % w) + w) % w) / w)})`; };
+    // Indicador: un tramo que ocupa la parte de la serie que se ve y se desplaza con el carrusel. Como el carrusel no tiene fin,
+    // al llegar al último servicio el tramo sale por la derecha mientras su gemelo entra por la izquierda: nunca salta ni se vacía.
+    const upd = () => {
+      const w = setW(), pos = (((svcTrack.scrollLeft % w) + w) % w) / w;            // 0…1: por dónde va dentro de la serie
+      const frac = Math.min(1, (svcTrack.clientWidth + gap()) / w);                 // parte de la serie visible a la vez
+      bars.forEach((b, i) => { b.style.width = frac * 100 + '%'; b.style.transform = `translateX(${((pos - i) / frac) * 100}%)`; });
+    };
     // cada flecha pasa una "página": tantas tarjetas como se ven a la vez
     const move = (dir) => {
       settle();
