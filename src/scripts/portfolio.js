@@ -118,9 +118,9 @@ export async function initPortfolio(root) {
       new THREE.TextureLoader().load(p.cover, (img) => {
         img.anisotropy = maxAniso;
         if (PORTRAIT) { img.repeat.set(CARD_W / CARD_H / (img.image.width / img.image.height), 1); img.offset.set((1 - img.repeat.x) / 2, 0); }   // recorte centrado
-        // con portada en vídeo, la imagen fija se muestra con los mismos tonos que el vídeo (sin la conversión de color de las
-        // demás portadas, que las oscurece): así no se nota el cambio de una a otro
-        if (!p.coverVideo) img.colorSpace = THREE.SRGBColorSpace || img.colorSpace;
+        // las capturas de webs reales (proyectos con `url`) se muestran con sus tonos tal cual, igual que las portadas en vídeo;
+        // las maquetas de ejemplo conservan la conversión de color con la que se diseñaron, que las oscurece
+        if (!p.coverVideo && !p.url) img.colorSpace = THREE.SRGBColorSpace || img.colorSpace;
         if (!videoOn) mat.uniforms.uMap.value = img;
       }, undefined, () => { const t = drawn(); t.anisotropy = maxAniso; mat.uniforms.uMap.value = t; });
     }
