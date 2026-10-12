@@ -212,12 +212,14 @@ export async function initPortfolio(root) {
   bgScene.add(dust);
 
   /* ===================== Etiquetas y botón "+" (HTML pegado a cada panel) ===================== */
+  const COARSE = window.matchMedia('(pointer: coarse)').matches;
   const tags = projects.map((p, i) => {
     const label = document.createElement('button');
     label.type = 'button'; label.className = 'pf-label'; label.textContent = p.name; label.dataset.i = i; label.tabIndex = -1;
     const plus = document.createElement('button');
     plus.type = 'button'; plus.className = 'pf-plus'; plus.setAttribute('aria-label', `Abrir proyecto ${p.name}`); plus.dataset.i = i;
-    plus.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>';
+    // el «+» se abre en una pastilla «Ver proyecto» al acercar el cursor al proyecto (clase is-open, la pone el bucle de dibujo)
+    plus.innerHTML = '<span class="pf-plus__text">Ver proyecto</span><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>';
     labelsEl.append(label, plus);
     return { label, plus };
   });
@@ -394,7 +396,9 @@ export async function initPortfolio(root) {
       const vis = e * S.mode * (1 - clamp((ad - 0.4) / 1.4, 0, 1)) * (1 - S.dim);
       const visPlus = e * S.mode * (1 - clamp((ad - 0.15) / 0.55, 0, 1)) * (1 - S.dim);   // el "+" de los paneles vecinos se apaga antes
       place(tags[i].label, -CARD_W / 2 + 0.2, -CARD_H / 2 + 0.2, 'translate(0,-100%)');
-      place(tags[i].plus, CARD_W / 2 - 0.3, -CARD_H / 2 + 0.3, 'translate(-50%,-50%)');
+      place(tags[i].plus, CARD_W / 2 - 0.3, -CARD_H / 2 + 0.3, 'translate(calc(-100% + 15px),-50%)');   // anclado por la derecha: al abrirse crece hacia la izquierda
+      // abierto con el cursor sobre el proyecto; en táctil (sin cursor), mientras el proyecto está en el centro
+      tags[i].plus.classList.toggle('is-open', !S.dragging && (S.hover === i || (COARSE && ad < 0.3)));
       tags[i].label.style.opacity = vis.toFixed(3);
       tags[i].plus.style.opacity = visPlus.toFixed(3);
       tags[i].label.style.pointerEvents = vis > 0.4 ? 'auto' : 'none';
