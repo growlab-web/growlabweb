@@ -42,7 +42,7 @@ export async function initPortfolio(root) {
 
   /* ===================== Renderer y cámara ===================== */
   const renderer = new WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
-  const SOFT = isSoftwareGL(renderer.getContext());                // sin tarjeta gráfica: menos resolución y sin vídeos de portada
+  const SOFT = isSoftwareGL(renderer.getContext());                // sin aceleración gráfica: menos resolución y sin vídeos de portada
   const PR = SOFT ? 1 : Math.min(window.devicePixelRatio || 1, 1.75);
   renderer.setPixelRatio(PR);
   renderer.setClearColor(0x000000, 0);

@@ -348,7 +348,7 @@ select:-webkit-autofill {
 }
 input:autofill, textarea:autofill { background-color: transparent !important; color: #fff !important; }
 
-/* ---------- Hero sin WebGL (equipos sin tarjeta gráfica: scripts/heroStatic.js) ----------
+/* ---------- Hero sin WebGL (equipos sin aceleración gráfica: scripts/heroStatic.js) ----------
    Imágenes fijas de las formas sobre negro; con «screen» el negro desaparece y quedan sólo las partículas, como en la escena real. */
 .hero-static { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
 .hero-static img { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; object-fit: cover; mix-blend-mode: screen; }

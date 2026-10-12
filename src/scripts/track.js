@@ -11,6 +11,7 @@
  *   section_view    secciones del inicio        → section (quienes-somos, servicios, contacto)
  *   project_view    proyecto abierto            → project
  *   thanks_game_play alguien juega tras enviar  → form_location
+ *   render_mode     versión del hero que se ve  → render_mode ('3d', o 'imagenes' si el navegador no tiene aceleración gráfica)
  *   page_not_found  página de error 404         → missing_path, referrer
  *   notfound_broken alguien rompió el 404       → (sin datos)
  *

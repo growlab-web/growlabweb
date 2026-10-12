@@ -1,7 +1,9 @@
 /**
- * ¿El equipo dibuja WebGL sin tarjeta gráfica (por software)? Pasa en equipos muy básicos, escritorios remotos y en las
+ * ¿El navegador dibuja WebGL por software, sin aceleración gráfica? OJO: no es «no tener tarjeta de vídeo dedicada»: los gráficos
+ * integrados (Intel, AMD, Apple, cualquier móvil) SÍ aceleran y ven el 3D normal. Esto sólo ocurre cuando no hay ninguna aceleración:
+ * aceleración por hardware desactivada en el navegador, máquinas virtuales, escritorios remotos y las
  * herramientas de medición (PageSpeed/Lighthouse). Ahí sólo crear la escena 3D deja la página bloqueada varios segundos
- * (medido: ~3 s, frente a 0,07 s con tarjeta gráfica), así que en esos equipos el hero usa imágenes fijas (heroStatic.js).
+ * (medido: ~3 s, frente a 0,07 s con aceleración), así que en esos equipos el hero usa imágenes fijas (heroStatic.js).
  */
 const SOFTWARE = /swiftshader|llvmpipe|softpipe|software|basic render/i;
 
@@ -13,8 +15,9 @@ export function isSoftwareGL(gl) {
 }
 
 /**
- * Lo mismo, pero averiguado en un hilo aparte: la comprobación en sí también es lenta sin tarjeta gráfica y, hecha aquí,
- * no bloquea la página. Devuelve una promesa; si el navegador no permite la prueba, se asume que hay tarjeta gráfica.
+ * Lo mismo, pero averiguado en un hilo aparte: la comprobación en sí también es lenta sin aceleración gráfica y, hecha aquí,
+ * no bloquea la página. Devuelve una promesa; ante cualquier duda (prueba no disponible, sin respuesta) se asume que hay aceleración
+ * y se muestra el 3D.
  */
 let probe = null;
 export function softwareGL() {

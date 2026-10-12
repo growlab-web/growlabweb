@@ -11,7 +11,7 @@ import { startRain } from './loaderRain.js';
 import { initDataFlow } from './dataflow.js';
 import { initDust } from './dust.js';
 import { initCursor } from './cursor.js';
-import { initTracking } from './track.js';
+import { initTracking, track } from './track.js';
 import { softwareGL } from './gpu.js';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -146,9 +146,10 @@ let hero3d = null;                 // se rellena cuando el objeto del hero (3D o
 let heroWanted = false;            // la página ya se mostró y espera al objeto para arrancarlo
 const startHero = () => { if (!hero3d) { heroWanted = true; return; } hero3d.start(reduceMotion); };
 const heroReady = hasHero
-  // sin tarjeta gráfica (equipos muy básicos y herramientas de medición) el hero usa imágenes fijas en vez de la escena 3D: ver gpu.js
+  // sin aceleración gráfica (equipos muy básicos y herramientas de medición) el hero usa imágenes fijas en vez de la escena 3D: ver gpu.js
   ? softwareGL()
-      .then((soft) => { if (soft) document.documentElement.classList.add('no-3d'); return soft ? import('./heroStatic.js').then((m) => m.initHeroStatic()) : import('./hero3d.js').then((m) => m.initHero3D()); })
+      .then((soft) => { track('render_mode', { render_mode: soft ? 'imagenes' : '3d' });   // medición: cuántas visitas ven cada versión
+        if (soft) document.documentElement.classList.add('no-3d'); return soft ? import('./heroStatic.js').then((m) => m.initHeroStatic()) : import('./hero3d.js').then((m) => m.initHero3D()); })
       .then((h) => Promise.race([h.ready, new Promise((r) => setTimeout(r, 3000))]).then(() => {   // espera a que la gráfica esté lista (máx. 3 s)
         hero3d = h;
         if (!heroWanted) return;
@@ -166,8 +167,8 @@ const pfReady = pfEl
       .then(async (m) => { pf = await m.initPortfolio(pfEl); })
       .catch((err) => { console.warn('No se pudo iniciar el portafolio 3D.', err); const l = $('[data-pf-loader]'); if (l) l.remove(); })
   : Promise.resolve();
-// el texto no espera indefinidamente al objeto del hero: si tarda (sin tarjeta gráfica la comprobación es lenta), la página
-// se muestra igual y el objeto aparece cuando esté. Con tarjeta gráfica llega mucho antes de ese margen.
+// el texto no espera indefinidamente al objeto del hero: si tarda (sin aceleración gráfica la comprobación es lenta), la página
+// se muestra igual y el objeto aparece cuando esté. Con aceleración llega mucho antes de ese margen.
 const sceneReady = Promise.all([Promise.race([heroReady, new Promise((r) => setTimeout(r, 900))]), pfReady]);
 
 /* ---------- Pantalla de carga con lluvia (sólo en el inicio) ---------- */

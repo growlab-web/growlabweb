@@ -1,5 +1,5 @@
 /**
- * Hero sin WebGL, para equipos que no tienen tarjeta gráfica (ver gpu.js): en lugar de la escena de partículas se muestran
+ * Hero sin WebGL, para equipos que no tienen aceleración gráfica (ver gpu.js): en lugar de la escena de partículas se muestran
  * imágenes fijas de cada forma (capturas de la escena real, en /public/hero/), que se funden entre sí con el scroll.
  * El resto del hero (textos, etapas, degradados) se mueve igual, con la misma secuencia de heroStages.js.
  */
