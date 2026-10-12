@@ -291,28 +291,34 @@ function initPage() {
     });
   }
 
-  /* SERVICIOS: carrusel lateral con flechas (el scroll vertical ya no lo mueve) */
+  /* SERVICIOS: carrusel lateral sin fin, con flechas (el scroll vertical no lo mueve) */
   const svcTrack = $('[data-services-track]');
-  if (svcTrack) {
+  const svcCards = svcTrack ? [...svcTrack.children] : [];        // las tarjetas reales (las copias se añaden abajo)
+  if (svcTrack && svcCards.length) {
     const bar = $('[data-services-bar]'), prev = $('[data-services-prev]'), next = $('[data-services-next]');
-    const upd = () => {
-      const max = svcTrack.scrollWidth - svcTrack.clientWidth, x = svcTrack.scrollLeft;
-      if (bar) bar.style.transform = `scaleX(${max > 0 ? Math.max(0.08, x / max) : 1})`;
-      if (prev) prev.disabled = x <= 2;
-      if (next) next.disabled = x >= max - 2;
-    };
+    // Sin fin: la serie se repite antes y después con copias (ocultas para lectores de pantalla). Se empieza en la serie del medio y,
+    // cada vez que el desplazamiento se detiene dentro de una copia, se salta sin que se note al mismo punto de la serie real.
+    const copy = (c) => { const n = c.cloneNode(true); n.setAttribute('aria-hidden', 'true'); n.inert = true; return n; };
+    svcTrack.prepend(...svcCards.map(copy));
+    svcTrack.append(...svcCards.map(copy));
+    const gap = () => parseFloat(getComputedStyle(svcTrack).columnGap || '0');
+    const step = () => svcCards[0].getBoundingClientRect().width + gap();
+    const setW = () => step() * svcCards.length;                  // ancho de una serie completa
+    const jump = (x) => { svcTrack.style.scrollSnapType = 'none'; svcTrack.scrollLeft = x; svcTrack.style.scrollSnapType = ''; };
+    const settle = () => { const w = setW(), x = svcTrack.scrollLeft; if (x < w - 2) jump(x + w); else if (x >= 2 * w - 2) jump(x - w); };   // siempre de vuelta a la serie real (la del medio)
+    const upd = () => { const w = setW(); if (bar) bar.style.transform = `scaleX(${Math.max(0.08, (((svcTrack.scrollLeft % w) + w) % w) / w)})`; };
     // cada flecha avanza las tarjetas que caben enteras en pantalla (al menos una)
     const move = (dir) => {
-      const card = svcTrack.firstElementChild; if (!card) return;
-      const step = card.getBoundingClientRect().width + parseFloat(getComputedStyle(svcTrack).columnGap || '0');
-      svcTrack.scrollBy({ left: dir * Math.max(1, Math.floor(svcTrack.clientWidth / step)) * step, behavior: reduceMotion ? 'auto' : 'smooth' });
+      settle();
+      svcTrack.scrollBy({ left: dir * Math.max(1, Math.floor(svcTrack.clientWidth / step())) * step(), behavior: reduceMotion ? 'auto' : 'smooth' });
       track('services_slide', { direction: dir > 0 ? 'siguiente' : 'anterior' });
     };
     if (prev) prev.addEventListener('click', () => move(-1));
     if (next) next.addEventListener('click', () => move(1));
-    svcTrack.addEventListener('scroll', upd, { passive: true });
-    window.addEventListener('resize', upd);
-    upd();
+    let idle = 0;
+    svcTrack.addEventListener('scroll', () => { upd(); clearTimeout(idle); idle = setTimeout(settle, 140); }, { passive: true });
+    window.addEventListener('resize', () => { jump(setW()); upd(); });
+    jump(setW()); upd();
     gsap.from('[data-services-head] > *', {
       y: 60, opacity: 0, stagger: 0.15, duration: 1, ease: 'expo.out',
       scrollTrigger: { trigger: '[data-services]', start: isTouch ? 'top 95%' : 'top 70%' },
@@ -351,7 +357,7 @@ function initPage() {
   };
   enter('[data-marquee]', null, { y: 30, duration: 1.2 }, 'top 92%');
   $$('[data-manifesto]').forEach((m) => enter([m.previousElementSibling], m.parentElement));
-  enter('[data-services-track] > *', '[data-services]', { y: 0, x: 140, stagger: 0.09, duration: 1.1 }, 'top 75%');
+  enter(svcCards, '[data-services]', { y: 0, x: 140, stagger: 0.09, duration: 1.1 }, 'top 75%');
   $$('[data-contact]').forEach((c) => {
     enter([c.firstElementChild], c, { y: 0, x: -50, duration: 1.3 }, 'top 75%');
     enter($$('[data-contact-form] > *', c), $('[data-contact-form]', c), { y: 26, stagger: 0.06, duration: 0.9 }, 'top 88%');
