@@ -20,6 +20,8 @@ export function initCursor() {
     x = e.clientX; y = e.clientY;
     if (!seen) { seen = true; rx = x; ry = y; el.classList.add('is-on'); }
     el.classList.toggle('is-link', !!e.target.closest?.('a, button, [role="button"], input, textarea, select, label, [data-pf-canvas]'));
+    // sobre superficies claras (la ficha blanca de un proyecto) el puntero se invierte para no perderse
+    el.classList.toggle('is-invert', !!e.target.closest?.('[data-pf-panel], [data-cursor="invert"]'));
   }, { passive: true });
   document.addEventListener('pointerdown', () => el.classList.add('is-down'));
   document.addEventListener('pointerup', () => el.classList.remove('is-down'));

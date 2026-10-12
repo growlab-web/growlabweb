@@ -231,6 +231,11 @@ video.pf-img { aspect-ratio: 16 / 10; background: #0d111a; object-fit: cover; } 
 html.has-cursor, html.has-cursor * { cursor: none !important; }
 .gl-cursor { position: fixed; inset: 0; z-index: 9999; pointer-events: none; opacity: 0; transition: opacity .25s; }
 .gl-cursor.is-on { opacity: 1; }
+/* invertido: toma el color contrario al de lo que tiene debajo (negro sobre blanco, blanco sobre una captura oscura) */
+.gl-cursor.is-invert { mix-blend-mode: difference; }
+.gl-cursor.is-invert .gl-cursor__dot::before { background: #fff; box-shadow: none; }
+.gl-cursor.is-invert.is-link .gl-cursor__ring::before { border-color: #fff; background-color: transparent; }
+.gl-cursor.is-invert.is-link .gl-cursor__ring b { background: #fff; }
 .gl-cursor__dot, .gl-cursor__ring { position: absolute; left: 0; top: 0; will-change: transform; }
 .gl-cursor__dot::before { content: ''; position: absolute; left: -3.5px; top: -3.5px; width: 7px; height: 7px; border-radius: 50%; background: var(--color-secondary); box-shadow: 0 0 10px 2px color-mix(in srgb, var(--color-secondary) 70%, transparent); }
 .gl-cursor__ring::before { content: ''; position: absolute; left: -17px; top: -17px; width: 34px; height: 34px; border-radius: 50%; border: 2px solid rgba(255, 255, 255, .8); transition: transform .25s ease, border-color .25s ease, background-color .25s ease; }
