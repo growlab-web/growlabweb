@@ -122,8 +122,9 @@ export async function initPortfolio(root) {
       }, undefined, () => { const t = drawn(); t.anisotropy = maxAniso; mat.uniforms.uMap.value = t; });
     }
     // portada en vídeo (p. ej. el hero animado de la web): arranca con la imagen fija y pasa al vídeo en cuanto puede reproducirse
+    let coverVideo = null;
     if (p.coverVideo) {
-      const video = document.createElement('video');
+      const video = coverVideo = document.createElement('video');
       video.muted = true; video.loop = true; video.playsInline = true; video.preload = 'auto';
       video.setAttribute('muted', ''); video.setAttribute('playsinline', '');
       video.addEventListener('canplay', () => {
@@ -134,7 +135,6 @@ export async function initPortfolio(root) {
         video.play().then(() => { mat.uniforms.uMap.value = vt; }).catch(() => { /* reproducción bloqueada: se queda la imagen */ });
       }, { once: true });
       video.src = p.coverVideo;
-      document.addEventListener('visibilitychange', () => { if (document.hidden) video.pause(); else video.play().catch(() => {}); });
     }
     const mat = new THREE.ShaderMaterial({
       transparent: true, depthWrite: false, vertexShader: cardVert, fragmentShader: cardFrag,
@@ -143,7 +143,7 @@ export async function initPortfolio(root) {
     const mesh = new THREE.Mesh(geo, mat);
     mesh.userData.i = i;
     scene.add(mesh);
-    return { mesh, mat, hover: 0, p, muv: new THREE.Vector2(0.5, 0.5) };
+    return { mesh, mat, hover: 0, p, muv: new THREE.Vector2(0.5, 0.5), video: coverVideo };
   });
 
   /* ===================== Partículas: suelo en perspectiva + polvo ===================== */
@@ -347,6 +347,11 @@ export async function initPortfolio(root) {
 
       const m = c.mesh;
       m.visible = ad < 3.4 && e > 0.001 && S.mode > 0.01;
+      // las portadas en vídeo sólo corren cerca del centro y con el carrusel a la vista: con varias a la vez, el resto descansa
+      if (c.video && c.video.readyState >= 2) {
+        const play = ad < 1.6 && m.visible && !S.open && !document.hidden;
+        if (play && c.video.paused) c.video.play().catch(() => {}); else if (!play && !c.video.paused) c.video.pause();
+      }
       if (!m.visible) { tags[i].label.style.opacity = 0; tags[i].plus.style.opacity = 0; tags[i].label.style.pointerEvents = tags[i].plus.style.pointerEvents = 'none'; return; }
       // posición sobre el cilindro (el centro del cilindro queda delante del panel central)
       const th = d * DTH * (1 + (1 - e) * 0.18);

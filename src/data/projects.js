@@ -33,6 +33,38 @@ export const projects = [
     art: 'hero',
   },
   {
+    // PROYECTO REAL. Portada animada y capturas tomadas de la tienda publicada (alpaca111.com).
+    slug: 'alpaca-111',
+    cover: '/projects/alpaca-111/cover.jpg',
+    coverVideo: '/projects/alpaca-111/hero.mp4',
+    // capturas: hero · campaña de temporada · productos destacados · hombre y mujer · colección · ficha de producto
+    images: [1, 2, 3, 4, 5, 6].map((n) => `/projects/alpaca-111/${n}.jpg`),
+    name: 'Alpaca 111',
+    desc: 'Tienda online de moda sostenible en fibra de alpaca para mujer, hombre y hogar: campañas de temporada, colecciones, fichas de producto y compra en línea.',
+    category: 'Moda · Ecommerce',
+    year: '2026',
+    url: 'https://alpaca111.com/',
+    services: ['UX/UI Design', 'Web Development & Ecommerce'],
+    palette: { bg: '#efefef', fg: '#111111', accent: '#5d6b2f' },
+    art: 'catalog',
+  },
+  {
+    // PROYECTO REAL. Portada animada y capturas tomadas de la web publicada (pacomarca.com).
+    slug: 'pacomarca',
+    cover: '/projects/pacomarca/cover.jpg',
+    coverVideo: '/projects/pacomarca/hero.mp4',
+    // capturas: hero · cifras de impacto · fibras · programas · página de fibras · El Quintal del Inca
+    images: [1, 2, 3, 4, 5, 6].map((n) => `/projects/pacomarca/${n}.jpg`),
+    name: 'Pacomarca',
+    desc: 'Sitio institucional del ecosistema de alpaca sostenible impulsado por el Grupo Inca: investigación científica, fibras, programas sociales y blog, en español e inglés.',
+    category: 'Sostenibilidad · Web institucional',
+    year: '2026',
+    url: 'https://pacomarca.com/',
+    services: ['UX/UI Design', 'Web Development & Ecommerce', 'Tracking & Attribution'],
+    palette: { bg: '#1c211b', fg: '#ffffff', accent: '#b9c48a' },
+    art: 'hero',
+  },
+  {
     slug: 'aurora-studio',
     cover: '/projects/aurora-studio/cover.jpg',
     images: ['/projects/aurora-studio/cover.jpg', '/projects/aurora-studio/1.jpg', '/projects/aurora-studio/2.jpg', '/projects/aurora-studio/3.jpg'],
