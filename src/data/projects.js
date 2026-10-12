@@ -65,6 +65,22 @@ export const projects = [
     art: 'hero',
   },
   {
+    // PROYECTO REAL. Sólo diseño UX/UI; el home lo adaptó otra agencia, por eso la portada y las capturas son de páginas interiores.
+    slug: 'kuna',
+    cover: '/projects/kuna/cover.jpg',
+    coverVideo: '/projects/kuna/hero.mp4',            // página de la colección Black Alpaka (no el home)
+    // capturas: Black Alpaka · Vikuna · Fall Winter 26 · colección · ficha de producto · Home & Relax
+    images: [1, 2, 3, 4, 5, 6].map((n) => `/projects/kuna/${n}.jpg`),
+    name: 'Kuna',
+    desc: 'Diseño UX/UI de la tienda online de KUNA, marca peruana de prendas de alpaca y vicuña: páginas de colección y de campaña, catálogo y ficha de producto. Las adaptaciones del home fueron realizadas por otra agencia.',
+    category: 'Moda de lujo · Ecommerce',
+    year: '2025',
+    url: 'https://pe.kunastores.com/',
+    services: ['UX/UI Design'],
+    palette: { bg: '#1a1a1a', fg: '#ffffff', accent: '#8a4b2a' },
+    art: 'editorial',
+  },
+  {
     slug: 'aurora-studio',
     cover: '/projects/aurora-studio/cover.jpg',
     images: ['/projects/aurora-studio/cover.jpg', '/projects/aurora-studio/1.jpg', '/projects/aurora-studio/2.jpg', '/projects/aurora-studio/3.jpg'],
