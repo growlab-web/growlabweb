@@ -67,9 +67,10 @@ import Icon from './Icon.astro';
     gap: 10px;
     padding: 0 2rem 2rem;
   }
-  /* teléfonos estrechos: la tarjeta es más angosta y el texto ocupa más renglones; el dibujo se encoge para no pisarlo */
+  /* teléfonos estrechos: la tarjeta es más angosta y el texto ocupa más renglones; la tarjeta crece y el dibujo se encoge para no pisarlo */
   @media (max-width: 380px) {
     .art { transform: scale(0.74); transform-origin: 100% 100%; }
+    .card { height: 430px; }
   }
   /* barras */
   .art-bars i {
