@@ -111,14 +111,17 @@ export async function initPortfolio(root) {
       const g = c.getContext('2d'); g.fillStyle = (p.palette && p.palette.bg) || '#10131c'; g.fillRect(0, 0, 4, 4);
       return new THREE.CanvasTexture(c);
     };
+    let videoOn = false;                                             // true cuando la portada ya es el vídeo (la imagen no debe pisarlo)
     const tex = p.cover ? flat() : drawn();
     tex.anisotropy = maxAniso;
     if (p.cover) {
       new THREE.TextureLoader().load(p.cover, (img) => {
         img.anisotropy = maxAniso;
         if (PORTRAIT) { img.repeat.set(CARD_W / CARD_H / (img.image.width / img.image.height), 1); img.offset.set((1 - img.repeat.x) / 2, 0); }   // recorte centrado
-        img.colorSpace = THREE.SRGBColorSpace || img.colorSpace;
-        mat.uniforms.uMap.value = img;
+        // con portada en vídeo, la imagen fija se muestra con los mismos tonos que el vídeo (sin la conversión de color de las
+        // demás portadas, que las oscurece): así no se nota el cambio de una a otro
+        if (!p.coverVideo) img.colorSpace = THREE.SRGBColorSpace || img.colorSpace;
+        if (!videoOn) mat.uniforms.uMap.value = img;
       }, undefined, () => { const t = drawn(); t.anisotropy = maxAniso; mat.uniforms.uMap.value = t; });
     }
     // portada en vídeo (p. ej. el hero animado de la web): arranca con la imagen fija y pasa al vídeo en cuanto puede reproducirse
@@ -127,12 +130,13 @@ export async function initPortfolio(root) {
       const video = coverVideo = document.createElement('video');
       video.muted = true; video.loop = true; video.playsInline = true; video.preload = 'auto';
       video.setAttribute('muted', ''); video.setAttribute('playsinline', '');
-      video.addEventListener('canplay', () => {
+      // el vídeo sustituye a la imagen la primera vez que está reproduciéndose de verdad; arrancarlo y pararlo es cosa del
+      // bucle de dibujo (sólo corre cerca del centro del carrusel), así que aquí no se llama a play()
+      video.addEventListener('playing', () => {
         const vt = new THREE.VideoTexture(video);
         vt.anisotropy = maxAniso;
-        vt.colorSpace = THREE.SRGBColorSpace || vt.colorSpace;
         if (PORTRAIT) { vt.repeat.set(CARD_W / CARD_H / (video.videoWidth / video.videoHeight), 1); vt.offset.set((1 - vt.repeat.x) / 2, 0); }   // mismo recorte centrado que las imágenes
-        video.play().then(() => { mat.uniforms.uMap.value = vt; }).catch(() => { /* reproducción bloqueada: se queda la imagen */ });
+        videoOn = true; mat.uniforms.uMap.value = vt;
       }, { once: true });
       video.src = p.coverVideo;
     }
