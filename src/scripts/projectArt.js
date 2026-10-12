@@ -91,8 +91,8 @@ function drawStats(ctx, w, h, p) {
   ctx.fillStyle = hexA(accent, 0.22); ctx.beginPath(); ctx.arc(w * 0.12, h * 0.9, w * 0.34, 0, Math.PI * 2); ctx.fill();
   ctx.fillStyle = fg; ctx.textBaseline = 'alphabetic';
   ctx.font = `700 ${22 * s}px ${DISPLAY}`; ctx.globalAlpha = 0.6; ctx.fillText('RESULTADO', 60 * s, 110 * s); ctx.globalAlpha = 1;
-  ctx.font = `800 ${220 * s}px ${DISPLAY}`; ctx.fillStyle = accent; ctx.fillText(p.result.value, 56 * s, h * 0.58);
-  ctx.fillStyle = fg; ctx.font = `500 ${28 * s}px ${SANS}`; ctx.fillText(p.result.label, 60 * s, h * 0.58 + 54 * s);
+  ctx.font = `800 ${220 * s}px ${DISPLAY}`; ctx.fillStyle = accent; ctx.fillText(p.result ? p.result.value : p.year, 56 * s, h * 0.58);
+  ctx.fillStyle = fg; ctx.font = `500 ${28 * s}px ${SANS}`; ctx.fillText(p.result ? p.result.label : p.category, 60 * s, h * 0.58 + 54 * s);
   // mini gráfico
   ctx.strokeStyle = accent; ctx.lineWidth = 5 * s; ctx.lineJoin = 'round'; ctx.beginPath();
   const pts = [0.9, 0.82, 0.86, 0.7, 0.62, 0.55, 0.38, 0.3, 0.16];

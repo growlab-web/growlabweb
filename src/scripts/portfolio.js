@@ -419,20 +419,34 @@ export async function initPortfolio(root) {
     $('[data-pf-chips]', modal).innerHTML =
       `<span class="pf-dot" aria-hidden="true"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg></span>` +
       `<span class="pf-chip">${p.category}</span><span class="pf-chip">${p.year}</span>` +
-      `<span class="pf-chip pf-chip--result"><b>${p.result.value}</b> ${p.result.label}</span>`;
+      (p.result ? `<span class="pf-chip pf-chip--result"><b>${p.result.value}</b> ${p.result.label}</span>` : '') +
+      (p.url ? `<a class="pf-chip pf-chip--link" href="${p.url}" target="_blank" rel="noopener noreferrer">Ver sitio ↗</a>` : '');
     $('[data-pf-services]', modal).innerHTML = p.services.map((s) => `<li>${s}</li>`).join('');
     const prev = projects[(projects.indexOf(p) - 1 + N) % N], next = projects[(projects.indexOf(p) + 1) % N];
     $('[data-pf-prev-name]', modal).textContent = prev.name; $('[data-pf-next-name]', modal).textContent = next.name;
     // imágenes
     imagesEl.innerHTML = '';
     if (!imgCache.has(p.slug)) imgCache.set(p.slug, projectImageKinds(p).map((k) => makeArt(p, k, 1400, 880)));
-    const imgs = (p.images && p.images.length) ? p.images.map((src) => { const im = new Image(); im.src = src; im.alt = p.name; return im; }) : imgCache.get(p.slug);
+    // cada entrada es una imagen o, si acaba en .mp4/.webm, una grabación de la web que se reproduce sola (sin sonido y en bucle)
+    const media = (src) => {
+      if (!/\.(mp4|webm)$/i.test(src)) { const im = new Image(); im.src = src; im.alt = p.name; return im; }
+      const v = document.createElement('video');
+      v.src = src; v.muted = true; v.loop = true; v.playsInline = true; v.preload = 'metadata';
+      v.setAttribute('muted', ''); v.setAttribute('playsinline', '');
+      if (p.cover) v.poster = p.cover;
+      v.setAttribute('aria-label', `Grabación de la web de ${p.name}`);
+      return v;
+    };
+    const imgs = (p.images && p.images.length) ? p.images.map(media) : imgCache.get(p.slug);
     imgs.forEach((el) => { const fig = document.createElement('figure'); fig.className = 'pf-fig'; el.className = 'pf-img'; fig.append(el); imagesEl.append(fig); });
     scroller.scrollTop = 0; ring.style.strokeDashoffset = RING_LEN;
     if ('IntersectionObserver' in window) {
       const io = new IntersectionObserver((es) => es.forEach((en) => { if (en.isIntersecting) { en.target.classList.add('is-in'); io.unobserve(en.target); } }), { root: scroller, threshold: 0.15 });
       $$('.pf-fig', imagesEl).forEach((f) => io.observe(f));
-    } else $$('.pf-fig', imagesEl).forEach((f) => f.classList.add('is-in'));
+      // los vídeos sólo corren mientras se ven (y se paran al cerrar el proyecto, porque dejan de estar a la vista)
+      const vio = new IntersectionObserver((es) => es.forEach((en) => { if (en.isIntersecting) en.target.play().catch(() => {}); else en.target.pause(); }), { root: scroller, threshold: 0.25 });
+      $$('video', imagesEl).forEach((v) => vio.observe(v));
+    } else { $$('.pf-fig', imagesEl).forEach((f) => f.classList.add('is-in')); $$('video', imagesEl).forEach((v) => { v.controls = true; }); }
   }
 
   scroller.addEventListener('scroll', () => {

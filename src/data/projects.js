@@ -10,8 +10,25 @@
  * Si faltan, se dibuja una imagen por código a partir de `palette` y `art` (ver scripts/projectArt.js).
  *
  * art: 'hero' | 'catalog' | 'editorial'  → estilo de la imagen generada.
+ *
+ * Vídeo: en `images` también se puede poner un .mp4 (grabación de la web con sus animaciones); se reproduce solo, en bucle y sin sonido.
+ * Opcionales: `url` (enlace «Ver sitio» al proyecto publicado) y `result` (si no hay una cifra real, se omite y no se muestra).
  */
 export const projects = [
+  {
+    // PROYECTO REAL. Capturas y vídeo tomados de la web publicada (relengcorp.com).
+    slug: 'relengcorp',
+    cover: '/projects/relengcorp/cover.jpg',
+    images: ['/projects/relengcorp/home.mp4', '/projects/relengcorp/1.jpg', '/projects/relengcorp/2.jpg', '/projects/relengcorp/3.jpg'],
+    name: 'Relengcorp',
+    desc: 'Sitio corporativo para una empresa de ingeniería especializada en operaciones críticas: siete soluciones estratégicas, portafolio de proyectos, clientes y blog, con animaciones que acompañan el scroll.',
+    category: 'Ingeniería industrial · Web corporativa',
+    year: '2026',
+    url: 'https://www.relengcorp.com/',
+    services: ['Web Development & Ecommerce', 'UX/UI Design'],
+    palette: { bg: '#141b2d', fg: '#ffffff', accent: '#00a8e8' },
+    art: 'hero',
+  },
   {
     slug: 'aurora-studio',
     cover: '/projects/aurora-studio/cover.jpg',
