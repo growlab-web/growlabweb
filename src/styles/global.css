@@ -239,13 +239,11 @@ html.has-cursor, html.has-cursor * { cursor: none !important; }
 .gl-cursor.is-link .gl-cursor__ring b { transform: rotate(calc(var(--a) + 45deg)) translateY(-30px); background: var(--color-secondary); }
 .gl-cursor.is-down .gl-cursor__ring::before { transform: scale(.8); }
 
-/* ---------- Servicios en móvil/tablet: carrusel que se desliza con el dedo (en escritorio sigue el scroll con pin) ---------- */
+/* ---------- Servicios: carrusel lateral ---------- */
 .services-hint { display: flex; align-items: center; gap: 1rem; }
 .hint-swipe { display: none; }
 .hint-arrow { animation: hint-nudge 1.4s ease-in-out infinite; }
-.hint-wheel { animation: hint-wheel 1.4s ease-in-out infinite; }
 @keyframes hint-nudge { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(5px); } }
-@keyframes hint-wheel { 0% { transform: translateY(-1px); opacity: 1; } 70%, 100% { transform: translateY(4px); opacity: 0; } }
 
 /* señal de scroll del hero: una gota de luz que baja por la línea y tres puntos, uno por etapa */
 .cue-drop { animation: cue-drop 1.8s cubic-bezier(.6, 0, .3, 1) infinite; }
@@ -254,14 +252,20 @@ html.has-cursor, html.has-cursor * { cursor: none !important; }
 .cue-dot.is-on { background: var(--color-secondary); transform: scale(1.5); }
 .cue-coarse { display: none; }
 @media (pointer: coarse) { .cue-fine { display: none; } .cue-coarse { display: inline; } }
+/* carrusel de servicios: desplazamiento lateral nativo con enganche tarjeta a tarjeta; las flechas lo mueven por código (main.js) */
+[data-services-track] { overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scroll-padding-inline: var(--pad); -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+[data-services-track]::-webkit-scrollbar { display: none; }
+[data-services-track] > * { flex: 0 0 auto; scroll-snap-align: start; }
+.svc-arrow { position: absolute; top: 50%; z-index: 3; display: grid; place-items: center; width: 52px; height: 52px; margin-top: -26px; border-radius: 9999px; border: 1px solid rgba(255, 255, 255, .25); background: rgba(8, 12, 24, .82); color: #fff; cursor: pointer; backdrop-filter: blur(8px); transition: background .25s, color .25s, border-color .25s, opacity .25s, transform .25s; }
+.svc-arrow:hover { background: var(--color-secondary); border-color: var(--color-secondary); color: #000; transform: scale(1.06); }
+.svc-arrow:disabled { opacity: 0; pointer-events: none; }
 @media (max-width: 1023px), (pointer: coarse) {
-  [data-services-pin] { height: auto; overflow: visible; padding-block: 10vh; gap: 2rem; }
-  [data-services-track] { width: auto; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scroll-padding-inline: var(--pad); -webkit-overflow-scrolling: touch; scrollbar-width: none; gap: 1rem; will-change: auto; }
-  [data-services-track]::-webkit-scrollbar { display: none; }
-  [data-services-track] > * { flex: 0 0 auto; scroll-snap-align: start; width: min(78vw, 340px); }
-  .hint-scroll { display: none; }
-  .hint-swipe { display: inline; }
+  [data-services-pin] { padding-block: 10vh; gap: 2rem; }
+  [data-services-track] { gap: 1rem; }
+  [data-services-track] > * { width: min(78vw, 340px); }
+  .hint-swipe { display: flex; }
 }
+@media (max-width: 639px), (pointer: coarse) { .svc-arrow { display: none; } }      /* en táctil se desliza con el dedo */
 
 /* ---------- Móvil y táctil: degradados baratos de dibujar ----------
    Cambiar contorno o brillo de una mancha difuminada obliga a recalcular el desenfoque en cada fotograma; aquí solo se mueven y giran. */

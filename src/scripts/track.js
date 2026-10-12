@@ -9,6 +9,7 @@
  *   contact_click   correo, teléfono y redes    → contact_method (email, telefono, whatsapp, instagram, linkedin)
  *   hero_stage      etapas del hero al bajar    → stage (esfera, galaxia, cerebro)
  *   section_view    secciones del inicio        → section (quienes-somos, servicios, contacto)
+ *   services_slide  flechas del carrusel        → direction (siguiente, anterior)
  *   project_view    proyecto abierto            → project
  *   thanks_game_play alguien juega tras enviar  → form_location
  *   render_mode     versión del hero que se ve  → render_mode ('3d', o 'imagenes' si el navegador no tiene aceleración gráfica)

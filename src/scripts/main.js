@@ -48,7 +48,7 @@ if ($('[data-hero][data-pin]') || isApp) lenis.stop();
 
 /* ---------- Paradas de scroll: un gesto de rueda o trackpad avanza como mucho hasta la siguiente ---------- */
 // la inercia del trackpad sigue mandando scroll un buen rato después de soltar: sin esto, un gesto rápido cruza toda la página
-// Paradas: las etapas del hero, los tramos del carrusel de servicios y las secciones marcadas con data-stop (sólo en páginas con pin)
+// Paradas: las etapas del hero y las secciones marcadas con data-stop (sólo en páginas con pin)
 let stops = [];
 const gesture = { t: 0, dir: 0, limit: null, held: false, heldAt: 0, low: 0 };
 function measureStops() {
@@ -291,23 +291,28 @@ function initPage() {
     });
   }
 
-  /* SERVICIOS: scroll horizontal con pin */
-  const track = $('[data-services-track]');
-  // en móvil y tablet la gente arrastra las tarjetas de lado: ahí es un carrusel que se desliza con el dedo, sin pin
-  const swipeServices = window.matchMedia('(max-width: 1023px), (pointer: coarse)').matches;
-  if (track && swipeServices) {
-    const bar = $('[data-services-bar]');
-    const upd = () => { const max = track.scrollWidth - track.clientWidth; if (bar) bar.style.transform = `scaleX(${max > 0 ? Math.max(0.08, track.scrollLeft / max) : 1})`; };
-    track.addEventListener('scroll', upd, { passive: true });
+  /* SERVICIOS: carrusel lateral con flechas (el scroll vertical ya no lo mueve) */
+  const svcTrack = $('[data-services-track]');
+  if (svcTrack) {
+    const bar = $('[data-services-bar]'), prev = $('[data-services-prev]'), next = $('[data-services-next]');
+    const upd = () => {
+      const max = svcTrack.scrollWidth - svcTrack.clientWidth, x = svcTrack.scrollLeft;
+      if (bar) bar.style.transform = `scaleX(${max > 0 ? Math.max(0.08, x / max) : 1})`;
+      if (prev) prev.disabled = x <= 2;
+      if (next) next.disabled = x >= max - 2;
+    };
+    // cada flecha avanza las tarjetas que caben enteras en pantalla (al menos una)
+    const move = (dir) => {
+      const card = svcTrack.firstElementChild; if (!card) return;
+      const step = card.getBoundingClientRect().width + parseFloat(getComputedStyle(svcTrack).columnGap || '0');
+      svcTrack.scrollBy({ left: dir * Math.max(1, Math.floor(svcTrack.clientWidth / step)) * step, behavior: reduceMotion ? 'auto' : 'smooth' });
+      track('services_slide', { direction: dir > 0 ? 'siguiente' : 'anterior' });
+    };
+    if (prev) prev.addEventListener('click', () => move(-1));
+    if (next) next.addEventListener('click', () => move(1));
+    svcTrack.addEventListener('scroll', upd, { passive: true });
+    window.addEventListener('resize', upd);
     upd();
-  }
-  if (track) {
-    const getDist = () => track.scrollWidth - window.innerWidth;
-    if (!swipeServices) gsap.to(track, {
-      x: () => -getDist(), ease: 'none',
-      scrollTrigger: { trigger: '[data-services-pin]', start: 'top top', end: () => '+=' + getDist(), pin: true, scrub: 0.4, invalidateOnRefresh: true, anticipatePin: 1,
-        onUpdate: (self) => { const bar = $('[data-services-bar]'); if (bar) bar.style.transform = `scaleX(${Math.max(0.08, self.progress)})`; } },   // la barra bajo las tarjetas marca cuánto falta
-    });
     gsap.from('[data-services-head] > *', {
       y: 60, opacity: 0, stagger: 0.15, duration: 1, ease: 'expo.out',
       scrollTrigger: { trigger: '[data-services]', start: isTouch ? 'top 95%' : 'top 70%' },
@@ -346,7 +351,7 @@ function initPage() {
   };
   enter('[data-marquee]', null, { y: 30, duration: 1.2 }, 'top 92%');
   $$('[data-manifesto]').forEach((m) => enter([m.previousElementSibling], m.parentElement));
-  enter('[data-services-track] > *', '[data-services]', { y: 0, x: 140, stagger: 0.09, duration: 1.1 }, swipeServices ? 'top 75%' : 'top 55%');
+  enter('[data-services-track] > *', '[data-services]', { y: 0, x: 140, stagger: 0.09, duration: 1.1 }, 'top 75%');
   $$('[data-contact]').forEach((c) => {
     enter([c.firstElementChild], c, { y: 0, x: -50, duration: 1.3 }, 'top 75%');
     enter($$('[data-contact-form] > *', c), $('[data-contact-form]', c), { y: 26, stagger: 0.06, duration: 0.9 }, 'top 88%');
