@@ -21,7 +21,8 @@ export const projects = [
     slug: 'relengcorp',
     cover: '/projects/relengcorp/cover.jpg',
     coverVideo: '/projects/relengcorp/hero.mp4',      // portada animada del panel 3D: un ciclo completo del hero (sin sonido, en bucle)
-    images: ['/projects/relengcorp/cover.jpg', '/projects/relengcorp/1.jpg', '/projects/relengcorp/2.jpg', '/projects/relengcorp/3.jpg'],   // capturas provisionales
+    // capturas: hero · soluciones · cifras · página de servicio · nosotros · portafolio
+    images: [1, 2, 3, 4, 5, 6].map((n) => `/projects/relengcorp/${n}.jpg`),
     name: 'Relengcorp',
     desc: 'Sitio corporativo para una empresa de ingeniería especializada en operaciones críticas: siete soluciones estratégicas, portafolio de proyectos, clientes y blog, con animaciones que acompañan el scroll.',
     category: 'Ingeniería industrial · Web corporativa',

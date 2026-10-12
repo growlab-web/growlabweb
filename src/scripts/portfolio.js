@@ -10,7 +10,6 @@ import gsap from 'gsap';
 import { projects, getProject } from '../data/projects.js';
 import { makeArt, projectImageKinds } from './projectArt.js';
 import { track } from './track.js';
-import { attachBulge } from './bulge.js';
 
 const N = projects.length;
 let CARD_W = 3.6, CARD_H = 2.25;                  // en móvil se cambian a un formato vertical (ver initPortfolio)
@@ -426,7 +425,6 @@ export async function initPortfolio(root) {
   const ring = $('[data-pf-ring]', modal);
   const RING_LEN = 2 * Math.PI * 9;
   const imgCache = new Map();
-  const bulges = [];
   const baseTitle = document.title;
 
   function fillProject(p) {
@@ -455,11 +453,7 @@ export async function initPortfolio(root) {
       return v;
     };
     const imgs = (p.images && p.images.length) ? p.images.map(media) : imgCache.get(p.slug);
-    bulges.splice(0).forEach((off) => off());                      // se desmonta el efecto de las imágenes del proyecto anterior
-    imgs.forEach((el) => {
-      const fig = document.createElement('figure'); fig.className = 'pf-fig'; el.className = 'pf-img'; fig.append(el); imagesEl.append(fig);
-      if (el instanceof HTMLImageElement) bulges.push(attachBulge(fig, el));   // mismo efecto que las portadas: se abomban siguiendo al cursor
-    });
+    imgs.forEach((el) => { const fig = document.createElement('figure'); fig.className = 'pf-fig'; el.className = 'pf-img'; fig.append(el); imagesEl.append(fig); });
     scroller.scrollTop = 0; ring.style.strokeDashoffset = RING_LEN;
     if ('IntersectionObserver' in window) {
       const io = new IntersectionObserver((es) => es.forEach((en) => { if (en.isIntersecting) { en.target.classList.add('is-in'); io.unobserve(en.target); } }), { root: scroller, threshold: 0.15 });
