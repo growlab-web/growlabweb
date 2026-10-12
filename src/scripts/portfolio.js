@@ -10,6 +10,7 @@ import gsap from 'gsap';
 import { projects, getProject } from '../data/projects.js';
 import { makeArt, projectImageKinds } from './projectArt.js';
 import { track } from './track.js';
+import { isSoftwareGL } from './gpu.js';
 
 const N = projects.length;
 let CARD_W = 3.6, CARD_H = 2.25;                  // en móvil se cambian a un formato vertical (ver initPortfolio)
@@ -41,7 +42,8 @@ export async function initPortfolio(root) {
 
   /* ===================== Renderer y cámara ===================== */
   const renderer = new WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
-  const PR = Math.min(window.devicePixelRatio || 1, 1.75);
+  const SOFT = isSoftwareGL(renderer.getContext());                // sin tarjeta gráfica: menos resolución y sin vídeos de portada
+  const PR = SOFT ? 1 : Math.min(window.devicePixelRatio || 1, 1.75);
   renderer.setPixelRatio(PR);
   renderer.setClearColor(0x000000, 0);
   const scene = new Scene();
@@ -126,9 +128,9 @@ export async function initPortfolio(root) {
     }
     // portada en vídeo (p. ej. el hero animado de la web): arranca con la imagen fija y pasa al vídeo en cuanto puede reproducirse
     let coverVideo = null;
-    if (p.coverVideo) {
+    if (p.coverVideo && !SOFT) {
       const video = coverVideo = document.createElement('video');
-      video.muted = true; video.loop = true; video.playsInline = true; video.preload = 'auto';
+      video.muted = true; video.loop = true; video.playsInline = true; video.preload = 'none';   // no se descarga hasta que le toca reproducirse
       video.setAttribute('muted', ''); video.setAttribute('playsinline', '');
       // el vídeo sustituye a la imagen la primera vez que está reproduciéndose de verdad; arrancarlo y pararlo es cosa del
       // bucle de dibujo (sólo corre cerca del centro del carrusel), así que aquí no se llama a play()
@@ -352,9 +354,11 @@ export async function initPortfolio(root) {
       const m = c.mesh;
       m.visible = ad < 3.4 && e > 0.001 && S.mode > 0.01;
       // las portadas en vídeo sólo corren cerca del centro y con el carrusel a la vista: con varias a la vez, el resto descansa
-      if (c.video && c.video.readyState >= 2) {
+      // (cada vídeo pesa unos 3 MB y no se pide al servidor hasta ese momento)
+      if (c.video) {
         const play = ad < 1.6 && m.visible && !S.open && !document.hidden;
-        if (play && c.video.paused) c.video.play().catch(() => {}); else if (!play && !c.video.paused) c.video.pause();
+        if (play && c.video.paused && !c.asked) { c.asked = true; c.video.play().catch(() => { c.asked = false; }); }
+        else if (!play) { c.asked = false; if (!c.video.paused) c.video.pause(); }
       }
       if (!m.visible) { tags[i].label.style.opacity = 0; tags[i].plus.style.opacity = 0; tags[i].label.style.pointerEvents = tags[i].plus.style.pointerEvents = 'none'; return; }
       // posición sobre el cilindro (el centro del cilindro queda delante del panel central)
@@ -454,7 +458,7 @@ export async function initPortfolio(root) {
     if (!imgCache.has(p.slug)) imgCache.set(p.slug, projectImageKinds(p).map((k) => makeArt(p, k, 1400, 880)));
     // cada entrada es una imagen o, si acaba en .mp4/.webm, una grabación de la web que se reproduce sola (sin sonido y en bucle)
     const media = (src) => {
-      if (!/\.(mp4|webm)$/i.test(src)) { const im = new Image(); im.src = src; im.alt = p.name; return im; }
+      if (!/\.(mp4|webm)$/i.test(src)) { const im = new Image(); im.loading = 'lazy'; im.decoding = 'async'; im.src = src; im.alt = p.name; return im; }
       const v = document.createElement('video');
       v.src = src; v.muted = true; v.loop = true; v.playsInline = true; v.preload = 'metadata';
       v.setAttribute('muted', ''); v.setAttribute('playsinline', '');

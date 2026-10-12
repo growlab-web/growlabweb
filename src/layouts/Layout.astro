@@ -12,8 +12,9 @@ interface Props {
   app?: boolean; // página a pantalla completa (portafolio 3D): sin scroll de documento ni Lenis
   image?: string; // imagen al compartir el enlace (por defecto, la general del sitio)
   noindex?: boolean; // páginas que no deben salir en buscadores (p. ej. la de error)
+  intro?: boolean; // pantalla de carga con lluvia: sólo el inicio (en las demás retrasaría el primer contenido sin aportar nada)
 }
-const { title, description, app = false, image = '/og.jpg', noindex = false } = Astro.props;
+const { title, description, app = false, image = '/og.jpg', noindex = false, intro = false } = Astro.props;
 
 // dirección oficial de la página (sin barra final) e imagen para redes, siempre con el dominio completo
 const canonical = new URL(Astro.url.pathname.replace(/\/$/, '') || '/', site.url).href;
@@ -73,12 +74,10 @@ const gtm = /^GTM-[A-Z0-9]+$/.test(site.gtm) ? site.gtm : '';
     <script type="application/ld+json" set:html={JSON.stringify(schema)} />
     <link rel="icon" type="image/png" href="/favicon.png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Host+Grotesk:wght@300;400;500;600&family=Nunito+Sans:wght@400;600&family=Syne:wght@400;500;600;700;800&display=swap"
-      rel="stylesheet"
-    />
+    <!-- tipografías propias: se piden cuanto antes para que el primer texto ya salga con su letra -->
+    <link rel="preload" href="/fonts/syne.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/host-grotesk.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/nunito-sans.woff2" as="font" type="font/woff2" crossorigin />
     <title>{title}</title>
     {
       gtm && (
@@ -111,7 +110,7 @@ const gtm = /^GTM-[A-Z0-9]+$/.test(site.gtm) ? site.gtm : '';
   </head>
   <body class:list={['bg-black font-body text-white antialiased', app ? 'h-screen overflow-hidden' : 'overflow-x-hidden']} data-app={app ? '' : undefined}>
     {gtm && <noscript><iframe src={`https://www.googletagmanager.com/ns.html?id=${gtm}`} height="0" width="0" style="display:none;visibility:hidden" title="Google Tag Manager"></iframe></noscript>}
-    <Loader />
+    {intro && <Loader />}
     <slot />
     <WhatsApp />
     {gtm && <Consent />}

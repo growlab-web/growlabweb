@@ -12,6 +12,7 @@ import { initDataFlow } from './dataflow.js';
 import { initDust } from './dust.js';
 import { initCursor } from './cursor.js';
 import { initTracking } from './track.js';
+import { softwareGL } from './gpu.js';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -141,10 +142,19 @@ $$('a[href^="#"], a[href^="/#"]').forEach((a) => {
 
 /* ---------- Objeto 3D (sólo en el inicio): se descarga en segundo plano mientras llueve ---------- */
 const hasHero = !!$('[data-hero]');
-let hero3d = { start() {} };
+let hero3d = null;                 // se rellena cuando el objeto del hero (3D o imágenes) está listo
+let heroWanted = false;            // la página ya se mostró y espera al objeto para arrancarlo
+const startHero = () => { if (!hero3d) { heroWanted = true; return; } hero3d.start(reduceMotion); };
 const heroReady = hasHero
-  ? import('./hero3d.js')
-      .then((m) => { hero3d = m.initHero3D(); return Promise.race([hero3d.ready, new Promise((r) => setTimeout(r, 3000))]); })   // espera a que la gráfica esté lista (máx. 3 s)
+  // sin tarjeta gráfica (equipos muy básicos y herramientas de medición) el hero usa imágenes fijas en vez de la escena 3D: ver gpu.js
+  ? softwareGL()
+      .then((soft) => { if (soft) document.documentElement.classList.add('no-3d'); return soft ? import('./heroStatic.js').then((m) => m.initHeroStatic()) : import('./hero3d.js').then((m) => m.initHero3D()); })
+      .then((h) => Promise.race([h.ready, new Promise((r) => setTimeout(r, 3000))]).then(() => {   // espera a que la gráfica esté lista (máx. 3 s)
+        hero3d = h;
+        if (!heroWanted) return;
+        // la página se mostró antes (ver sceneReady): el objeto arranca ahora y, como su pin se crea tarde, se reordenan y recalculan los demás
+        hero3d.start(reduceMotion); ScrollTrigger.sort(); ScrollTrigger.refresh();
+      }))
       .catch((err) => console.warn('WebGL no disponible, se omite el objeto 3D.', err))
   : Promise.resolve();
 
@@ -156,7 +166,9 @@ const pfReady = pfEl
       .then(async (m) => { pf = await m.initPortfolio(pfEl); })
       .catch((err) => { console.warn('No se pudo iniciar el portafolio 3D.', err); const l = $('[data-pf-loader]'); if (l) l.remove(); })
   : Promise.resolve();
-const sceneReady = Promise.all([heroReady, pfReady]);
+// el texto no espera indefinidamente al objeto del hero: si tarda (sin tarjeta gráfica la comprobación es lenta), la página
+// se muestra igual y el objeto aparece cuando esté. Con tarjeta gráfica llega mucho antes de ese margen.
+const sceneReady = Promise.all([Promise.race([heroReady, new Promise((r) => setTimeout(r, 900))]), pfReady]);
 
 /* ---------- Pantalla de carga con lluvia (sólo en el inicio) ---------- */
 let introSeen = false;
@@ -248,7 +260,7 @@ function initPage() {
     // en táctil sin desenfoque: animar un blur es de lo más caro en un teléfono y coincide con el arranque del 3D
     gsap.from('[data-line]', { autoAlpha: 0, y: 26, ...(isTouch ? {} : { filter: 'blur(14px)' }), duration: 1.3, stagger: 0.14, ease: 'power3.out' });
     gsap.from('[data-foot], [data-actions] > *, [data-logos] > *', { autoAlpha: 0, y: 20, ...(isTouch ? {} : { filter: 'blur(8px)' }), duration: 1.1, stagger: 0.12, delay: 0.35, ease: 'power3.out' });
-    hero3d.start(reduceMotion);
+    startHero();
     initTypewriter();
   }
 

@@ -1,6 +1,12 @@
 @import "tailwindcss";
 
 /* ───────── Tokens de diseño (Tailwind v4) ───────── */
+/* Tipografías alojadas en el propio sitio (antes venían de Google Fonts y frenaban el primer pintado). Archivos variables: un solo
+   archivo por familia cubre todos los grosores. Sólo el alfabeto latino básico, que incluye tildes, ñ y ¿¡. */
+@font-face { font-family: "Syne"; src: url("/fonts/syne.woff2") format("woff2"); font-weight: 400 800; font-style: normal; font-display: swap; }
+@font-face { font-family: "Host Grotesk"; src: url("/fonts/host-grotesk.woff2") format("woff2"); font-weight: 300 800; font-style: normal; font-display: swap; }
+@font-face { font-family: "Nunito Sans"; src: url("/fonts/nunito-sans.woff2") format("woff2"); font-weight: 200 1000; font-style: normal; font-display: swap; }
+
 @theme {
   --font-display: "Syne", "Host Grotesk", system-ui, sans-serif;
   --font-ui: "Host Grotesk", system-ui, sans-serif;
@@ -341,3 +347,9 @@ select:-webkit-autofill {
   transition: background-color 99999s ease-out 0s, color 99999s ease-out 0s;
 }
 input:autofill, textarea:autofill { background-color: transparent !important; color: #fff !important; }
+
+/* ---------- Hero sin WebGL (equipos sin tarjeta gráfica: scripts/heroStatic.js) ----------
+   Imágenes fijas de las formas sobre negro; con «screen» el negro desaparece y quedan sólo las partículas, como en la escena real. */
+.hero-static { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+.hero-static img { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; object-fit: cover; mix-blend-mode: screen; }
+.no-3d [data-universe] { display: none; }      /* las plataformas en órbita se calculan con la escena 3D */
