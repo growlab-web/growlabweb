@@ -17,17 +17,17 @@
  */
 export const projects = [
   {
-    // PROYECTO REAL. Capturas y vídeo tomados de la web publicada (relengcorp.com).
+    // PROYECTO REAL. La portada animada y las capturas están tomadas de la web publicada (relengcorp.com).
     slug: 'relengcorp',
     cover: '/projects/relengcorp/cover.jpg',
     coverVideo: '/projects/relengcorp/hero.mp4',      // portada animada del panel 3D: un ciclo completo del hero (sin sonido, en bucle)
-    images: ['/projects/relengcorp/home.mp4', '/projects/relengcorp/1.jpg', '/projects/relengcorp/2.jpg', '/projects/relengcorp/3.jpg'],
+    images: ['/projects/relengcorp/cover.jpg', '/projects/relengcorp/1.jpg', '/projects/relengcorp/2.jpg', '/projects/relengcorp/3.jpg'],   // capturas provisionales
     name: 'Relengcorp',
     desc: 'Sitio corporativo para una empresa de ingeniería especializada en operaciones críticas: siete soluciones estratégicas, portafolio de proyectos, clientes y blog, con animaciones que acompañan el scroll.',
     category: 'Ingeniería industrial · Web corporativa',
     year: '2026',
     url: 'https://www.relengcorp.com/',
-    services: ['Web Development & Ecommerce', 'UX/UI Design'],
+    services: ['UX/UI Design', 'Web Development & Ecommerce', 'Tracking & Attribution'],
     palette: { bg: '#141b2d', fg: '#ffffff', accent: '#00a8e8' },
     art: 'hero',
   },
