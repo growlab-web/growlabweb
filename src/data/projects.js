@@ -12,6 +12,7 @@
  * art: 'hero' | 'catalog' | 'editorial'  → estilo de la imagen generada.
  *
  * Vídeo: en `images` también se puede poner un .mp4 (grabación de la web con sus animaciones); se reproduce solo, en bucle y sin sonido.
+ * Portada animada: `coverVideo` (.mp4) sustituye a `cover` en el panel 3D en cuanto puede reproducirse; `cover` queda como imagen inicial.
  * Opcionales: `url` (enlace «Ver sitio» al proyecto publicado) y `result` (si no hay una cifra real, se omite y no se muestra).
  */
 export const projects = [
@@ -19,6 +20,7 @@ export const projects = [
     // PROYECTO REAL. Capturas y vídeo tomados de la web publicada (relengcorp.com).
     slug: 'relengcorp',
     cover: '/projects/relengcorp/cover.jpg',
+    coverVideo: '/projects/relengcorp/hero.mp4',      // portada animada del panel 3D: un ciclo completo del hero (sin sonido, en bucle)
     images: ['/projects/relengcorp/home.mp4', '/projects/relengcorp/1.jpg', '/projects/relengcorp/2.jpg', '/projects/relengcorp/3.jpg'],
     name: 'Relengcorp',
     desc: 'Sitio corporativo para una empresa de ingeniería especializada en operaciones críticas: siete soluciones estratégicas, portafolio de proyectos, clientes y blog, con animaciones que acompañan el scroll.',

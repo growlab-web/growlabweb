@@ -121,6 +121,21 @@ export async function initPortfolio(root) {
         mat.uniforms.uMap.value = img;
       }, undefined, () => { const t = drawn(); t.anisotropy = maxAniso; mat.uniforms.uMap.value = t; });
     }
+    // portada en vídeo (p. ej. el hero animado de la web): arranca con la imagen fija y pasa al vídeo en cuanto puede reproducirse
+    if (p.coverVideo) {
+      const video = document.createElement('video');
+      video.muted = true; video.loop = true; video.playsInline = true; video.preload = 'auto';
+      video.setAttribute('muted', ''); video.setAttribute('playsinline', '');
+      video.addEventListener('canplay', () => {
+        const vt = new THREE.VideoTexture(video);
+        vt.anisotropy = maxAniso;
+        vt.colorSpace = THREE.SRGBColorSpace || vt.colorSpace;
+        if (PORTRAIT) { vt.repeat.set(CARD_W / CARD_H / (video.videoWidth / video.videoHeight), 1); vt.offset.set((1 - vt.repeat.x) / 2, 0); }   // mismo recorte centrado que las imágenes
+        video.play().then(() => { mat.uniforms.uMap.value = vt; }).catch(() => { /* reproducción bloqueada: se queda la imagen */ });
+      }, { once: true });
+      video.src = p.coverVideo;
+      document.addEventListener('visibilitychange', () => { if (document.hidden) video.pause(); else video.play().catch(() => {}); });
+    }
     const mat = new THREE.ShaderMaterial({
       transparent: true, depthWrite: false, vertexShader: cardVert, fragmentShader: cardFrag,
       uniforms: { uMap: { value: tex }, uBend: { value: BEND_R }, uBright: { value: 1 }, uOpacity: { value: 1 }, uHover: { value: 0 }, uSize: { value: new THREE.Vector2(CARD_W, CARD_H) }, uTime: { value: 0 }, uFlag: { value: 0 }, uPhase: { value: 0 }, uLean: { value: 0 }, uSph: { value: new THREE.Vector4(SPH.rx2, SPH.ry2, SPH.amp, SPH.back) }, uCy: { value: 0 }, uMouseUV: { value: new THREE.Vector2(0.5, 0.5) } },
