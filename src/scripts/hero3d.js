@@ -456,7 +456,8 @@ export function initHero3D() {
     base.brainScale = Math.max(0.12, fit);
     // el tronco del cerebro (abajo) es fino y casi no se ve: el cuerpo visible queda algo por encima del centro de su caja, así
     // que se baja un poco para que el aire por arriba y por abajo se vea igual
-    const centerPx = (above + below) / 2 + boxH * base.brainScale * pxPerUnit * 0.045, boxMid = ((brainBox.y0 + brainBox.y1) / 2) * base.brainScale;
+    // algo por debajo del punto medio (55 %), para dejar más aire con el texto de arriba que con los logos
+    const centerPx = above + (below - above) * 0.55 + boxH * base.brainScale * pxPerUnit * 0.045, boxMid = ((brainBox.y0 + brainBox.y1) / 2) * base.brainScale;
     base.brainDy = (h / 2 - centerPx) / pxPerUnit - boxMid - base.y;                           // del centro del hueco a unidades de la escena
   }
 
