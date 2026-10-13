@@ -123,10 +123,12 @@ const stats = site.stats.map((s) => ({ n: `${s.v}${s.s}`, l: s.l }));
       <!-- escritorio: los logos van bajo el texto; en pantallas menores siguen sobre el cierre -->
       <AiTools class="mt-8 justify-start max-lg:hidden" />
     </div>
-    <!-- el cierre deja libre la esquina inferior derecha, donde va el botón flotante de WhatsApp -->
-    <div class="absolute bottom-[max(4%,88px)] right-(--gx) flex flex-col items-end gap-6 max-sm:bottom-[80px] max-sm:gap-4">
-      <AiTools class="justify-end lg:hidden" />
-      <h3 data-in class="display-xl text-right max-md:text-[2.2rem]">
+    <!-- escritorio: el cierre va abajo a la derecha, por encima del botón flotante de WhatsApp.
+         móvil y tableta: va abajo a la izquierda, alineado con el texto de arriba, y así puede bajar hasta el borde sin chocar con
+         el botón (que está a la derecha); el cerebro aprovecha el espacio que queda libre (hero3d.js, fitBrain) -->
+    <div class="absolute bottom-[max(4%,88px)] right-(--gx) flex flex-col items-end gap-6 max-lg:left-(--gx) max-lg:right-auto max-lg:items-start max-lg:bottom-[clamp(20px,3.2vh,40px)] max-sm:gap-4">
+      <AiTools class="justify-end lg:hidden max-lg:justify-start" />
+      <h3 data-in class="display-xl text-right max-lg:text-left max-md:text-[2.2rem]">
         Predice, activa<br />y convierte.
       </h3>
     </div>

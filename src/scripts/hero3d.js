@@ -452,7 +452,7 @@ export function initHero3D() {
     const pxPerUnit = h / (2 * Math.tan((camera.fov * Math.PI) / 360) * camera.position.z);
     const boxW = (brainBox.x1 - brainBox.x0) * 1.12, boxH = (brainBox.y1 - brainBox.y0) * 1.12;   // margen por el giro y el relieve
     const gap = Math.max(40, below - above), air = Math.min(36, gap * 0.12);                   // aire mínimo con cada texto
-    const fit = Math.min((gap - 2 * air) / (boxH * pxPerUnit), (w * 0.86) / (boxW * pxPerUnit), base.scale * 1.6);
+    const fit = Math.min((gap - 2 * air) / (boxH * pxPerUnit), (w * 0.97) / (boxW * pxPerUnit));
     base.brainScale = Math.max(0.12, fit);
     // el tronco del cerebro (abajo) es fino y casi no se ve: el cuerpo visible queda algo por encima del centro de su caja, así
     // que se baja un poco para que el aire por arriba y por abajo se vea igual
