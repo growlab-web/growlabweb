@@ -60,5 +60,8 @@ export function startHeroStages({ hero, pinned, MOB, state, position, homeX }) {
     .to(A, { opacity: 0.45, rotation: -24, scale: 1.2, xPercent: 8, yPercent: 14, duration: 1.7, ease: E }, 3.7)
     .to(B, { opacity: 0.25, yPercent: -30, scale: 0.95, duration: 1.7, ease: E }, 3.7)
     .to({}, { duration: 0.25 }, 5.8)                                                       // pausa final mínima: tras el cerebro el scroll sigue enseguida
-    .addLabel('esfera', 0).addLabel('galaxia', 2.75).addLabel('cerebro', 5.95);
+    .addLabel('esfera', 0).addLabel('galaxia', 2.75).addLabel('cerebro', 5.95)
+    // final del hero: sin esta etiqueta, un gesto corto hacia abajo desde el cerebro quedaba dentro del hero y el enganche lo
+    // devolvía al cerebro, como si la página no quisiera bajar
+    .addLabel('fin', 6.05);
 }

@@ -124,8 +124,8 @@ const stats = site.stats.map((s) => ({ n: `${s.v}${s.s}`, l: s.l }));
       <AiTools class="mt-8 justify-start max-lg:hidden" />
     </div>
     <!-- el cierre va abajo a la derecha. En escritorio, por encima del botón flotante de WhatsApp; en móvil y tableta baja hasta el
-         borde y se aparta a la izquierda del botón (lo justo para no tocarlo), y el cerebro aprovecha el espacio (hero3d.js, fitBrain) -->
-    <div class="absolute bottom-[max(4%,88px)] right-(--gx) flex flex-col items-end gap-6 max-lg:bottom-[clamp(18px,3vh,36px)] max-lg:right-[calc(var(--gx)+66px)] max-sm:right-[76px] max-sm:gap-4">
+         borde (el botón puede quedar encima) y el cerebro aprovecha el espacio libre (hero3d.js, fitBrain) -->
+    <div class="absolute bottom-[max(4%,88px)] right-(--gx) flex flex-col items-end gap-6 max-lg:bottom-[clamp(18px,3vh,36px)] max-sm:gap-4">
       <AiTools class="justify-end lg:hidden" />
       <h3 data-in class="display-xl text-right max-md:text-[2.2rem] max-sm:text-[clamp(1.6rem,8.2vw,2.2rem)]">
         Predice, activa<br />y convierte.
