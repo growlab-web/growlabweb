@@ -120,6 +120,7 @@ export function initHero3D() {
   }
   for (let i = N1; i < COUNT; i++) { const k = (Math.random() * N1) | 0; copy3(P1, i, k); copy3(C1, i, k); PATH[i] = PATH[k]; SPD[i] = SPD[k]; GSZ[i] = GSZ[k]; }
 
+  const brainBox = { x0: 0, x1: 0, y0: 0, y1: 0 };
   /* --- 3) Cerebro: silueta + surcos reales de la referencia, inflados en 3D con perfil redondo --- */
   (function buildBrain() {
     const B = BRAIN_DATA;
@@ -187,6 +188,12 @@ export function initHero3D() {
       const bump = (sample(D, fx, fy) - 0.5) * 0.07 + (Math.random() - 0.5) * 0.015;   // los pliegues sobresalen un poco, siguiendo la curvatura
       set3(P2, n, (fx + 0.5 - cx) * S + nx * bump, -(fy + 0.5 - cy) * S + ny * bump, side * zf * thick + nz * bump);
       set3(N2v, n, nx, ny, nz);
+    }
+    // caja que ocupa el cerebro (en unidades de la escena): sirve para encajarlo entre los textos en pantallas estrechas
+    for (let n = 0; n < N2; n++) {
+      const x = P2[n * 3], y = P2[n * 3 + 1];
+      if (x < brainBox.x0) brainBox.x0 = x; if (x > brainBox.x1) brainBox.x1 = x;
+      if (y < brainBox.y0) brainBox.y0 = y; if (y > brainBox.y1) brainBox.y1 = y;
     }
     fill(N2, [P2, N2v]);
   })();
@@ -433,6 +440,26 @@ export function initHero3D() {
   const galaxyK = () => (window.innerWidth < 520 ? 0.62 : window.innerWidth < 1000 ? 0.78 : 1);
   const state = { scale: 1, morph: pinned ? 0 : (SHAPES[hero.dataset.shape] ?? 0) };
   let lastW = 0, lastH = 0;
+  // Móvil y tableta: en la etapa del cerebro, el texto va arriba y los logos de IA abajo. El cerebro se coloca justo en medio de
+  // los dos, con el mismo aire por arriba que por abajo, y con el tamaño que quepa en ese hueco (sin pisar ninguno).
+  function fitBrain(w, h) {
+    const panel = hero.querySelector('[data-panel="3"]');
+    const text = panel && panel.firstElementChild;
+    const logos = panel && [...panel.querySelectorAll('[data-ai-tools]')].find((el) => el.offsetParent !== null);
+    if (!text || !logos) return;
+    const topOf = (el) => { let y = 0; for (let e = el; e && e !== panel; e = e.offsetParent) y += e.offsetTop; return y; };   // sin contar animaciones
+    const above = topOf(text) + text.offsetHeight, below = topOf(logos);
+    const pxPerUnit = h / (2 * Math.tan((camera.fov * Math.PI) / 360) * camera.position.z);
+    const boxW = (brainBox.x1 - brainBox.x0) * 1.12, boxH = (brainBox.y1 - brainBox.y0) * 1.12;   // margen por el giro y el relieve
+    const gap = Math.max(40, below - above), air = Math.min(36, gap * 0.12);                   // aire mínimo con cada texto
+    const fit = Math.min((gap - 2 * air) / (boxH * pxPerUnit), (w * 0.86) / (boxW * pxPerUnit), base.scale * 1.6);
+    base.brainScale = Math.max(0.12, fit);
+    // el tronco del cerebro (abajo) es fino y casi no se ve: el cuerpo visible queda algo por encima del centro de su caja, así
+    // que se baja un poco para que el aire por arriba y por abajo se vea igual
+    const centerPx = (above + below) / 2 + boxH * base.brainScale * pxPerUnit * 0.045, boxMid = ((brainBox.y0 + brainBox.y1) / 2) * base.brainScale;
+    base.brainDy = (h / 2 - centerPx) / pxPerUnit - boxMid - base.y;                           // del centro del hueco a unidades de la escena
+  }
+
   function resize() {
     const w = hero.clientWidth, h = hero.clientHeight;
     // en móvil la barra del navegador aparece y desaparece al hacer scroll y dispara "resize": si el tamaño no cambió de verdad, no se rehace nada
@@ -452,7 +479,8 @@ export function initHero3D() {
       base.galY = phone ? -0.22 : narrow ? -0.28 : -0.15;
       base.gal = phone ? 0.52 : (narrow ? 0.66 : W < 1400 ? 0.72 : 0.86) * galaxyK();
       base.galTilt = phone ? 0.25 : 0.27;
-      base.brainDy = phone ? -0.24 : 0;                                  // móvil: el cerebro baja un poco para dejar sitio al texto
+      base.brainDy = 0; base.brainScale = base.scale;
+      if (W < 1024) fitBrain(w, h);                                      // móvil y tableta: el cerebro va centrado entre el texto y los logos
       galaxyOrbit.unit = (h / (2 * Math.tan((camera.fov * Math.PI) / 360) * camera.position.z)) * base.gal;
       group.position.y = base.y;
     } else {                                                               // cabeceras de páginas interiores
@@ -549,8 +577,9 @@ export function initHero3D() {
     updateSparks(t);
     {
       const w1 = clamp01(1 - Math.abs(state.morph - 1));                    // 1 cuando la forma es la galaxia
-      group.scale.setScalar(state.scale * (base.scale + (base.gal - base.scale) * w1));
-      group.position.y = base.y + (base.galY - base.y) * w1 + (base.brainDy || 0) * clamp01(state.morph - 1);
+      const wb = clamp01(state.morph - 1);                               // 1 cuando la forma es el cerebro
+      group.scale.setScalar(state.scale * (base.scale + (base.gal - base.scale) * w1 + ((base.brainScale ?? base.scale) - base.scale) * wb));
+      group.position.y = base.y + (base.galY - base.y) * w1 + (base.brainDy || 0) * wb;
     }
 
     mat.uniforms.uGrad.value.set(group.position.y, Math.max(group.scale.x, 0.05));
@@ -583,6 +612,8 @@ export function initHero3D() {
 
   window.addEventListener('resize', resize);
   resize();
+  // los textos cambian de alto cuando terminan de cargar las tipografías: se vuelve a medir el hueco del cerebro
+  if (pinned && document.fonts) document.fonts.ready.then(() => { if (window.innerWidth < 1024) fitBrain(hero.clientWidth, hero.clientHeight); });
   // el sombreador se compila en segundo plano (si el navegador lo permite) y se dibuja un primer fotograma antes de quitar la carga:
   // así el tirón de preparar la gráfica ocurre tras la pantalla de carga y no en el primer scroll
   const ready = Promise.resolve(renderer.compileAsync ? renderer.compileAsync(scene, camera) : null)
