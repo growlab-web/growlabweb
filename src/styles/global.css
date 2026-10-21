@@ -399,3 +399,14 @@ a :where(svg, span, i, img, b), button :where(svg, span, i, img, b), summary :wh
 .prose-blog table { display: block; overflow-x: auto; width: 100%; border-collapse: collapse; font-size: 0.95em; }
 .prose-blog th, .prose-blog td { border-bottom: 1px solid rgba(255, 255, 255, .1); padding: 0.65em 0.9em; text-align: left; white-space: nowrap; }
 .prose-blog th { color: #fff; font-weight: 600; }
+
+/* tarjeta destacada del blog (la primera de la lista visible) */
+.post-card.is-featured .post-card__title { font-size: clamp(1.5rem, 2.6vw, 2.3rem); }
+@media (min-width: 640px) { .post-card.is-featured { grid-column: 1 / -1; } }
+@media (min-width: 1024px) {
+  .post-card.is-featured { display: grid; grid-template-columns: 1.25fr 1fr; }
+  .post-card.is-featured .post-card__media { margin: 1rem; align-self: center; border-radius: 16px; }
+  .post-card.is-featured .post-card__body { padding: clamp(1.5rem, 3vw, 2.5rem); }
+}
+.post-card.is-entering { animation: post-in 0.45s cubic-bezier(.2, .8, .2, 1) both; }
+@keyframes post-in { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }

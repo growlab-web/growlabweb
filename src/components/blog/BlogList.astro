@@ -1,44 +1,95 @@
 ---
-// Listado del blog (portada y páginas de categoría): cabecera, categorías, artículo destacado y rejilla
+// Listado del blog (portada y páginas de categoría). Se pintan todos los artículos y el filtro por categoría funciona en la misma
+// página, sin recargar: muestra los de la categoría, cambia el título y la dirección (/blog/categoria/…), y el botón «atrás» funciona.
+// Cada dirección de categoría sigue existiendo como página propia, así que se puede compartir o abrir directamente.
 import PostCard from './PostCard.astro';
 import { blogCategories } from '../../data/blog.js';
 import { getPosts } from '../../data/posts.js';
-interface Props { posts: any[]; eyebrow: string; title: string; text: string; current?: string }
-const { posts, eyebrow, title, text, current } = Astro.props;
-// sólo se muestran las categorías que ya tienen artículos (las vacías no tienen página)
-const used = new Set((await getPosts()).map((p) => p.data.category));
-const cats = blogCategories.filter((c) => used.has(c.slug));
-const [first, ...rest] = posts;
-const chip = 'rounded-full border px-4 py-2 font-ui text-[.88rem] transition-colors';
+interface Props { eyebrow: string; title: string; text: string; current?: string }
+const { eyebrow, title, text, current } = Astro.props;
+const all = await getPosts();
+const used = new Set(all.map((p) => p.data.category));
+const cats = blogCategories.filter((c) => used.has(c.slug));            // sólo categorías con artículos
+const visible = all.filter((p) => !current || p.data.category === current);
+const featuredId = visible[0]?.id;
+const chip = 'blog-chip gtm-blog-categoria rounded-full border px-4 py-2 font-ui text-[.88rem] transition-colors';
+// textos de cada vista, para que el filtro pueda cambiar la cabecera sin recargar
+const views = { '': { eyebrow: 'Blog', title: 'Ideas para crecer con datos', text: 'Guías prácticas, casos y aprendizajes sobre campañas, medición, SEO, ecommerce e inteligencia artificial, desde lo que vemos cada día con nuestros clientes.', doc: 'Blog · Marketing digital, datos y crecimiento · GrowLab' } };
+cats.forEach((c) => { views[c.slug] = { eyebrow: 'Blog · Categoría', title: c.name, text: c.description, doc: `${c.name} · Blog · GrowLab` }; });
 ---
 
-<section class="relative z-[1] mx-auto max-w-[1240px] px-(--pad) pb-[12vh] pt-[clamp(130px,20vh,200px)]">
+<section data-blog-list data-views={JSON.stringify(views)} class="relative z-[1] mx-auto max-w-[1240px] px-(--pad) pb-[12vh] pt-[clamp(130px,20vh,200px)]">
   <header class="max-w-[760px]">
-    <p data-reveal class="eyebrow">{eyebrow}</p>
-    <h1 data-reveal class="display-xl !text-[clamp(2.2rem,4.4vw,4.4rem)]">{title}</h1>
-    <p data-reveal class="mt-6 max-w-[56ch] font-body text-[clamp(.95rem,1.15vw,1.1rem)] leading-relaxed text-copy">{text}</p>
+    <p data-reveal data-blog-eyebrow class="eyebrow">{eyebrow}</p>
+    <h1 data-reveal data-blog-title class="display-xl !text-[clamp(2.2rem,4.4vw,4.4rem)]">{title}</h1>
+    <p data-reveal data-blog-text class="mt-6 max-w-[56ch] font-body text-[clamp(.95rem,1.15vw,1.1rem)] leading-relaxed text-copy">{text}</p>
   </header>
 
-  {cats.length > 1 && <nav data-reveal aria-label="Categorías del blog" class="mt-10 flex flex-wrap gap-2.5">
-    <a href="/blog" id="blog-categoria-todas" aria-current={!current ? 'page' : undefined} class:list={[chip, 'gtm-blog-categoria', !current ? 'border-secondary bg-secondary text-black' : 'border-white/20 text-white/80 hover:border-white']}>Todo</a>
-    {cats.map((c) => (
-      <a href={`/blog/categoria/${c.slug}`} id={`blog-categoria-${c.slug}`} aria-current={current === c.slug ? 'page' : undefined} class:list={[chip, 'gtm-blog-categoria', current === c.slug ? 'border-secondary bg-secondary text-black' : 'border-white/20 text-white/80 hover:border-white']}>{c.name}</a>
-    ))}
-  </nav>}
+  {cats.length > 1 && (
+    <nav data-reveal aria-label="Categorías del blog" class="mt-10 flex flex-wrap gap-2.5">
+      <a href="/blog" data-cat="" id="blog-categoria-todas" aria-current={!current ? 'page' : undefined} class={chip}>Todo</a>
+      {cats.map((c) => <a href={`/blog/categoria/${c.slug}`} data-cat={c.slug} id={`blog-categoria-${c.slug}`} aria-current={current === c.slug ? 'page' : undefined} class={chip}>{c.name}</a>)}
+    </nav>
+  )}
 
-  {posts.length === 0 ? (
+  {all.length === 0 ? (
     <div data-reveal class="mt-16 rounded-[24px] border border-white/10 bg-panel/70 p-10 text-center">
       <p class="font-display text-[1.3rem]">Muy pronto, nuevos artículos aquí.</p>
       <p class="mt-3 text-copy">Mientras tanto, cuéntanos qué necesitas: <a href="/contacto" class="text-secondary underline underline-offset-4">escríbenos</a>.</p>
     </div>
   ) : (
-    <div class="mt-14 grid gap-6">
-      <div data-reveal><PostCard post={first} featured /></div>
-      {rest.length > 0 && (
-        <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {rest.map((p) => <div data-reveal><PostCard post={p} /></div>)}
-        </div>
-      )}
+    <div data-blog-grid class="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {all.map((p) => <div data-blog-item data-category={p.data.category} hidden={current ? p.data.category !== current : undefined} class:list={['contents']}><PostCard post={p} featured={p.id === featuredId} /></div>)}
     </div>
   )}
 </section>
+
+<style>
+  .blog-chip { border-color: rgba(255, 255, 255, 0.2); color: rgba(255, 255, 255, 0.8); }
+  .blog-chip:hover { border-color: #fff; }
+  .blog-chip[aria-current='page'] { border-color: var(--color-secondary); background: var(--color-secondary); color: #000; }
+</style>
+
+<script>
+  import { track } from '../../scripts/track.js';
+  const list = document.querySelector<HTMLElement>('[data-blog-list]');
+  if (list) {
+    const views = JSON.parse(list.dataset.views || '{}');
+    const items = [...list.querySelectorAll<HTMLElement>('[data-blog-item]')];
+    const chips = [...list.querySelectorAll<HTMLAnchorElement>('.blog-chip')];
+    const set = (sel: string, txt: string) => { const el = list.querySelector(sel); if (el) el.textContent = txt; };
+
+    function show(cat: string, animate: boolean) {
+      const v = views[cat] || views[''];
+      set('[data-blog-eyebrow]', v.eyebrow); set('[data-blog-title]', v.title); set('[data-blog-text]', v.text);
+      document.title = v.doc;
+      chips.forEach((c) => { if (c.dataset.cat === cat) c.setAttribute('aria-current', 'page'); else c.removeAttribute('aria-current'); });
+      let first = true;
+      items.forEach((it) => {
+        const on = !cat || it.dataset.category === cat;
+        it.hidden = !on;
+        const card = it.querySelector('.post-card');
+        if (!card) return;
+        card.classList.toggle('is-featured', on && first);            // la primera visible pasa a ser la destacada
+        if (on) first = false;
+        card.classList.remove('is-entering');
+        if (on && animate) { void (card as HTMLElement).offsetWidth; card.classList.add('is-entering'); }
+      });
+    }
+
+    chips.forEach((c) => c.addEventListener('click', (e) => {
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;   // abrir en otra pestaña sigue funcionando
+      e.preventDefault();
+      const cat = c.dataset.cat || '';
+      if (c.getAttribute('aria-current') === 'page') return;
+      show(cat, true);
+      history.pushState({ cat }, '', c.getAttribute('href') || '/blog');
+      track('blog_filter', { category: cat || 'todas' });
+    }));
+    // botón atrás / adelante del navegador
+    addEventListener('popstate', () => {
+      const m = location.pathname.match(/\/blog\/categoria\/([^/]+)/);
+      show(m ? m[1] : '', true);
+    });
+  }
+</script>

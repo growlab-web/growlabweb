@@ -15,6 +15,7 @@
  *   render_mode     versión del hero que se ve  → render_mode ('3d', o 'imagenes' si el navegador no tiene aceleración gráfica)
  *   blog_read       lectura de un artículo      → article, category, percent (50 o 90)
  *   blog_share      artículo compartido         → article, method (linkedin, whatsapp, x, copiar)
+ *   blog_filter     filtro de categoría del blog → category
  *   page_not_found  página de error 404         → missing_path, referrer
  *   notfound_broken alguien rompió el 404       → (sin datos)
  *
