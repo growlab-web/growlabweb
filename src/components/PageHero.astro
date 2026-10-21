@@ -7,15 +7,17 @@ interface Props {
   text: string;
   shape?: 'sphere' | 'galaxy' | 'brain';
   compact?: boolean;
+  seamless?: boolean; // sin fondo ni línea propios: deja ver el fondo continuo de la página
 }
-const { eyebrow, lines, text, shape = 'sphere', compact = false } = Astro.props;
+const { eyebrow, lines, text, shape = 'sphere', compact = false, seamless = false } = Astro.props;
 ---
 
 <section
   data-hero
   data-shape={shape}
   class:list={[
-    'relative flex items-center overflow-hidden border-b border-white/10 bg-[linear-gradient(175deg,#030814_0%,#000_55%,#000_100%)] [--gx:1.8vw]',
+    'relative flex items-center overflow-hidden [--gx:1.8vw]',
+    seamless ? 'page-hero--seamless' : 'border-b border-white/10 bg-[linear-gradient(175deg,#030814_0%,#000_55%,#000_100%)]',
     compact ? 'min-h-[72vh] max-lg:min-h-[88svh]' : 'min-h-svh',          // a pantalla completa en cualquier dispositivo
     'max-lg:items-start',
   ]}
@@ -53,3 +55,7 @@ const { eyebrow, lines, text, shape = 'sphere', compact = false } = Astro.props;
     </p>
   </div>
 </section>
+
+<style>
+  .page-hero--seamless [data-aurora] { display: none; }
+</style>

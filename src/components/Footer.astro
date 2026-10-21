@@ -2,6 +2,8 @@
 import { site } from '../data/site.js';
 import { gtmId } from '../data/gtm.js';
 import { projects } from '../data/projects.js';
+interface Props { seamless?: boolean } // sin la línea superior (páginas con fondo continuo)
+const { seamless = false } = Astro.props;
 const year = new Date().getFullYear();
 const links = [...site.nav, site.contact];
 const latest = projects.slice(0, 4);       // los primeros de data/projects.js son los más recientes
@@ -9,7 +11,7 @@ const head = 'font-display text-[.74rem] uppercase tracking-[.16em] text-white/4
 const link = 'transition-colors hover:text-secondary';
 ---
 
-<footer class="border-t border-white/10 px-(--pad) text-[.95rem] text-muted">
+<footer class:list={['px-(--pad) text-[.95rem] text-muted', !seamless && 'border-t border-white/10']}>
   <div class="grid gap-x-10 gap-y-12 py-[clamp(3rem,8vh,5rem)] max-sm:gap-y-0 max-sm:pb-4 sm:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_1fr]">
     <div>
       <a href="/" id="pie-logo" aria-label="GrowLab, ir al inicio" class="inline-flex">

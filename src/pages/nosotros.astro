@@ -37,6 +37,7 @@ const values = [
 
   <main class="page-in relative z-[1]">
     <PageHero
+      seamless
       shape="brain"
       eyebrow="Nosotros"
       lines={['Datos, creatividad', 'y obsesión por crecer.']}
@@ -53,7 +54,7 @@ const values = [
     <Stats />
     </div>
 
-    <section class="flex min-h-svh flex-col justify-center border-t border-white/10 px-(--pad) py-[12vh]">
+    <section class="flex min-h-svh flex-col justify-center px-(--pad) py-[12vh]">
       <div data-reveal class="mb-[7vh]">
         <p class="eyebrow">Cómo pensamos</p>
         <h2 class="max-w-[16em] text-[clamp(1.7rem,3.6vw,3.3rem)] font-medium leading-[1.02] tracking-[-0.03em]">
@@ -76,5 +77,5 @@ const values = [
 
     <Cta />
   </main>
-  <div class="relative z-[1]"><Footer /></div>
+  <div class="relative z-[1]"><Footer seamless /></div>
 </Layout>
