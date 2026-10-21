@@ -16,7 +16,7 @@ const { eyebrow, lines, text, shape = 'sphere', compact = false } = Astro.props;
   data-shape={shape}
   class:list={[
     'relative flex items-center overflow-hidden border-b border-white/10 bg-[linear-gradient(175deg,#030814_0%,#000_55%,#000_100%)] [--gx:1.8vw]',
-    compact ? 'min-h-[72vh] max-lg:min-h-[88svh]' : 'min-h-[88vh] max-lg:min-h-[100svh]',
+    compact ? 'min-h-[72vh] max-lg:min-h-[88svh]' : 'min-h-svh',          // a pantalla completa en cualquier dispositivo
     'max-lg:items-start',
   ]}
 >

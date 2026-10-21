@@ -28,14 +28,17 @@ const values = [
       text="Somos un equipo de estrategas, analistas y desarrolladores que trabaja como una sola unidad para escalar tu negocio."
     />
 
+    <!-- cada bloque ocupa al menos el alto de la pantalla, con su contenido centrado -->
+    <div class="flex min-h-svh flex-col justify-center">
     <Manifesto
       eyebrow="Quiénes somos"
       text="GrowLab nace de una idea simple: el marketing tiene que medirse en resultados. Unimos performance, analítica, desarrollo web y automatización con IA para que cada acción tenga un porqué, un número y un siguiente paso."
     />
 
     <Stats />
+    </div>
 
-    <section class="border-t border-white/10 px-(--pad) py-[12vh]">
+    <section class="flex min-h-svh flex-col justify-center border-t border-white/10 px-(--pad) py-[12vh]">
       <div data-reveal class="mb-[7vh]">
         <p class="eyebrow">Cómo pensamos</p>
         <h2 class="max-w-[16em] text-[clamp(1.7rem,3.6vw,3.3rem)] font-medium leading-[1.02] tracking-[-0.03em]">
