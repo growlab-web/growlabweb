@@ -19,10 +19,14 @@ cats.forEach((c) => { views[c.slug] = { eyebrow: 'Blog · Categoría', title: c.
 ---
 
 <section data-blog-list data-views={JSON.stringify(views)} class="relative z-[1] mx-auto max-w-[1240px] px-(--pad) pb-[12vh] pt-[clamp(130px,20vh,200px)]">
-  <header class="max-w-[760px]">
-    <p data-reveal data-blog-eyebrow class="eyebrow">{eyebrow}</p>
-    <h1 data-reveal data-blog-title class="display-xl !text-[clamp(2.2rem,4.4vw,4.4rem)]">{title}</h1>
-    <p data-reveal data-blog-text class="mt-6 max-w-[56ch] font-body text-[clamp(.95rem,1.15vw,1.1rem)] leading-relaxed text-copy">{text}</p>
+  <!-- Cabecera: el texto cambia con el filtro. Su alto se fija al de la vista más alta (lo mide el script), así al filtrar no se
+       mueve nada de lo que hay debajo. -->
+  <header data-reveal class="blog-head relative max-w-[760px]">
+    <div data-blog-head class="blog-head__live">
+      <p data-blog-eyebrow class="eyebrow">{eyebrow}</p>
+      <h1 data-blog-title class="blog-head__title">{title}</h1>
+      <p data-blog-text class="blog-head__text">{text}</p>
+    </div>
   </header>
 
   {cats.length > 1 && (
@@ -45,6 +49,11 @@ cats.forEach((c) => { views[c.slug] = { eyebrow: 'Blog · Categoría', title: c.
 </section>
 
 <style>
+  /* todas las vistas usan exactamente los mismos tamaños de título y descripción */
+  .blog-head__title { font-family: var(--font-display); font-weight: 300; line-height: 0.98; letter-spacing: -0.035em; font-size: clamp(2.2rem, 4.4vw, 4.4rem); }
+  .blog-head__text { margin-top: 1.5rem; max-width: 56ch; font-family: var(--font-body); font-size: clamp(0.95rem, 1.15vw, 1.1rem); line-height: 1.65; color: var(--color-copy); }
+  .blog-chip { transition: background-color 0.35s, border-color 0.35s, color 0.35s, transform 0.2s; }
+  .blog-chip:active { transform: scale(0.95); }
   .blog-chip { border-color: rgba(255, 255, 255, 0.2); color: rgba(255, 255, 255, 0.8); }
   .blog-chip:hover { border-color: #fff; }
   .blog-chip[aria-current='page'] { border-color: var(--color-secondary); background: var(--color-secondary); color: #000; }
@@ -59,7 +68,35 @@ cats.forEach((c) => { views[c.slug] = { eyebrow: 'Blog · Categoría', title: c.
     const chips = [...list.querySelectorAll<HTMLAnchorElement>('.blog-chip')];
     const set = (sel: string, txt: string) => { const el = list.querySelector(sel); if (el) el.textContent = txt; };
 
-    function show(cat: string, animate: boolean) {
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const head = list.querySelector<HTMLElement>('[data-blog-head]');
+    const grid = list.querySelector<HTMLElement>('[data-blog-grid]');
+    const ease = 'cubic-bezier(.2,.8,.2,1)';
+    let busy: Promise<unknown> = Promise.resolve();
+
+    // alto fijo de la cabecera = el de la vista más alta: se mide escribiendo cada vista en una copia invisible del mismo ancho
+    function lockHeight() {
+      if (!head) return;
+      const probe = head.cloneNode(true) as HTMLElement;
+      probe.removeAttribute('data-blog-head');
+      Object.assign(probe.style, { position: 'absolute', visibility: 'hidden', pointerEvents: 'none', left: '0', top: '0', width: head.offsetWidth + 'px', minHeight: '0' });
+      head.parentElement!.appendChild(probe);
+      let max = 0;
+      Object.values(views).forEach((v: any) => {
+        probe.querySelector('[data-blog-eyebrow]')!.textContent = v.eyebrow;
+        probe.querySelector('[data-blog-title]')!.textContent = v.title;
+        probe.querySelector('[data-blog-text]')!.textContent = v.text;
+        max = Math.max(max, probe.offsetHeight);
+      });
+      probe.remove();
+      head.style.minHeight = max + 'px';
+    }
+    lockHeight();
+    (document.fonts ? document.fonts.ready : Promise.resolve()).then(lockHeight);
+    let rt = 0; addEventListener('resize', () => { clearTimeout(rt); rt = window.setTimeout(lockHeight, 150); });
+
+    // pinta la vista: textos, botón activo, tarjetas visibles y cuál es la destacada
+    function apply(cat: string) {
       const v = views[cat] || views[''];
       set('[data-blog-eyebrow]', v.eyebrow); set('[data-blog-title]', v.title); set('[data-blog-text]', v.text);
       document.title = v.doc;
@@ -68,12 +105,30 @@ cats.forEach((c) => { views[c.slug] = { eyebrow: 'Blog · Categoría', title: c.
       items.forEach((it) => {
         const on = !cat || it.dataset.category === cat;
         it.hidden = !on;
-        const card = it.querySelector('.post-card');
-        if (!card) return;
-        card.classList.toggle('is-featured', on && first);            // la primera visible pasa a ser la destacada
+        it.querySelector('.post-card')?.classList.toggle('is-featured', on && first);
         if (on) first = false;
-        card.classList.remove('is-entering');
-        if (on && animate) { void (card as HTMLElement).offsetWidth; card.classList.add('is-entering'); }
+      });
+    }
+
+    // transición: la cabecera y las tarjetas salen (se desvanecen y bajan un poco), se cambia la vista y entran escalonadas;
+    // la rejilla anima su alto para que lo de abajo (el pie) no salte de golpe
+    function show(cat: string, animate: boolean) {
+      if (!animate || reduce || !grid || !head) { apply(cat); return; }
+      busy = busy.then(async () => {
+        const out = [...items].filter((it) => !it.hidden).map((it) => it.querySelector<HTMLElement>('.post-card')).filter(Boolean) as HTMLElement[];
+        const h0 = grid.offsetHeight;
+        await Promise.all([
+          head.animate([{ opacity: 1, transform: 'none', filter: 'blur(0)' }, { opacity: 0, transform: 'translateY(-10px)', filter: 'blur(6px)' }], { duration: 220, easing: 'ease-in', fill: 'forwards' }).finished,
+          ...out.map((c, i) => c.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'translateY(16px) scale(.98)' }], { duration: 200, delay: i * 25, easing: 'ease-in', fill: 'forwards' }).finished),
+        ]);
+        apply(cat);
+        out.forEach((c) => c.getAnimations().forEach((a) => a.cancel()));
+        const h1 = grid.offsetHeight;
+        if (h0 !== h1) grid.animate([{ height: h0 + 'px', overflow: 'hidden' }, { height: h1 + 'px', overflow: 'hidden' }], { duration: 380, easing: ease });
+        head.getAnimations().forEach((a) => a.cancel());
+        head.animate([{ opacity: 0, transform: 'translateY(12px)', filter: 'blur(6px)' }, { opacity: 1, transform: 'none', filter: 'blur(0)' }], { duration: 420, easing: ease });
+        const inn = [...items].filter((it) => !it.hidden).map((it) => it.querySelector<HTMLElement>('.post-card')).filter(Boolean) as HTMLElement[];
+        inn.forEach((c, i) => c.animate([{ opacity: 0, transform: 'translateY(22px) scale(.98)' }, { opacity: 1, transform: 'none' }], { duration: 480, delay: 60 + i * 70, easing: ease, fill: 'backwards' }));
       });
     }
 

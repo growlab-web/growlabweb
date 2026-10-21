@@ -408,5 +408,3 @@ a :where(svg, span, i, img, b), button :where(svg, span, i, img, b), summary :wh
   .post-card.is-featured .post-card__media { margin: 1rem; align-self: center; border-radius: 16px; }
   .post-card.is-featured .post-card__body { padding: clamp(1.5rem, 3vw, 2.5rem); }
 }
-.post-card.is-entering { animation: post-in 0.45s cubic-bezier(.2, .8, .2, 1) both; }
-@keyframes post-in { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
