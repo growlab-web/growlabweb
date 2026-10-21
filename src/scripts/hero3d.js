@@ -604,10 +604,11 @@ export function initHero3D() {
     orb.material.opacity += (0 - orb.material.opacity) * 0.08;   // sin resplandor: el puntero propio ya marca la posición
 
     // orientación de cada forma (inclinación mínima hacia el cursor)
-    mat.uniforms.uTilt.value.set(1.2 - mouse.y * 0.1, (base.galTilt || 0.27) + Math.sin(t * 0.23) * 0.025 - mouse.y * 0.08, -0.05 - mouse.y * 0.05);
-    mat.uniforms.uYaw.value.set(mouse.x * 0.14 + t * 0.12, mouse.x * 0.3, 0.12 + Math.sin(t * 0.3) * 0.3 + mouse.x * 0.3);
+    // galaxia (componente y): se mueve sola, sin seguir al cursor (el cursor sólo aparta sus partículas); balanceo lento y constante
+    mat.uniforms.uTilt.value.set(1.2 - mouse.y * 0.1, (base.galTilt || 0.27) + Math.sin(t * 0.23) * 0.03, -0.05 - mouse.y * 0.05);
+    mat.uniforms.uYaw.value.set(mouse.x * 0.14 + t * 0.12, Math.sin(t * 0.16) * 0.22, 0.12 + Math.sin(t * 0.3) * 0.3 + mouse.x * 0.3);
 
-    mat.uniforms.uRoll.value.y = mouse.x * 0.02;
+    mat.uniforms.uRoll.value.y = Math.sin(t * 0.11) * 0.03;
     if (pinned) { galaxyOrbit.t = t; galaxyOrbit.tilt = mat.uniforms.uTilt.value.y; galaxyOrbit.yaw = mat.uniforms.uYaw.value.y; galaxyOrbit.roll = mat.uniforms.uRoll.value.y; }
     dust.rotation.y = t * 0.02;
     dust.position.y = Math.sin(t * 0.3) * 0.1;
