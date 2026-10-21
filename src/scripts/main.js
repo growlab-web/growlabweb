@@ -50,7 +50,6 @@ if ($('[data-hero][data-pin]') || isApp) lenis.stop();
 // la inercia del trackpad sigue mandando scroll un buen rato después de soltar: sin esto, un gesto rápido cruza toda la página
 // Paradas: las etapas del hero y las secciones marcadas con data-stop (sólo en páginas con pin)
 let stops = [];
-let heroStops = [], heroEnd = -1;   // etapas del hero (esfera, galaxia, cerebro) y dónde termina
 const gesture = { t: 0, dir: 0, limit: null, held: false, heldAt: 0, low: 0 };
 function measureStops() {
   const max = ScrollTrigger.maxScroll(window), out = [];
@@ -59,7 +58,7 @@ function measureStops() {
     const span = st.end - st.start, tl = st.animation;
     // etapas del hero (la etiqueta «fin» sólo sirve para que el enganche pueda soltar el hero hacia abajo: no es una parada)
     const labels = tl && tl.labels ? Object.entries(tl.labels).filter(([name]) => name !== 'fin').map(([, t]) => t) : [];
-    if (labels.length) { heroEnd = st.end; heroStops = labels.map((time) => Math.round(st.start + (span * time) / tl.duration())); return labels.forEach((time) => out.push(st.start + (span * time) / tl.duration())); }
+    if (labels.length) return labels.forEach((time) => out.push(st.start + (span * time) / tl.duration()));
     const n = Math.max(1, Math.round(span / window.innerHeight));       // sin etiquetas: tramos de más o menos una pantalla
     for (let i = 0; i <= n; i++) out.push(st.start + (span * i) / n);
   });
@@ -80,19 +79,10 @@ function limitWheel(data) {
   // gesto nuevo: tras una pausa, al cambiar de sentido o, ya detenido, cuando el impulso vuelve a crecer (la inercia sólo decae)
   const fresh = now - g.t > 160 || dir !== g.dir || (g.held && now - g.heldAt > 220 && abs > Math.max(g.low * 3, g.low + 30));
   g.t = now;
-  if (g.auto) { if (e.cancelable) e.preventDefault(); return false; }   // la etapa ya está en camino: el resto del gesto se ignora
   if (fresh) {
     const from = lenis.targetScroll;
     g.dir = dir; g.held = false;
     g.limit = dir > 0 ? stops.find((s) => s > from + 2) : stops.findLast((s) => s < from - 2);
-    // dentro del hero, un solo gesto (por corto que sea) lleva completa a la etapa siguiente o anterior, con una transición fija
-    if (g.limit != null && heroStops.includes(g.limit) && from < heroEnd - 2) {
-      g.auto = true; g.held = true; g.heldAt = now; g.low = abs;
-      lenis.scrollTo(g.limit, { duration: 1.15, easing: (x) => 1 - Math.pow(1 - x, 3), lock: true, onComplete: () => { g.auto = false; g.t = performance.now(); } });
-      setTimeout(() => { g.auto = false; }, 1600);
-      if (e.cancelable) e.preventDefault();
-      return false;
-    }
   }
   if (g.limit == null) return true;                     // más allá de la última parada el scroll es libre
   if (g.held) g.low = Math.min(g.low, abs);
