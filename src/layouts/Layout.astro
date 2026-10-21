@@ -89,7 +89,17 @@ const gtm = /^GTM-[A-Z0-9]+$/.test(site.gtm) ? site.gtm : '';
           try { choice = localStorage.getItem('gl-consent'); } catch (e) {}
           var state = choice === 'all' ? 'granted' : choice === 'necessary' ? 'denied' : consentDefault === 'granted' ? 'granted' : 'denied';
           gtag('consent', 'default', { ad_storage: state, ad_user_data: state, ad_personalization: state, analytics_storage: state, wait_for_update: 500 });
-          (function (w, d, s, l, i) { w[l] = w[l] || []; w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' }); var f = d.getElementsByTagName(s)[0], j = d.createElement(s); j.async = true; j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i; f.parentNode.insertBefore(j, f); })(window, document, 'script', 'dataLayer', gtm);
+          // Tag Manager (y con él GA4, Meta, TikTok…) se carga cuando el visitante interactúa por primera vez (scroll, toque, clic,
+          // tecla) o a los 3,5 s de terminar la carga, lo que pase antes. Sus ~900 KB ya no compiten con el contenido al abrir la
+          // página. Los eventos que el sitio deja antes en dataLayer no se pierden: GTM los procesa al llegar.
+          var gtmLoaded = false;
+          var loadGtm = function () {
+            if (gtmLoaded) return; gtmLoaded = true;
+            ['scroll', 'pointerdown', 'keydown', 'touchstart'].forEach(function (e) { removeEventListener(e, loadGtm, true); });
+            (function (w, d, s, l, i) { w[l] = w[l] || []; w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' }); var f = d.getElementsByTagName(s)[0], j = d.createElement(s); j.async = true; j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i; f.parentNode.insertBefore(j, f); })(window, document, 'script', 'dataLayer', gtm);
+          };
+          ['scroll', 'pointerdown', 'keydown', 'touchstart'].forEach(function (e) { addEventListener(e, loadGtm, { capture: true, passive: true, once: true }); });
+          addEventListener('load', function () { setTimeout(loadGtm, 3500); });
         </script>
       )
     }
