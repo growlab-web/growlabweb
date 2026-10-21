@@ -29,7 +29,7 @@ export function startHeroStages({ hero, pinned, MOB, state, position, homeX }) {
   const tl = gsap.timeline({
     defaults: { ease: 'none' },
     scrollTrigger: {
-      trigger: hero, start: 'top top', end: MOB ? '+=170%' : '+=260%', pin: true,   // en móvil, menos recorrido de dedo entre etapas
+      trigger: hero, start: 'top top', end: MOB ? '+=140%' : '+=215%', pin: true,   // en móvil, menos recorrido de dedo entre etapas
       scrub: 0.35, anticipatePin: 1,
       onUpdate: (self) => {
         const stage = self.progress < 0.23 ? 0 : self.progress < 0.72 ? 1 : 2;
@@ -52,20 +52,20 @@ export function startHeroStages({ hero, pinned, MOB, state, position, homeX }) {
     .to(A, { opacity: 0.5, rotation: -30, scale: 1.3, xPercent: 18, yPercent: 30, duration: 0.9, ease: E }, 0.6)
     .to(A, { opacity: 0.16, rotation: -12, scale: 1.0, xPercent: 0, yPercent: 0, duration: 0.9, ease: E }, 1.5)
     .to(B, { opacity: 0.2, yPercent: -90, scale: 1.1, duration: 1.7, ease: E }, 0.6)
-    // salida de la galaxia: zoom in hacia su núcleo (la cámara se mete en ella, fly negativo) mientras empieza a deshacerse,
-    // y del interior sale el cerebro, que se aleja hasta su sitio
-    .to(state, { fly: -0.4, duration: 0.8, ease: 'power2.in' }, 3.7)
-    .to(state, { fly: 0, duration: 1.0, ease: 'power2.out' }, 4.5)
-    .to(state, { morph: 2, duration: 1.7, ease: E }, 3.7)                                   // → cerebro
-    .to(position, { x: homeX, duration: 1.7, ease: E }, 3.7)
-    .to('[data-panel="2"]', hide, 3.8)
-    .fromTo('[data-panel="3"]', { autoAlpha: 0, y: 40 }, show, 5.0)
-    .from('[data-panel="3"] [data-in]', { autoAlpha: 0, y: 34, duration: 0.5, stagger: 0.06, ease: 'power2.out' }, 5.0)
-    .to(A, { opacity: 0.45, rotation: -24, scale: 1.2, xPercent: 8, yPercent: 14, duration: 1.7, ease: E }, 3.7)
-    .to(B, { opacity: 0.25, yPercent: -30, scale: 0.95, duration: 1.7, ease: E }, 3.7)
-    .to({}, { duration: 0.25 }, 5.8)                                                       // pausa final mínima: tras el cerebro el scroll sigue enseguida
-    .addLabel('esfera', 0).addLabel('galaxia', 2.75).addLabel('cerebro', 5.95)
+    // salida de la galaxia: primero la cámara entra en la galaxia tal cual, sin deformarla (zoom in hacia su núcleo); ya dentro,
+    // las partículas se reordenan en el cerebro, que se aleja hasta su sitio. Tramo más corto que antes: menos scroll hasta el cerebro.
+    .to('[data-panel="2"]', hide, 2.85)
+    .to(state, { fly: -0.42, duration: 0.75, ease: 'power2.in' }, 2.85)                    // entrar en la galaxia (intacta)
+    .to(state, { morph: 2, duration: 1.0, ease: E }, 3.45)                                  // → cerebro, ya dentro
+    .to(state, { fly: 0, duration: 0.95, ease: 'power2.out' }, 3.6)                         // y la cámara vuelve atrás
+    .to(position, { x: homeX, duration: 1.0, ease: E }, 3.45)
+    .fromTo('[data-panel="3"]', { autoAlpha: 0, y: 40 }, show, 4.15)
+    .from('[data-panel="3"] [data-in]', { autoAlpha: 0, y: 34, duration: 0.5, stagger: 0.06, ease: 'power2.out' }, 4.15)
+    .to(A, { opacity: 0.45, rotation: -24, scale: 1.2, xPercent: 8, yPercent: 14, duration: 1.2, ease: E }, 3.3)
+    .to(B, { opacity: 0.25, yPercent: -30, scale: 0.95, duration: 1.2, ease: E }, 3.3)
+    .to({}, { duration: 0.2 }, 4.75)                                                       // pausa final mínima: tras el cerebro el scroll sigue enseguida
+    .addLabel('esfera', 0).addLabel('galaxia', 2.75).addLabel('cerebro', 4.85)
     // final del hero: sin esta etiqueta, un gesto corto hacia abajo desde el cerebro quedaba dentro del hero y el enganche lo
     // devolvía al cerebro, como si la página no quisiera bajar
-    .addLabel('fin', 6.05);
+    .addLabel('fin', 4.95);
 }
