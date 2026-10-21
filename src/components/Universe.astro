@@ -10,6 +10,9 @@ const stape = { path: 'M23 7L14 22L23 28V38H0V34L8 20L0 14V5H23V7Z', hex: 'ff6d3
 const [shopSide, shopS, shopBag] = siShopify.path.split(/(?=M)/);
 const shopify = { ...siShopify, parts: [{ d: shopBag, fill: '#95BF47' }, { d: shopSide, fill: '#5E8E3E' }, { d: shopS, fill: '#FFFFFF' }] };
 
+// Mailchimp como su logo: el mono en negro sobre un cuadro amarillo redondeado (en simple-icons el trazado es la parte negra).
+const mailchimp = { ...siMailchimp, tile: '#FFE01B', fg: '#241C15' };
+
 const inner = [
   { icon: siGoogletagmanager, name: 'Tag Manager' },
   { icon: siGoogleanalytics, name: 'Analytics' },
@@ -21,7 +24,7 @@ const outer = [
   { icon: siMeta, name: 'Meta Ads' },
   { icon: siGoogleads, name: 'Google Ads' },
   { icon: { ...siTiktok, hex: 'ffffff' }, name: 'TikTok Ads' },
-  { icon: siMailchimp, name: 'Mailchimp' },
+  { icon: mailchimp, name: 'Mailchimp' },
 ];
 const rings = [inner, outer];
 ---
@@ -38,7 +41,9 @@ const rings = [inner, outer];
           class="absolute left-0 top-0 flex items-center gap-2 whitespace-nowrap rounded-full border border-white/25 bg-[#0b1226] py-2 pl-2.5 pr-4 font-ui text-[.95rem] text-white/90 shadow-[0_0_24px_rgba(56,111,222,.25)] will-change-transform max-sm:p-2"
         >
           <svg viewBox={'viewBox' in p.icon ? p.icon.viewBox : '0 0 24 24'} class="h-[22px] w-[22px] shrink-0" fill={`#${p.icon.hex}`}>
-            {'parts' in p.icon ? p.icon.parts.map((part) => <path d={part.d} fill={part.fill} />) : <path d={p.icon.path} />}
+            {'parts' in p.icon ? p.icon.parts.map((part) => <path d={part.d} fill={part.fill} />)
+              : 'tile' in p.icon ? (<><rect width="24" height="24" rx="5.5" fill={p.icon.tile} /><path d={p.icon.path} fill={p.icon.fg} transform="translate(3.2 3.2) scale(0.733)" /></>)
+              : <path d={p.icon.path} />}
           </svg>
           <span class="max-sm:hidden">{p.name}</span>
           <i class="pointer-events-none absolute left-1/2 top-full h-7 w-px -translate-x-1/2 bg-gradient-to-b from-white/60 to-white/10"></i>
