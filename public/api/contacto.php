@@ -13,6 +13,10 @@ const FROM      = 'web@growlab.pe';               // remitente técnico (del dom
 const FROM_NAME = 'Web GrowLab';
 const MAX_PER_HOUR = 6;                           // envíos permitidos por visitante y hora (freno básico al spam)
 
+// la respuesta tiene que ser JSON limpio: ningún aviso de PHP debe colarse en ella (el formulario no podría leerla)
+ini_set('display_errors', '0');
+date_default_timezone_set('America/Lima');      // fecha de los leads en hora de Perú
+
 header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-store');
 header('X-Robots-Tag: noindex');
@@ -102,11 +106,12 @@ if ($canStore) {
         if (flock($fh, LOCK_EX)) {
             if ($isNew) {
                 fwrite($fh, "\xEF\xBB\xBF");      // marca UTF-8 para que Excel muestre bien las tildes
-                fputcsv($fh, ['fecha', 'nombre', 'email', 'telefono', 'servicios', 'mensaje', 'pagina']);
+                fputcsv($fh, ['fecha', 'nombre', 'email', 'telefono', 'servicios', 'mensaje', 'pagina'], ',', '"', '');
             }
-            // un valor que empieza por = + - @ se guarda como texto, para que la hoja de cálculo no lo ejecute como fórmula
-            $safe = function ($v) { return preg_match('/^[=+\-@]/', $v) ? "'" . $v : $v; };
-            fputcsv($fh, array_map($safe, [$fecha, $nombre, $email, $telefono, $lista, $mensaje, $pagina]));
+            // un valor que la hoja de cálculo podría ejecutar como fórmula (empieza por = o @, o por + o - seguido de algo que no
+            // sea un número de teléfono) se guarda como texto; los teléfonos como «+51 999 888 777» se quedan tal cual
+            $safe = function ($v) { return preg_match('/^[=@]|^[+\-](?![\d\s()]*$)/', $v) ? "'" . $v : $v; };
+            fputcsv($fh, array_map($safe, [$fecha, $nombre, $email, $telefono, $lista, $mensaje, $pagina]), ',', '"', '');
             $stored = true;
             flock($fh, LOCK_UN);
         }
@@ -136,6 +141,10 @@ $headers = implode("\r\n", [
     'Content-Transfer-Encoding: 8bit',
 ]);
 $sent = @mail(TO, $encode($subject), $body, $headers, '-f' . FROM);
+// si el correo no sale, queda constancia junto a los leads (el lead ya está guardado en leads.csv)
+if (!$sent && $canStore) {
+    @file_put_contents($dataDir . '/correo-fallido.log', $fecha . ' · no se pudo enviar el aviso del lead de ' . $email . "\n", FILE_APPEND | LOCK_EX);
+}
 
 if (!$sent && !$stored) {
     respond(500, ['ok' => false, 'error' => 'No pudimos enviar tu mensaje. Escríbenos directamente a ' . TO . '.']);

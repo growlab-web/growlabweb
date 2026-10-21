@@ -16,3 +16,6 @@ npm-debug.log*
 Thumbs.db
 .vscode/
 .vercel/
+
+# paquete para subir al hosting (se genera con npm run build)
+growlab-web-subir.zip
