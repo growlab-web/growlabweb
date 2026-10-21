@@ -12,7 +12,7 @@ const used = new Set(all.map((p) => p.data.category));
 const cats = blogCategories.filter((c) => used.has(c.slug));            // sólo categorías con artículos
 const visible = all.filter((p) => !current || p.data.category === current);
 const featuredId = visible[0]?.id;
-const chip = 'blog-chip gtm-blog-categoria rounded-full border px-4 py-2 font-ui text-[.88rem] transition-colors';
+const chip = 'blog-chip gtm-blog-categoria shrink-0 whitespace-nowrap rounded-full border px-4 py-2.5 font-ui text-[.88rem] transition-colors';
 // textos de cada vista, para que el filtro pueda cambiar la cabecera sin recargar
 const views = { '': { eyebrow: 'Blog', title: 'Ideas para crecer con datos', text: 'Guías prácticas, casos y aprendizajes sobre campañas, medición, SEO, ecommerce e inteligencia artificial, desde lo que vemos cada día con nuestros clientes.', doc: 'Blog · Marketing digital, datos y crecimiento · GrowLab' } };
 cats.forEach((c) => { views[c.slug] = { eyebrow: 'Blog · Categoría', title: c.name, text: c.description, doc: `${c.name} · Blog · GrowLab` }; });
@@ -30,7 +30,7 @@ cats.forEach((c) => { views[c.slug] = { eyebrow: 'Blog · Categoría', title: c.
   </header>
 
   {cats.length > 1 && (
-    <nav data-reveal aria-label="Categorías del blog" class="mt-10 flex flex-wrap gap-2.5">
+    <nav data-reveal data-blog-chips aria-label="Categorías del blog" class="blog-chips relative mt-10 flex gap-2.5 max-sm:-mx-(--pad) max-sm:overflow-x-auto max-sm:px-(--pad) sm:flex-wrap">
       <a href="/blog" data-cat="" id="blog-categoria-todas" aria-current={!current ? 'page' : undefined} class={chip}>Todo</a>
       {cats.map((c) => <a href={`/blog/categoria/${c.slug}`} data-cat={c.slug} id={`blog-categoria-${c.slug}`} aria-current={current === c.slug ? 'page' : undefined} class={chip}>{c.name}</a>)}
     </nav>
@@ -52,6 +52,12 @@ cats.forEach((c) => { views[c.slug] = { eyebrow: 'Blog · Categoría', title: c.
   /* todas las vistas usan exactamente los mismos tamaños de título y descripción */
   .blog-head__title { font-family: var(--font-display); font-weight: 300; line-height: 0.98; letter-spacing: -0.035em; font-size: clamp(2.2rem, 4.4vw, 4.4rem); }
   .blog-head__text { margin-top: 1.5rem; max-width: 56ch; font-family: var(--font-body); font-size: clamp(0.95rem, 1.15vw, 1.1rem); line-height: 1.65; color: var(--color-copy); }
+  /* en móvil las categorías van en una sola fila que se desliza con el dedo, en vez de ocupar tres filas */
+  .blog-chips { scrollbar-width: none; overscroll-behavior-x: contain; }
+  .blog-chips::-webkit-scrollbar { display: none; }
+  @media (max-width: 639px) {
+    .blog-chips { mask-image: linear-gradient(90deg, transparent, #000 var(--pad) calc(100% - 2.5rem), transparent); scroll-padding-inline: var(--pad); }
+  }
   .blog-chip { transition: background-color 0.35s, border-color 0.35s, color 0.35s, transform 0.2s; }
   .blog-chip:active { transform: scale(0.95); }
   .blog-chip { border-color: rgba(255, 255, 255, 0.2); color: rgba(255, 255, 255, 0.8); }
@@ -95,12 +101,22 @@ cats.forEach((c) => { views[c.slug] = { eyebrow: 'Blog · Categoría', title: c.
     (document.fonts ? document.fonts.ready : Promise.resolve()).then(lockHeight);
     let rt = 0; addEventListener('resize', () => { clearTimeout(rt); rt = window.setTimeout(lockHeight, 150); });
 
+    // en móvil (fila deslizable) lleva la categoría activa al centro de la fila, sin mover la página
+    const chipRow = list.querySelector<HTMLElement>('[data-blog-chips]');
+    function centerChip(cat: string, smooth = true) {
+      const c = chips.find((x) => x.dataset.cat === cat);
+      if (!chipRow || !c || chipRow.scrollWidth <= chipRow.clientWidth) return;
+      chipRow.scrollTo({ left: c.offsetLeft - (chipRow.clientWidth - c.offsetWidth) / 2, behavior: smooth && !reduce ? 'smooth' : 'auto' });
+    }
+    centerChip(chips.find((c) => c.getAttribute('aria-current') === 'page')?.dataset.cat ?? '', false);
+
     // pinta la vista: textos, botón activo, tarjetas visibles y cuál es la destacada
     function apply(cat: string) {
       const v = views[cat] || views[''];
       set('[data-blog-eyebrow]', v.eyebrow); set('[data-blog-title]', v.title); set('[data-blog-text]', v.text);
       document.title = v.doc;
       chips.forEach((c) => { if (c.dataset.cat === cat) c.setAttribute('aria-current', 'page'); else c.removeAttribute('aria-current'); });
+      centerChip(cat);
       let first = true;
       items.forEach((it) => {
         const on = !cat || it.dataset.category === cat;
