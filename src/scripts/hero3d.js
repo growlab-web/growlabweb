@@ -379,7 +379,7 @@ export function initHero3D() {
         float facing = dot(normalize(nb + vec3(1e-5)), vdir);
         // cerebro: la cara de atrás no desaparece del todo (se ve más tenue, como la parte lejana de un objeto sólido); si se apagaba
         // del todo, al girar quedaba una franja vacía entre el borde y el cuerpo
-        float vis = mix(1.0, 0.16 + 0.84*smoothstep(-0.3, 0.3, facing), w2);
+        float vis = mix(1.0, 0.38 + 0.62*smoothstep(-0.45, 0.35, facing), w2);
         // luz desde arriba a la izquierda: da volumen al cerebro (zonas iluminadas y en sombra)
         float lit = mix(1.0, 0.55 + 0.65 * max(dot(normalize(nb + vec3(1e-5)), normalize(vec3(-0.35, 0.55, 0.76))), 0.0), w2);
         float alive = aVis.x*w0 + aVis.y*w1 + aVis.z*w2;
