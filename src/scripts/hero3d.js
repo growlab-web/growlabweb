@@ -173,7 +173,7 @@ export function initHero3D() {
       const gy = (Z[Math.min(H - 1, y + 1) * W + x] - Z[Math.max(0, y - 1) * W + x]) * thick / (2 * S);
       // toda la silueta recibe partículas (también las zonas lisas del dibujo, como el lóbulo frontal): si no, esas zonas quedaban
       // vacías y el cerebro parecía hueco; los surcos siguen marcándose porque reciben más
-      acc += !outside[i] ? (0.42 + 0.58 * Math.pow(D[i], 1.5)) * Math.min(1.5, Math.sqrt(1 + gx * gx + gy * gy)) : 0;
+      acc += !outside[i] ? (0.42 + 0.58 * Math.pow(D[i], 1.5)) * Math.min(5, Math.sqrt(1 + gx * gx + gy * gy)) : 0;   // los costados (muy inclinados) reciben partículas según su superficie real: sin hueco al girar
       cdf[i] = acc;
     }
     for (let n = 0; n < N2; n++) {
@@ -358,8 +358,8 @@ export function initHero3D() {
         for (int i = 0; i < 8; i++) {
           vec4 sp = uSpark[i];
           float on = step(0.0, sp.w), sd = distance(aP2, sp.xyz);
-          synPt += on * exp(-sd*sd / 0.0014) * (1.0 - smoothstep(0.0, 0.3, sp.w)) * 4.5;       // nace en un solo punto muy brillante…
-          float ra = sp.w, sr = (sd - ra * ra * 0.75) / (0.03 + 0.03 * ra);                       // …y la onda sale de él sin pausa, cada vez más rápida
+          synPt += on * exp(-sd*sd / 0.0014) * (1.0 - smoothstep(0.0, 0.18, sp.w)) * 4.5;      // destello en el punto…
+          float ra = sp.w, sr = (sd - sqrt(max(ra, 0.0)) * 0.8) / (0.03 + 0.04 * ra);                       // …y la onda sale de él en el mismo instante, rápida desde el principio
           syn += on * exp(-sr*sr) * (1.0 - ra) * 0.9;
         }
         syn = (syn * (0.3 + 0.7 * step(0.4, fract(aRand * 5.3))) + synPt) * w2;
@@ -559,7 +559,7 @@ export function initHero3D() {
         sp.wait -= dt;
         if (sp.wait <= 0) {
           const n = sparkPoint(sp.chain ? sp.v : null);
-          sp.v.set(P2[n * 3], P2[n * 3 + 1], P2[n * 3 + 2], 0); sp.age = 0; sp.dur = 1.0 + Math.random() * 0.6;
+          sp.v.set(P2[n * 3], P2[n * 3 + 1], P2[n * 3 + 2], 0); sp.age = 0; sp.dur = 0.75 + Math.random() * 0.3;
         }
       } else {
         sp.age += dt / sp.dur;
