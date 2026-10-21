@@ -50,7 +50,6 @@ if ($('[data-hero][data-pin]') || isApp) lenis.stop();
 // la inercia del trackpad sigue mandando scroll un buen rato después de soltar: sin esto, un gesto rápido cruza toda la página
 // Paradas: las etapas del hero y las secciones marcadas con data-stop (sólo en páginas con pin)
 let stops = [];
-let heroStops = [], heroEnd = -1;   // etapas del hero (esfera, galaxia, cerebro) y dónde termina su recorrido
 const gesture = { t: 0, dir: 0, limit: null, held: false, heldAt: 0, low: 0 };
 function measureStops() {
   const max = ScrollTrigger.maxScroll(window), out = [];
@@ -59,7 +58,7 @@ function measureStops() {
     const span = st.end - st.start, tl = st.animation;
     // etapas del hero (la etiqueta «fin» sólo sirve para que el enganche pueda soltar el hero hacia abajo: no es una parada)
     const labels = tl && tl.labels ? Object.entries(tl.labels).filter(([name]) => name !== 'fin').map(([, t]) => t) : [];
-    if (labels.length) { heroEnd = st.end; heroStops = labels.map((time) => Math.round(st.start + (span * time) / tl.duration())); return labels.forEach((time) => out.push(st.start + (span * time) / tl.duration())); }
+    if (labels.length) return labels.forEach((time) => out.push(st.start + (span * time) / tl.duration()));
     const n = Math.max(1, Math.round(span / window.innerHeight));       // sin etiquetas: tramos de más o menos una pantalla
     for (let i = 0; i <= n; i++) out.push(st.start + (span * i) / n);
   });
@@ -80,16 +79,6 @@ function limitWheel(data) {
   // gesto nuevo: tras una pausa, al cambiar de sentido o, ya detenido, cuando el impulso vuelve a crecer (la inercia sólo decae)
   const fresh = now - g.t > 160 || dir !== g.dir || (g.held && now - g.heldAt > 220 && abs > Math.max(g.low * 3, g.low + 30));
   g.t = now;
-  // Hero: la animación sigue al gesto mientras dura y, cuando el gesto termina a medio camino entre dos etapas, se completa sola
-  // hasta la siguiente en el sentido del gesto (igual al bajar que al subir). Así cualquier gesto, aunque sea corto, cambia de etapa.
-  clearTimeout(g.finish);
-  g.finish = setTimeout(() => {
-    const y = lenis.targetScroll;
-    if (!heroStops.length || y <= heroStops[0] + 2 || y >= heroStops[heroStops.length - 1] - 2) return;
-    if (heroStops.some((s) => Math.abs(s - y) <= 2)) return;
-    const to = g.dir > 0 ? heroStops.find((s) => s > y) : heroStops.findLast((s) => s < y);
-    if (to != null) lenis.scrollTo(to, { duration: 0.9, easing: (x) => 1 - Math.pow(1 - x, 3) });
-  }, 170);
   if (fresh) {
     const from = lenis.targetScroll;
     g.dir = dir; g.held = false;
