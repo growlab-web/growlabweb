@@ -75,3 +75,28 @@ Vercel detecta Astro automáticamente (comando `npm run build`, carpeta de salid
 4. **Buscadores**: dar de alta `growlab.pe` en Google Search Console y enviar `https://growlab.pe/sitemap-index.xml`.
 5. **Política de privacidad**: completar razón social, RUC y domicilio en `src/data/site.js` (`legal`) y revisar el texto de `src/pages/privacidad.astro` con asesoría legal.
 
+## Identificadores para Google Tag Manager
+
+Cada botón, enlace y formulario importante lleva un `id` estable (en español, con guiones) para usar las variables integradas
+de GTM **Click ID**, **Click Classes**, **Click Element**, **Form ID** y **Form Element**. Al hacer clic, el elemento que recibe
+el clic es siempre el botón o enlace (nunca su icono o texto interior), así que **Click ID** devuelve estos valores:
+
+| Zona | ids |
+|---|---|
+| Menú | `menu-logo`, `menu-inicio`, `menu-servicios`, `menu-portafolio`, `menu-nosotros`, `menu-agendar`, `menu-movil-abrir`, `menu-movil-…` (mismos nombres), `menu-movil-agendar` |
+| Inicio | `hero-agendar`, `servicios-anterior`, `servicios-siguiente` |
+| WhatsApp | `whatsapp-boton` |
+| Formulario | `form-contacto` (página de contacto) y `form-contacto-inicio` (inicio) como **Form ID**; `form-servicios`, `form-prefijo`, `form-enviar`, `form-privacidad`, `form-otro-mensaje`, `juego-pong` |
+| Página de contacto | `contacto-correo`, `contacto-telefono`, `contacto-instagram`, `contacto-linkedin` |
+| Nosotros | `nosotros-hablemos` |
+| Portafolio | `portafolio-anterior`, `portafolio-siguiente`, `portafolio-destacados`, `portafolio-todos`, `portafolio-agendar`, `portafolio-nombre-<proyecto>`, `portafolio-ver-<proyecto>`, `portafolio-lista-<proyecto>` |
+| Ficha de proyecto | `proyecto-anterior`, `proyecto-siguiente`, `proyecto-cerrar`, `proyecto-quiero-uno-asi`, `proyecto-ver-sitio` |
+| Pie | `pie-logo`, `pie-correo`, `pie-telefono`, `pie-inicio`, `pie-servicios`, `pie-portafolio`, `pie-nosotros`, `pie-contacto`, `pie-proyecto-<proyecto>`, `pie-proyectos-todos`, `pie-instagram`, `pie-linkedin`, `pie-cookies`, `pie-privacidad`, `pie-desplegar-navegacion`, `pie-desplegar-proyectos`, `pie-desplegar-redes` |
+| Aviso de cookies | `cookies-aceptar`, `cookies-solo-necesarias`, `cookies-mas-info` |
+| Página 404 | `error-logo`, `error-inicio`, `error-avisar` |
+
+`<proyecto>` es el identificador del proyecto (`relengcorp`, `alpaca-111`, `pacomarca`, `kuna`…).
+
+El formulario se envía por código (no recarga la página), así que el activador «Envío de formulario» de GTM puede no
+dispararse. Para medir leads, usa el evento personalizado `generate_lead`, que el sitio envía sólo cuando el envío sale bien.
+

@@ -1,5 +1,6 @@
 ---
 import { site } from '../data/site.js';
+import { gtmId } from '../data/gtm.js';
 import { projects } from '../data/projects.js';
 const year = new Date().getFullYear();
 const links = [...site.nav, site.contact];
@@ -11,39 +12,39 @@ const link = 'transition-colors hover:text-secondary';
 <footer class="border-t border-white/10 px-(--pad) text-[.95rem] text-muted">
   <div class="grid gap-x-10 gap-y-12 py-[clamp(3rem,8vh,5rem)] max-sm:gap-y-0 max-sm:pb-4 sm:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_1fr]">
     <div>
-      <a href="/" aria-label="GrowLab, ir al inicio" class="inline-flex">
+      <a href="/" id="pie-logo" aria-label="GrowLab, ir al inicio" class="inline-flex">
         <img src="/logo.png" alt="GrowLab" width="1046" height="205" loading="lazy" class="h-[26px] w-auto" />
       </a>
       <p class="mt-6 max-w-[32ch] leading-relaxed">Agencia de marketing digital. Creatividad y datos para hacer crecer tu negocio.</p>
-      <a href={`mailto:${site.email}`} class={`mt-5 block w-fit break-all text-white/85 ${link}`}>{site.email}</a>
-      <a href={site.phone.href} class={`mt-2 block w-fit whitespace-nowrap text-white/85 ${link}`}>{site.phone.label}</a>
+      <a href={`mailto:${site.email}`} id="pie-correo" class={`mt-5 block w-fit break-all text-white/85 ${link}`}>{site.email}</a>
+      <a href={site.phone.href} id="pie-telefono" class={`mt-2 block w-fit whitespace-nowrap text-white/85 ${link}`}>{site.phone.label}</a>
     </div>
 
     <!-- Los tres grupos son desplegables: en móvil empiezan cerrados para no alargar el pie (los cierra el script de abajo);
          en pantallas mayores están siempre abiertos y el título no se puede pulsar. -->
     <details class="ft-group" open>
-      <summary class={head}>Navegación <svg class="ft-chevron" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></summary>
+      <summary id="pie-desplegar-navegacion" class={head}>Navegación <svg class="ft-chevron" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></summary>
       <nav aria-label="Pie de página">
         <ul class="grid gap-3">
-          {links.map((l) => <li><a href={l.href} class={link}>{l.label}</a></li>)}
+          {links.map((l) => <li><a href={l.href} id={`pie-${gtmId(l.label)}`} class={link}>{l.label}</a></li>)}
         </ul>
       </nav>
     </details>
 
     <details class="ft-group" open>
-      <summary class={head}>Últimos proyectos <svg class="ft-chevron" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></summary>
+      <summary id="pie-desplegar-proyectos" class={head}>Últimos proyectos <svg class="ft-chevron" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></summary>
       <nav aria-label="Últimos proyectos">
         <ul class="grid gap-3">
-          {latest.map((p) => <li><a href={`/portafolio/${p.slug}`} class={link}>{p.name}</a></li>)}
-          <li><a href="/portafolio" class={`text-white/85 ${link}`}>Ver todos →</a></li>
+          {latest.map((p) => <li><a href={`/portafolio/${p.slug}`} id={`pie-proyecto-${p.slug}`} class={link}>{p.name}</a></li>)}
+          <li><a href="/portafolio" id="pie-proyectos-todos" class={`text-white/85 ${link}`}>Ver todos →</a></li>
         </ul>
       </nav>
     </details>
 
     <details class="ft-group" open>
-      <summary class={head}>Síguenos <svg class="ft-chevron" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></summary>
+      <summary id="pie-desplegar-redes" class={head}>Síguenos <svg class="ft-chevron" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></summary>
       <ul class="grid gap-3">
-        {site.social.map((s) => <li><a href={s.href} target="_blank" rel="noopener noreferrer" class={link}>{s.label}</a></li>)}
+        {site.social.map((s) => <li><a href={s.href} id={`pie-${gtmId(s.label)}`} target="_blank" rel="noopener noreferrer" class={link}>{s.label}</a></li>)}
       </ul>
     </details>
   </div>
@@ -51,8 +52,8 @@ const link = 'transition-colors hover:text-secondary';
   <div class="flex flex-wrap items-center justify-between gap-x-8 gap-y-3 border-t border-white/10 py-6 text-[.85rem]">
     <span>© {year} {site.name}® Agencia de marketing digital</span>
     <span class="flex flex-wrap gap-x-6 gap-y-2">
-      {site.gtm && <a href="#cookies" data-consent-open class={link}>Preferencias de cookies</a>}
-      <a href={site.privacy.href} class={link}>{site.privacy.label}</a>
+      {site.gtm && <a href="#cookies" id="pie-cookies" data-consent-open class={link}>Preferencias de cookies</a>}
+      <a href={site.privacy.href} id="pie-privacidad" class={link}>{site.privacy.label}</a>
     </span>
   </div>
 </footer>

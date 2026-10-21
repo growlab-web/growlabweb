@@ -371,3 +371,7 @@ input:autofill, textarea:autofill { background-color: transparent !important; co
 .hero-static { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
 .hero-static img { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; object-fit: cover; mix-blend-mode: screen; }
 .no-3d [data-universe] { display: none; }      /* las plataformas en órbita se calculan con la escena 3D */
+
+/* Google Tag Manager: al hacer clic en un botón o enlace, el elemento que recibe el clic es siempre el botón/enlace y no el icono
+   o el texto de dentro. Así las variables Click ID y Click Classes devuelven el id del botón (ver src/data/gtm.js). */
+a :where(svg, span, i, img, b), button :where(svg, span, i, img, b), summary :where(svg, span) { pointer-events: none; }

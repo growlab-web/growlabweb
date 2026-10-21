@@ -13,11 +13,11 @@ import { site } from '../data/site.js';
 >
   <p class="leading-relaxed">
     Usamos cookies para medir las visitas y mejorar el sitio. Puedes aceptarlas o seguir solo con las necesarias.
-    <a href={site.privacy.href} class="text-white underline underline-offset-2 transition-colors hover:text-secondary">Más información</a>.
+    <a href={site.privacy.href} id="cookies-mas-info" class="text-white underline underline-offset-2 transition-colors hover:text-secondary">Más información</a>.
   </p>
   <div class="mt-4 flex flex-wrap gap-3">
-    <button type="button" data-consent-set="all" class="cursor-pointer rounded-full bg-secondary px-5 py-2.5 font-display text-[.85rem] font-medium text-black transition-colors hover:bg-white">Aceptar</button>
-    <button type="button" data-consent-set="necessary" class="cursor-pointer rounded-full border border-white/30 px-5 py-2.5 font-display text-[.85rem] text-white transition-colors hover:border-white">Solo necesarias</button>
+    <button type="button" id="cookies-aceptar" data-consent-set="all" class="cursor-pointer rounded-full bg-secondary px-5 py-2.5 font-display text-[.85rem] font-medium text-black transition-colors hover:bg-white">Aceptar</button>
+    <button type="button" id="cookies-solo-necesarias" data-consent-set="necessary" class="cursor-pointer rounded-full border border-white/30 px-5 py-2.5 font-display text-[.85rem] text-white transition-colors hover:border-white">Solo necesarias</button>
   </div>
 </div>
 

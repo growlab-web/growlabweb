@@ -5,6 +5,7 @@ import ContactForm from '../components/ContactForm.astro';
 import Footer from '../components/Footer.astro';
 import { site } from '../data/site.js';
 import Icon from '../components/Icon.astro';
+import { gtmId } from '../data/gtm.js';
 ---
 
 <Layout
@@ -44,11 +45,11 @@ import Icon from '../components/Icon.astro';
         <div class="mt-[8vh] grid gap-x-8 gap-y-10 border-t border-white/10 pt-[6vh] sm:grid-cols-2 lg:flex lg:justify-between">
           <div data-reveal>
             <p class="mb-3 flex items-center gap-2 font-display text-[.78rem] uppercase tracking-[.14em] text-white/50"><Icon name="mail" size={18} class="text-secondary" />Correo</p>
-            <a class="font-display text-[1rem] break-words transition-colors hover:text-secondary lg:whitespace-nowrap" href={`mailto:${site.email}`}>{site.email}</a>
+            <a id="contacto-correo" class="font-display text-[1rem] break-words transition-colors hover:text-secondary lg:whitespace-nowrap" href={`mailto:${site.email}`}>{site.email}</a>
           </div>
           <div data-reveal>
             <p class="mb-3 flex items-center gap-2 font-display text-[.78rem] uppercase tracking-[.14em] text-white/50"><Icon name="phone" size={18} class="text-secondary" />Teléfono</p>
-            <a class="font-display text-[1rem] whitespace-nowrap transition-colors hover:text-secondary" href={site.phone.href}>{site.phone.label}</a>
+            <a id="contacto-telefono" class="font-display text-[1rem] whitespace-nowrap transition-colors hover:text-secondary" href={site.phone.href}>{site.phone.label}</a>
           </div>
           <div data-reveal>
             <p class="mb-3 flex items-center gap-2 font-display text-[.78rem] uppercase tracking-[.14em] text-white/50"><Icon name="clock" size={18} class="text-secondary" />Horario</p>
@@ -57,7 +58,7 @@ import Icon from '../components/Icon.astro';
           <div data-reveal>
             <p class="mb-3 flex items-center gap-2 font-display text-[.78rem] uppercase tracking-[.14em] text-white/50"><Icon name="share-2" size={18} class="text-secondary" />Síguenos</p>
             <p class="flex flex-wrap gap-x-5 gap-y-1 text-muted">
-              {site.social.map((s) => <a href={s.href} target="_blank" rel="noopener noreferrer" class="transition-colors hover:text-secondary">{s.label}</a>)}
+              {site.social.map((s) => <a href={s.href} id={`contacto-${gtmId(s.label)}`} target="_blank" rel="noopener noreferrer" class="transition-colors hover:text-secondary">{s.label}</a>)}
             </p>
           </div>
         </div>

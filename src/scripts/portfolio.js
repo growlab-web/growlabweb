@@ -215,9 +215,9 @@ export async function initPortfolio(root) {
   const COARSE = window.matchMedia('(pointer: coarse)').matches;
   const tags = projects.map((p, i) => {
     const label = document.createElement('button');
-    label.type = 'button'; label.className = 'pf-label'; label.textContent = p.name; label.dataset.i = i; label.tabIndex = -1;
+    label.type = 'button'; label.id = `portafolio-nombre-${p.slug}`; label.className = 'pf-label'; label.textContent = p.name; label.dataset.i = i; label.tabIndex = -1;
     const plus = document.createElement('button');
-    plus.type = 'button'; plus.className = 'pf-plus'; plus.setAttribute('aria-label', `Abrir proyecto ${p.name}`); plus.dataset.i = i;
+    plus.type = 'button'; plus.id = `portafolio-ver-${p.slug}`; plus.className = 'pf-plus'; plus.setAttribute('aria-label', `Abrir proyecto ${p.name}`); plus.dataset.i = i;
     // el «+» se abre en una pastilla «Ver proyecto» al acercar el cursor al proyecto (clase is-open, la pone el bucle de dibujo)
     plus.innerHTML = '<span class="pf-plus__text">Ver proyecto</span><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>';
     labelsEl.append(label, plus);
@@ -453,7 +453,7 @@ export async function initPortfolio(root) {
       `<span class="pf-dot" aria-hidden="true"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg></span>` +
       `<span class="pf-chip">${p.category}</span><span class="pf-chip">${p.year}</span>` +
       (p.result ? `<span class="pf-chip pf-chip--result"><b>${p.result.value}</b> ${p.result.label}</span>` : '') +
-      (p.url ? `<a class="pf-chip pf-chip--link" href="${p.url}" target="_blank" rel="noopener noreferrer">Ver sitio ↗</a>` : '');
+      (p.url ? `<a id="proyecto-ver-sitio" class="pf-chip pf-chip--link" href="${p.url}" target="_blank" rel="noopener noreferrer">Ver sitio ↗</a>` : '');
     $('[data-pf-services]', modal).innerHTML = p.services.map((s) => `<li>${s}</li>`).join('');
     const prev = projects[(projects.indexOf(p) - 1 + N) % N], next = projects[(projects.indexOf(p) + 1) % N];
     $('[data-pf-prev-name]', modal).textContent = prev.name; $('[data-pf-next-name]', modal).textContent = next.name;

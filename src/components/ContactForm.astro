@@ -14,12 +14,15 @@ const countries = [
 const wrap = 'group relative flex items-center gap-3 border-b border-white/20 transition-colors focus-within:border-secondary';
 const icon = 'h-[22px] w-[22px] shrink-0 text-white/45 transition-colors group-focus-within:text-secondary';
 const input = 'w-full bg-transparent py-4 font-body text-[1rem] text-white outline-none placeholder:text-white/40';
+// id del formulario para GTM (Form ID): «form-contacto» en la página de contacto, «form-contacto-inicio» en la sección del inicio
+interface Props { formId?: string }
+const { formId = 'form-contacto' } = Astro.props;
 ---
 
 <!-- El formulario se envía a /api/contacto.php (hosting cPanel), que guarda el lead y lo manda al correo de GrowLab.
      Nunca abre el programa de correo del visitante. En local (npm run dev) y en la vista previa de Vercel no hay PHP: ahí el envío se simula para poder
      ver la pantalla de gracias, y se avisa de que no se ha mandado ningún correo. -->
-<form data-contact-form data-email={site.email} class="grid gap-x-10 gap-y-7 sm:grid-cols-2" novalidate>
+<form id={formId} data-contact-form data-email={site.email} class="grid gap-x-10 gap-y-7 sm:grid-cols-2" novalidate>
   <label class={wrap}>
     <svg class={icon} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"></path></svg>
     <span class="sr-only">Nombre</span>
@@ -39,7 +42,7 @@ const input = 'w-full bg-transparent py-4 font-body text-[1rem] text-white outli
       <span data-prefix-label>+51</span>
       <svg class="h-3.5 w-3.5 text-white/45" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
       <!-- el desplegable real va encima, invisible: se ve sólo el prefijo y al tocarlo se abre la lista del sistema -->
-      <select name="prefijo" data-prefix aria-label="País del teléfono" autocomplete="tel-country-code" class="absolute inset-0 h-full w-full cursor-pointer bg-[#0b1226] text-white opacity-0">
+      <select name="prefijo" id="form-prefijo" data-prefix aria-label="País del teléfono" autocomplete="tel-country-code" class="absolute inset-0 h-full w-full cursor-pointer bg-[#0b1226] text-white opacity-0">
         {countries.map(([name, code], i) => <option value={code} selected={i === 0}>{name} ({code})</option>)}
       </select>
     </span>
@@ -53,7 +56,7 @@ const input = 'w-full bg-transparent py-4 font-body text-[1rem] text-white outli
   <!-- Servicios de interés: desplegable en el que se pueden marcar varios -->
   <div data-services-select class={wrap + ' z-20'}>
     <svg class={icon} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"></path></svg>
-    <button type="button" data-ss-toggle aria-haspopup="true" aria-expanded="false" class="flex w-full cursor-pointer items-center justify-between gap-3 bg-transparent py-4 text-left font-body text-[1rem] outline-none">
+    <button type="button" id="form-servicios" data-ss-toggle aria-haspopup="true" aria-expanded="false" class="flex w-full cursor-pointer items-center justify-between gap-3 bg-transparent py-4 text-left font-body text-[1rem] outline-none">
       <span data-ss-label class="truncate text-white/40">Servicios de interés (opcional)</span>
       <svg data-ss-chevron class="h-4 w-4 shrink-0 text-white/45 transition-transform duration-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
     </button>
@@ -81,13 +84,13 @@ const input = 'w-full bg-transparent py-4 font-body text-[1rem] text-white outli
   </div>
 
   <div class="flex flex-wrap items-center gap-x-8 gap-y-4 pt-3 sm:col-span-2">
-    <button type="submit" data-form-submit class="inline-flex h-[54px] cursor-pointer disabled:cursor-wait disabled:opacity-60 items-center gap-3 bg-secondary px-8 font-display text-[.85rem] font-semibold uppercase tracking-[.12em] text-black transition-colors hover:bg-white">
+    <button type="submit" id="form-enviar" data-form-submit class="inline-flex h-[54px] cursor-pointer disabled:cursor-wait disabled:opacity-60 items-center gap-3 bg-secondary px-8 font-display text-[.85rem] font-semibold uppercase tracking-[.12em] text-black transition-colors hover:bg-white">
       <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21 3-9.5 18-2.5-7.5L1.5 11 21 3Z"></path><path d="M21 3 9 13.5"></path></svg>
       Enviar
     </button>
     <label class="flex cursor-pointer items-center gap-3 font-body text-[.9rem] text-white/60">
       <input type="checkbox" name="consent" class="h-[18px] w-[18px] shrink-0 cursor-pointer accent-secondary" />
-      <span>Acepto que se recopilen mis <a href={site.privacy.href} target="_blank" class="underline underline-offset-2 transition-colors hover:text-secondary">datos</a>.</span>
+      <span>Acepto que se recopilen mis <a href={site.privacy.href} id="form-privacidad" target="_blank" class="underline underline-offset-2 transition-colors hover:text-secondary">datos</a>.</span>
     </label>
   </div>
 
@@ -101,14 +104,14 @@ const input = 'w-full bg-transparent py-4 font-body text-[1rem] text-white outli
   <p class="mx-auto mt-4 max-w-[40ch] font-body text-[clamp(1rem,1.3vw,1.2rem)] leading-relaxed text-copy">Mientras esperas nuestra respuesta, juega un poco.</p>
 
   <div class="mx-auto mt-7 max-w-[720px]">
-    <canvas data-pong class="block h-[clamp(220px,38vh,340px)] w-full cursor-none touch-none rounded-[22px] border border-white/15 bg-white/[.03]" aria-label="Juego: para la pelota con las barras moviendo el ratón arriba y abajo"></canvas>
+    <canvas id="juego-pong" data-pong class="block h-[clamp(220px,38vh,340px)] w-full cursor-none touch-none rounded-[22px] border border-white/15 bg-white/[.03]" aria-label="Juego: para la pelota con las barras moviendo el ratón arriba y abajo"></canvas>
     <p class="mt-3 flex flex-wrap items-center justify-between gap-x-6 gap-y-1 font-ui text-[.8rem] uppercase tracking-[.14em] text-white/55">
       <span>Rebotes: <b data-pong-score class="font-medium text-secondary">0</b></span>
       <span>Tu récord: <b data-pong-best class="font-medium text-white">0</b></span>
     </p>
   </div>
 
-  <button type="button" data-form-again class="mt-6 cursor-pointer font-body text-[.9rem] text-white/60 underline underline-offset-4 transition-colors hover:text-secondary">Enviar otro mensaje</button>
+  <button type="button" id="form-otro-mensaje" data-form-again class="mt-6 cursor-pointer font-body text-[.9rem] text-white/60 underline underline-offset-4 transition-colors hover:text-secondary">Enviar otro mensaje</button>
 </div>
 
 <script>

@@ -24,7 +24,7 @@ const metrics = [
     </div>
 
     <header class="relative z-[2] flex shrink-0 items-center justify-between px-(--pad) pt-[clamp(14px,3vh,28px)]">
-      <a href="/" aria-label="GrowLab, ir al inicio"><img src="/logo.png" alt="GrowLab" width="1046" height="205" class="h-[22px] w-auto" /></a>
+      <a href="/" id="error-logo" aria-label="GrowLab, ir al inicio"><img src="/logo.png" alt="GrowLab" width="1046" height="205" class="h-[22px] w-auto" /></a>
       <span class="font-display text-[.72rem] uppercase tracking-[.22em] text-secondary">Error 404</span>
     </header>
 
@@ -58,8 +58,8 @@ const metrics = [
       </dl>
 
       <div class="mt-[clamp(14px,3.2vh,40px)] flex flex-wrap justify-center gap-x-4 gap-y-2.5">
-        <a href="/" class="inline-flex items-center gap-3 rounded-full bg-secondary px-8 py-[clamp(10px,1.8vh,16px)] font-display font-medium text-black transition-colors duration-300 hover:bg-white">Volver al inicio</a>
-        <a href={site.contact.href} class="inline-flex items-center rounded-full border border-white/30 px-8 py-[clamp(10px,1.8vh,16px)] font-display font-medium transition-colors hover:border-white">Avísanos del enlace roto</a>
+        <a href="/" id="error-inicio" class="inline-flex items-center gap-3 rounded-full bg-secondary px-8 py-[clamp(10px,1.8vh,16px)] font-display font-medium text-black transition-colors duration-300 hover:bg-white">Volver al inicio</a>
+        <a href={site.contact.href} id="error-avisar" class="inline-flex items-center rounded-full border border-white/30 px-8 py-[clamp(10px,1.8vh,16px)] font-display font-medium transition-colors hover:border-white">Avísanos del enlace roto</a>
       </div>
     </section>
 

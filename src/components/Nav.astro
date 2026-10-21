@@ -1,5 +1,6 @@
 ---
 import { site } from '../data/site.js';
+import { gtmId } from '../data/gtm.js';
 
 const path = Astro.url.pathname.replace(/\/$/, '') || '/';
 const isActive = (href) => (href === '/' ? path === '/' : path === href || path.startsWith(href + '/'));
@@ -19,7 +20,7 @@ const contactActive = isActive(site.contact.href);
   data-nav
   class="liquid-glass fixed inset-x-0 top-[17px] z-[70] mx-auto flex h-[50px] w-[min(760px,calc(100%-24px))] items-center justify-between gap-4 rounded-full pl-[24px] pr-[10px]"
 >
-  <a href="/" aria-label="GrowLab, ir al inicio" class="flex items-center">
+  <a href="/" id="menu-logo" aria-label="GrowLab, ir al inicio" class="flex items-center">
     <img src="/logo.png" alt="GrowLab" width="1046" height="205" class="h-[19px] w-auto" />
   </a>
 
@@ -28,6 +29,7 @@ const contactActive = isActive(site.contact.href);
       site.nav.map((l) => (
         <a
           href={l.href}
+          id={`menu-${gtmId(l.label)}`}
           aria-current={isActive(l.href) ? 'page' : undefined}
           class:list={[
             'transition hover:text-secondary',
@@ -43,6 +45,7 @@ const contactActive = isActive(site.contact.href);
   <div class="flex items-center gap-2">
     <a
       href={site.contact.href}
+      id="menu-agendar"
       aria-current={contactActive ? 'page' : undefined}
       class:list={[
         'inline-flex h-[32px] items-center gap-[.7rem] rounded-full border px-4 font-display text-[.92rem] font-light transition-colors hover:bg-white hover:text-black max-[480px]:hidden',
@@ -55,6 +58,7 @@ const contactActive = isActive(site.contact.href);
     <!-- botón del menú desplegable (móvil) -->
     <button
       type="button"
+      id="menu-movil-abrir"
       data-nav-toggle
       aria-expanded="false"
       aria-controls="nav-sheet"
@@ -79,6 +83,7 @@ const contactActive = isActive(site.contact.href);
         [...site.nav, site.contact].map((l) => (
           <a
             href={l.href}
+            id={`menu-movil-${gtmId(l.label)}`}
             class:list={[
               'rounded-xl px-4 py-3 transition-colors hover:bg-white/10',
               isActive(l.href) ? 'text-secondary' : 'text-white',
@@ -88,7 +93,7 @@ const contactActive = isActive(site.contact.href);
           </a>
         ))
       }
-      <a href={site.contact.href} class="mt-1 rounded-xl bg-secondary px-4 py-3 text-center font-medium text-black">{site.cta}</a>
+      <a href={site.contact.href} id="menu-movil-agendar" class="mt-1 rounded-xl bg-secondary px-4 py-3 text-center font-medium text-black">{site.cta}</a>
     </nav>
   </div>
 </header>
