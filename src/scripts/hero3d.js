@@ -265,7 +265,9 @@ export function initHero3D() {
         float w0 = clamp(1.0 - m, 0.0, 1.0);
         float w1 = clamp(1.0 - abs(m - 1.0), 0.0, 1.0);
         float w2 = clamp(m - 1.0, 0.0, 1.0);
-        float burst = pow(sin(3.14159 * rf), 1.5);
+        // explosión entre formas: completa de la esfera a la galaxia; casi nada de la galaxia al cerebro (ahí la cámara ya entra en
+        // la galaxia, y una explosión además dejaba las partículas difusas)
+        float burst = pow(sin(3.14159 * rf), 1.5) * (fl > 0.5 ? 0.25 : 1.0);
 
         // casi-esfera con relieve de ruido
         vec3 p0 = position;

@@ -55,7 +55,7 @@ export function startHeroStages({ hero, pinned, MOB, state, position, homeX }) {
     // salida de la galaxia: primero la cámara entra en la galaxia tal cual, sin deformarla (zoom in hacia su núcleo); ya dentro,
     // las partículas se reordenan en el cerebro, que se aleja hasta su sitio. Tramo más corto que antes: menos scroll hasta el cerebro.
     .to('[data-panel="2"]', hide, 2.85)
-    .to(state, { fly: -0.42, duration: 0.75, ease: 'power2.in' }, 2.85)                    // entrar en la galaxia (intacta)
+    .to(state, { fly: -0.26, duration: 0.75, ease: 'power2.in' }, 2.85)                    // entrar en la galaxia (intacta)
     .to(state, { morph: 2, duration: 1.0, ease: E }, 3.45)                                  // → cerebro, ya dentro
     .to(state, { fly: 0, duration: 0.95, ease: 'power2.out' }, 3.6)                         // y la cámara vuelve atrás
     .to(position, { x: homeX, duration: 1.0, ease: E }, 3.45)
