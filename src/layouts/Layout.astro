@@ -95,10 +95,11 @@ const gtm = /^GTM-[A-Z0-9]+$/.test(site.gtm) ? site.gtm : '';
           var gtmLoaded = false;
           var loadGtm = function () {
             if (gtmLoaded) return; gtmLoaded = true;
-            ['scroll', 'pointerdown', 'keydown', 'touchstart'].forEach(function (e) { removeEventListener(e, loadGtm, true); });
+            ['pointerdown', 'keydown', 'touchstart'].forEach(function (e) { removeEventListener(e, loadGtm, true); });
             (function (w, d, s, l, i) { w[l] = w[l] || []; w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' }); var f = d.getElementsByTagName(s)[0], j = d.createElement(s); j.async = true; j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i; f.parentNode.insertBefore(j, f); })(window, document, 'script', 'dataLayer', gtm);
           };
-          ['scroll', 'pointerdown', 'keydown', 'touchstart'].forEach(function (e) { addEventListener(e, loadGtm, { capture: true, passive: true, once: true }); });
+          // (no al hacer scroll: descargar y arrancar ~900 KB de etiquetas en ese momento entorpecía la animación del hero)
+          ['pointerdown', 'keydown', 'touchstart'].forEach(function (e) { addEventListener(e, loadGtm, { capture: true, passive: true, once: true }); });
           addEventListener('load', function () { setTimeout(loadGtm, 3500); });
         </script>
       )
