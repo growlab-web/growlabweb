@@ -52,13 +52,9 @@ export function startHeroStages({ hero, pinned, MOB, state, position, homeX }) {
     .to(A, { opacity: 0.5, rotation: -30, scale: 1.3, xPercent: 18, yPercent: 30, duration: 0.9, ease: E }, 0.6)
     .to(A, { opacity: 0.16, rotation: -12, scale: 1.0, xPercent: 0, yPercent: 0, duration: 0.9, ease: E }, 1.5)
     .to(B, { opacity: 0.2, yPercent: -90, scale: 1.1, duration: 1.7, ease: E }, 0.6)
-    // salida de la galaxia (mismo tramo de scroll que la entrada, igual que antes): primero la cámara entra en la galaxia tal cual,
-    // sin deformarla (zoom in hacia su núcleo); ya dentro, las partículas forman el cerebro y la cámara vuelve a su sitio
+    .to(state, { morph: 2, duration: 1.7, ease: E }, 3.7)                                   // → cerebro
+    .to(position, { x: homeX, duration: 1.7, ease: E }, 3.7)
     .to('[data-panel="2"]', hide, 3.8)
-    .to(state, { fly: -0.26, duration: 0.85, ease: 'power2.in' }, 3.7)                     // entrar en la galaxia (intacta)
-    .to(state, { morph: 2, duration: 1.1, ease: E }, 4.3)                                   // → cerebro, ya dentro
-    .to(state, { fly: 0, duration: 1.05, ease: 'power2.out' }, 4.45)                        // y la cámara vuelve atrás
-    .to(position, { x: homeX, duration: 1.1, ease: E }, 4.3)
     .fromTo('[data-panel="3"]', { autoAlpha: 0, y: 40 }, show, 5.0)
     .from('[data-panel="3"] [data-in]', { autoAlpha: 0, y: 34, duration: 0.5, stagger: 0.06, ease: 'power2.out' }, 5.0)
     .to(A, { opacity: 0.45, rotation: -24, scale: 1.2, xPercent: 8, yPercent: 14, duration: 1.7, ease: E }, 3.7)

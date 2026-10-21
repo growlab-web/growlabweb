@@ -265,9 +265,7 @@ export function initHero3D() {
         float w0 = clamp(1.0 - m, 0.0, 1.0);
         float w1 = clamp(1.0 - abs(m - 1.0), 0.0, 1.0);
         float w2 = clamp(m - 1.0, 0.0, 1.0);
-        // explosión entre formas: completa de la esfera a la galaxia; casi nada de la galaxia al cerebro (ahí la cámara ya entra en
-        // la galaxia, y una explosión además dejaba las partículas difusas)
-        float burst = pow(sin(3.14159 * rf), 1.5) * (fl > 0.5 ? 0.25 : 1.0);
+        float burst = pow(sin(3.14159 * rf), 1.5);
 
         // casi-esfera con relieve de ruido
         vec3 p0 = position;
@@ -444,7 +442,7 @@ export function initHero3D() {
   const pinned = hero.hasAttribute('data-pin');                       // inicio: secuencia completa con scroll
   const SHAPES = { sphere: 0, galaxy: 1, brain: 2 };                // páginas interiores: una forma fija
   const galaxyK = () => (window.innerWidth < 520 ? 0.62 : window.innerWidth < 1000 ? 0.78 : 1);
-  const state = { scale: 1, fly: 0, morph: pinned ? 0 : (SHAPES[hero.dataset.shape] ?? 0) };
+  const state = { scale: 1, morph: pinned ? 0 : (SHAPES[hero.dataset.shape] ?? 0) };
   let lastW = 0, lastH = 0;
   // Móvil y tableta: en la etapa del cerebro, el texto va arriba y los logos de IA abajo. El cerebro se coloca justo en medio de
   // los dos, con el mismo aire por arriba que por abajo, y con el tamaño que quepa en ese hueco (sin pisar ninguno).
@@ -584,8 +582,6 @@ export function initHero3D() {
     updateSparks(t);
     {
       const w1 = clamp01(1 - Math.abs(state.morph - 1));                    // 1 cuando la forma es la galaxia
-      // galaxia → cerebro: zoom in hacia la galaxia (la cámara se acerca a su núcleo y vuelve mientras aparece el cerebro)
-      if (pinned) camera.position.z = 5 + 10 * (state.fly || 0);   // fly: lo controla la secuencia de scroll (heroStages.js)
       const wb = clamp01(state.morph - 1);                               // 1 cuando la forma es el cerebro
       group.scale.setScalar(state.scale * (base.scale + (base.gal - base.scale) * w1 + ((base.brainScale ?? base.scale) - base.scale) * wb));
       group.position.y = base.y + (base.galY - base.y) * w1 + (base.brainDy || 0) * wb;
