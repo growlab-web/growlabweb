@@ -582,7 +582,7 @@ export function initHero3D() {
     updateSparks(t);
     {
       const w1 = clamp01(1 - Math.abs(state.morph - 1));                    // 1 cuando la forma es la galaxia
-      // esfera → galaxia: zoom hacia la galaxia (la cámara se aleja mientras la esfera se convierte en galaxia y luego avanza hacia ella)
+      // galaxia → cerebro: zoom in hacia la galaxia (la cámara se acerca a su núcleo y vuelve mientras aparece el cerebro)
       if (pinned) camera.position.z = 5 + 10 * (state.fly || 0);   // fly: lo controla la secuencia de scroll (heroStages.js)
       const wb = clamp01(state.morph - 1);                               // 1 cuando la forma es el cerebro
       group.scale.setScalar(state.scale * (base.scale + (base.gal - base.scale) * w1 + ((base.brainScale ?? base.scale) - base.scale) * wb));
