@@ -1,11 +1,12 @@
 ---
 import { site } from '../data/site.js';
 import { gtmId } from '../data/gtm.js';
+import { getPosts } from '../data/posts.js';
 import { projects } from '../data/projects.js';
 interface Props { seamless?: boolean } // sin la línea superior (páginas con fondo continuo)
 const { seamless = false } = Astro.props;
 const year = new Date().getFullYear();
-const links = [...site.nav, site.contact];
+const links = [...site.nav, ...((await getPosts()).length ? [{ href: '/blog', label: 'Blog' }] : []), site.contact];
 const latest = projects.slice(0, 4);       // los primeros de data/projects.js son los más recientes
 const head = 'font-display text-[.74rem] uppercase tracking-[.16em] text-white/45';
 const link = 'transition-colors hover:text-secondary';

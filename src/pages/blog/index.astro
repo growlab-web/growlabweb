@@ -1,0 +1,20 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Nav from '../../components/Nav.astro';
+import Footer from '../../components/Footer.astro';
+import BlogBackground from '../../components/blog/BlogBackground.astro';
+import BlogList from '../../components/blog/BlogList.astro';
+import { getPosts } from '../../data/posts.js';
+import { site } from '../../data/site.js';
+const posts = await getPosts();
+const jsonld = [{ '@context': 'https://schema.org', '@type': 'Blog', name: 'Blog de GrowLab', url: `${site.url}/blog`, inLanguage: 'es-PE', publisher: { '@id': `${site.url}/#organizacion` } }];
+---
+
+<Layout title="Blog · Marketing digital, datos y crecimiento · GrowLab" description="Guías y casos sobre paid media, SEO, tracking, ecommerce e inteligencia artificial aplicada al marketing, desde la experiencia de GrowLab en Perú." jsonld={jsonld}>
+  <BlogBackground />
+  <Nav />
+  <main class="page-in relative z-[1]">
+    <BlogList posts={posts} eyebrow="Blog" title="Ideas para crecer con datos" text="Guías prácticas, casos y aprendizajes sobre campañas, medición, SEO, ecommerce e inteligencia artificial, desde lo que vemos cada día con nuestros clientes." />
+  </main>
+  <div class="relative z-[1]"><Footer seamless /></div>
+</Layout>

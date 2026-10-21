@@ -1,6 +1,10 @@
 ---
 import { site } from '../data/site.js';
 import { gtmId } from '../data/gtm.js';
+import { getPosts } from '../data/posts.js';
+
+// «Blog» entra en el menú sólo cuando hay al menos un artículo publicado
+const navLinks = (await getPosts()).length ? [...site.nav, { href: '/blog', label: 'Blog' }] : site.nav;
 
 const path = Astro.url.pathname.replace(/\/$/, '') || '/';
 const isActive = (href) => (href === '/' ? path === '/' : path === href || path.startsWith(href + '/'));
@@ -26,7 +30,7 @@ const contactActive = isActive(site.contact.href);
 
   <nav class="hidden gap-7 font-display text-[.92rem] font-light sm:flex" aria-label="Principal">
     {
-      site.nav.map((l) => (
+      navLinks.map((l) => (
         <a
           href={l.href}
           id={`menu-${gtmId(l.label)}`}
@@ -80,7 +84,7 @@ const contactActive = isActive(site.contact.href);
   >
     <nav class="grid gap-1 font-display text-[1rem]" aria-label="Menú móvil">
       {
-        [...site.nav, site.contact].map((l) => (
+        [...navLinks, site.contact].map((l) => (
           <a
             href={l.href}
             id={`menu-movil-${gtmId(l.label)}`}

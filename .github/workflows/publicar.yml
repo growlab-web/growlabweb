@@ -1,0 +1,59 @@
+# Publicación automática en growlab.pe (cPanel): cada cambio que llega a la rama main —un artículo guardado desde Pages CMS o
+# cualquier cambio de la web— se compila y se sube por FTP. Sólo se suben los archivos que cambiaron.
+#
+# Necesita tres secretos en GitHub (Settings → Secrets and variables → Actions → New repository secret):
+#   FTP_SERVER    servidor FTP de cPanel (p. ej. ftp.growlab.pe)
+#   FTP_USERNAME  usuario de la cuenta FTP (limitada a public_html)
+#   FTP_PASSWORD  contraseña de esa cuenta
+# Mientras no existan, la web se compila igualmente pero no se sube nada.
+name: Publicar en growlab.pe
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: {}            # también se puede lanzar a mano desde la pestaña Actions
+
+concurrency:
+  group: publicar
+  cancel-in-progress: false        # si llegan dos cambios seguidos, se publican en orden
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Compilar la web
+        run: npm run build
+
+      - name: Comprobar credenciales FTP
+        id: ftp
+        env:
+          FTP_SERVER: ${{ secrets.FTP_SERVER }}
+        run: |
+          if [ -z "$FTP_SERVER" ]; then
+            echo "Faltan los secretos FTP: la web se compiló pero no se sube." >> "$GITHUB_STEP_SUMMARY"
+            echo "listo=no" >> "$GITHUB_OUTPUT"
+          else
+            echo "listo=si" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Subir a cPanel (sólo lo que cambió)
+        if: steps.ftp.outputs.listo == 'si'
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftps
+          local-dir: ./dist/
+          server-dir: ./

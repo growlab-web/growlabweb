@@ -1,0 +1,80 @@
+# Configuración de Pages CMS (https://app.pagescms.org): el editor visual del blog.
+# Al guardar un artículo, Pages CMS lo sube a GitHub y la acción .github/workflows/publicar.yml lo publica en growlab.pe.
+media:
+  input: public/images/blog          # dónde se guardan las imágenes que subes
+  output: /images/blog               # cómo se enlazan desde la web
+  extensions: [jpg, jpeg, png, webp, avif, gif]
+
+content:
+  - name: blog
+    label: Blog
+    type: collection
+    path: src/content/blog
+    filename: '{fields.slug}.md'
+    format: yaml-frontmatter
+    view:
+      fields: [title, category, date, draft]
+      primary: title
+      sort: [date]
+      default:
+        sort: date
+        order: desc
+    fields:
+      - name: title
+        label: Título
+        type: string
+        required: true
+      - name: slug
+        label: Dirección del artículo (sin tildes ni espacios, con guiones)
+        description: 'Ej.: api-de-conversiones-meta → growlab.pe/blog/api-de-conversiones-meta. No la cambies una vez publicado.'
+        type: string
+        required: true
+        pattern:
+          regex: '^[a-z0-9]+(-[a-z0-9]+)*$'
+          message: Solo minúsculas, números y guiones, sin tildes ni espacios.
+      - name: description
+        label: Resumen (aparece en Google y al compartir; máximo 160 caracteres)
+        type: text
+        required: true
+        options:
+          maxlength: 170
+      - name: date
+        label: Fecha de publicación
+        type: date
+        required: true
+      - name: updated
+        label: Fecha de actualización (opcional, si haces cambios importantes)
+        type: date
+      - name: category
+        label: Categoría
+        type: select
+        required: true
+        options:
+          values:
+            - { value: paid-media, label: Paid Media }
+            - { value: seo, label: SEO }
+            - { value: tracking-analitica, label: Tracking y analítica }
+            - { value: ecommerce-web, label: Ecommerce y web }
+            - { value: ia-automatizacion, label: IA y automatización }
+            - { value: email-marketing, label: Email marketing }
+      - name: cover
+        label: Imagen de portada (horizontal, 1600×900 recomendado)
+        type: image
+      - name: coverAlt
+        label: Descripción de la imagen de portada (para accesibilidad y Google)
+        type: string
+      - name: author
+        label: Autor
+        type: string
+        default: GrowLab
+      - name: tags
+        label: Etiquetas
+        type: string
+        list: true
+      - name: draft
+        label: Borrador (si está marcado, no se publica)
+        type: boolean
+        default: false
+      - name: body
+        label: Artículo
+        type: rich-text

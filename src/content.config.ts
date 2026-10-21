@@ -1,0 +1,23 @@
+// Colecciones de contenido. El blog vive en src/content/blog: un archivo Markdown por artículo (se edita desde Pages CMS, ver .pages.yml).
+import { defineCollection } from 'astro:content';
+import { glob } from 'astro/loaders';
+import { z } from 'astro/zod';
+import { blogCategories } from './data/blog.js';
+
+const blog = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/blog' }),
+  schema: z.object({
+    title: z.string(),
+    description: z.string().max(170),                         // resumen: tarjetas, buscadores y redes (≤ 160 caracteres ideal)
+    date: z.coerce.date(),                                     // fecha de publicación
+    updated: z.coerce.date().optional(),                       // última actualización relevante
+    category: z.enum(blogCategories.map((c) => c.slug) as [string, ...string[]]),
+    cover: z.string().optional(),                              // /images/blog/…
+    coverAlt: z.string().optional(),
+    author: z.string().default('GrowLab'),
+    tags: z.array(z.string()).default([]),
+    draft: z.boolean().default(false),                         // borrador: no se publica
+  }),
+});
+
+export const collections = { blog };

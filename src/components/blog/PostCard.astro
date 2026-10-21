@@ -1,0 +1,28 @@
+---
+import { getCategory, formatDate, readingTime } from '../../data/blog.js';
+interface Props { post: any; featured?: boolean }
+const { post, featured = false } = Astro.props;
+const { title, description, date, category, cover, coverAlt } = post.data;
+const cat = getCategory(category);
+const href = `/blog/${post.id}`;
+---
+
+<article class:list={['group relative flex flex-col overflow-hidden rounded-[24px] border border-white/10 bg-panel/80 transition-colors duration-300 hover:border-secondary', featured && 'lg:grid lg:grid-cols-[1.25fr_1fr]']}>
+  <div class:list={['relative overflow-hidden bg-[#0d1322]', 'aspect-[16/9]', featured && 'lg:self-center']}>
+    {cover
+      ? <img src={cover} alt={coverAlt || title} loading={featured ? 'eager' : 'lazy'} decoding="async" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" />
+      : <div class="grid h-full w-full place-items-center bg-[radial-gradient(circle_at_30%_30%,#1d3f94,transparent_60%),radial-gradient(circle_at_80%_80%,#1f8f68,transparent_55%)]"><span class="font-display text-[1.1rem] text-white/70">{cat?.name}</span></div>}
+  </div>
+  <div class:list={['flex flex-1 flex-col gap-3', featured ? 'p-[clamp(1.5rem,3vw,2.5rem)]' : 'p-6']}>
+    <p class="flex flex-wrap items-center gap-x-3 gap-y-1 font-ui text-[.78rem] uppercase tracking-[.12em] text-white/50">
+      <span class="text-secondary">{cat?.name}</span>
+      <span aria-hidden="true">·</span><time datetime={date.toISOString()}>{formatDate(date)}</time>
+      <span aria-hidden="true">·</span><span>{readingTime(post.body)} min</span>
+    </p>
+    <h2 class:list={['font-display font-medium leading-[1.15] tracking-[-0.02em]', featured ? 'text-[clamp(1.5rem,2.6vw,2.3rem)]' : 'text-[1.3rem]']}>
+      <a href={href} id={`blog-articulo-${post.id}`} class="gtm-blog-articulo after:absolute after:inset-0 after:content-['']">{title}</a>
+    </h2>
+    <p class="line-clamp-3 text-copy">{description}</p>
+    <span class="mt-auto pt-2 font-ui text-[.9rem] text-white/80 transition-colors group-hover:text-secondary">Leer artículo →</span>
+  </div>
+</article>

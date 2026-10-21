@@ -13,6 +13,7 @@
  *   project_view    proyecto abierto            → project
  *   thanks_game_play alguien juega tras enviar  → form_location
  *   render_mode     versión del hero que se ve  → render_mode ('3d', o 'imagenes' si el navegador no tiene aceleración gráfica)
+ *   blog_read       lectura de un artículo      → article, category, percent (50 o 90)
  *   page_not_found  página de error 404         → missing_path, referrer
  *   notfound_broken alguien rompió el 404       → (sin datos)
  *

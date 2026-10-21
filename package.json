@@ -9,6 +9,7 @@
     "preview": "astro preview"
   },
   "dependencies": {
+    "@astrojs/rss": "^4.0.18",
     "@astrojs/sitemap": "^3.7.4",
     "@lucide/astro": "^1.52.0",
     "astro": "^7.3.5",

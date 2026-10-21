@@ -112,3 +112,22 @@ para un solo activador que cubra varios elementos:
 El formulario se envía por código (no recarga la página), así que el activador «Envío de formulario» de GTM puede no
 dispararse. Para medir leads, usa el evento personalizado `generate_lead`, que el sitio envía sólo cuando el envío sale bien.
 
+## Blog
+
+Los artículos están en `src/content/blog/` (un archivo Markdown por artículo) y sus imágenes en `public/images/blog/`.
+El menú y el pie muestran «Blog» en cuanto hay al menos un artículo publicado; las categorías sin artículos no se muestran.
+`plantilla-de-articulo.md` es un borrador de ejemplo con todos los formatos admitidos (no se publica).
+
+**Escribir y publicar (sin tocar código):**
+1. Entrar a [app.pagescms.org](https://app.pagescms.org) con la cuenta de GitHub y abrir el repositorio `growlab-web/growlabweb`.
+2. «Blog» → «Add an entry»: título, dirección (slug), resumen, categoría, portada y el artículo con el editor.
+3. Guardar. Pages CMS lo sube a GitHub y la acción «Publicar en growlab.pe» lo publica en unos minutos.
+   Para guardar sin publicar, marcar «Borrador».
+
+## Publicación automática (GitHub → cPanel)
+
+`.github/workflows/publicar.yml` compila la web y sube por FTP a `public_html` sólo los archivos que cambiaron, cada vez que
+llega un cambio a `main` (artículos del blog o cualquier modificación). Necesita los secretos `FTP_SERVER`, `FTP_USERNAME` y
+`FTP_PASSWORD` en GitHub (Settings → Secrets and variables → Actions). Se puede relanzar a mano desde la pestaña «Actions».
+La primera publicación sube toda la web; las siguientes, sólo las diferencias.
+
