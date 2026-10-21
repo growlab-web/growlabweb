@@ -442,7 +442,7 @@ export function initHero3D() {
   const pinned = hero.hasAttribute('data-pin');                       // inicio: secuencia completa con scroll
   const SHAPES = { sphere: 0, galaxy: 1, brain: 2 };                // páginas interiores: una forma fija
   const galaxyK = () => (window.innerWidth < 520 ? 0.62 : window.innerWidth < 1000 ? 0.78 : 1);
-  const state = { scale: 1, morph: pinned ? 0 : (SHAPES[hero.dataset.shape] ?? 0) };
+  const state = { scale: 1, fly: 0, morph: pinned ? 0 : (SHAPES[hero.dataset.shape] ?? 0) };
   let lastW = 0, lastH = 0;
   // Móvil y tableta: en la etapa del cerebro, el texto va arriba y los logos de IA abajo. El cerebro se coloca justo en medio de
   // los dos, con el mismo aire por arriba que por abajo, y con el tamaño que quepa en ese hueco (sin pisar ninguno).
@@ -582,6 +582,8 @@ export function initHero3D() {
     updateSparks(t);
     {
       const w1 = clamp01(1 - Math.abs(state.morph - 1));                    // 1 cuando la forma es la galaxia
+      // esfera → galaxia: zoom hacia la galaxia (la cámara se aleja mientras la esfera se convierte en galaxia y luego avanza hacia ella)
+      if (pinned) camera.position.z = 5 + 10 * (state.fly || 0);   // fly: lo controla la secuencia de scroll (heroStages.js)
       const wb = clamp01(state.morph - 1);                               // 1 cuando la forma es el cerebro
       group.scale.setScalar(state.scale * (base.scale + (base.gal - base.scale) * w1 + ((base.brainScale ?? base.scale) - base.scale) * wb));
       group.position.y = base.y + (base.galY - base.y) * w1 + (base.brainDy || 0) * wb;

@@ -43,7 +43,11 @@ export function startHeroStages({ hero, pinned, MOB, state, position, homeX }) {
         : { snapTo: 'labelsDirectional', duration: { min: 0.15, max: 0.5 }, delay: 0.05, ease: 'power1.inOut' },
     },
   });
-  tl.to(state, { morph: 1, duration: 1.7, ease: E }, 0.6)                                   // → galaxia
+  // → galaxia, como un viaje: mientras la cámara se aleja (fly sube), la esfera se convierte en una galaxia pequeña y lejana;
+  // luego la cámara avanza hacia ella (fly baja) y la galaxia crece hasta su sitio: un zoom in
+  tl.to(state, { fly: 1, duration: 0.75, ease: 'power2.out' }, 0.6)
+    .to(state, { fly: 0, duration: 1.15, ease: 'power2.inOut' }, 1.35)
+    .to(state, { morph: 1, duration: 1.0, ease: E }, 0.6)
     .to(position, { x: 0, duration: 1.7, ease: E }, 0.6)                                    // la galaxia va centrada bajo su titular
     .to(p1, hide, 0.7)
     .fromTo('[data-panel="2"]', { autoAlpha: 0, y: 40 }, show, 1.9)
