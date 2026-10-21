@@ -95,6 +95,18 @@ el clic es siempre el botón o enlace (nunca su icono o texto interior), así qu
 | Aviso de cookies | `cookies-aceptar`, `cookies-solo-necesarias`, `cookies-mas-info` |
 | Página 404 | `error-logo`, `error-inicio`, `error-avisar` |
 
+Además, el menú y los botones llevan **clases de grupo** para la variable **Click Classes** (condición «contiene»), útiles
+para un solo activador que cubra varios elementos:
+
+| Clase | Dónde |
+|---|---|
+| `gtm-menu` | todos los enlaces del menú (logo, secciones, «Agendar reunión» y el desplegable móvil) |
+| `gtm-menu-movil` | sólo los del desplegable del menú en móvil (y su botón de abrir) |
+| `gtm-boton` | todos los botones del sitio |
+| `gtm-agendar` | todos los botones que llevan a agendar una reunión (menú, hero, portafolio, «Quiero un proyecto así», «Hablemos») |
+| `gtm-whatsapp` | el botón de WhatsApp |
+| `gtm-enviar` | el botón «Enviar» del formulario |
+
 `<proyecto>` es el identificador del proyecto (`relengcorp`, `alpaca-111`, `pacomarca`, `kuna`…).
 
 El formulario se envía por código (no recarga la página), así que el activador «Envío de formulario» de GTM puede no

@@ -20,7 +20,7 @@ const contactActive = isActive(site.contact.href);
   data-nav
   class="liquid-glass fixed inset-x-0 top-[17px] z-[70] mx-auto flex h-[50px] w-[min(760px,calc(100%-24px))] items-center justify-between gap-4 rounded-full pl-[24px] pr-[10px]"
 >
-  <a href="/" id="menu-logo" aria-label="GrowLab, ir al inicio" class="flex items-center">
+  <a href="/" id="menu-logo" aria-label="GrowLab, ir al inicio" class="gtm-menu flex items-center">
     <img src="/logo.png" alt="GrowLab" width="1046" height="205" class="h-[19px] w-auto" />
   </a>
 
@@ -32,7 +32,7 @@ const contactActive = isActive(site.contact.href);
           id={`menu-${gtmId(l.label)}`}
           aria-current={isActive(l.href) ? 'page' : undefined}
           class:list={[
-            'transition hover:text-secondary',
+            'gtm-menu transition hover:text-secondary',
             isActive(l.href) ? 'text-secondary' : 'opacity-90 hover:opacity-100',
           ]}
         >
@@ -48,7 +48,7 @@ const contactActive = isActive(site.contact.href);
       id="menu-agendar"
       aria-current={contactActive ? 'page' : undefined}
       class:list={[
-        'inline-flex h-[32px] items-center gap-[.7rem] rounded-full border px-4 font-display text-[.92rem] font-light transition-colors hover:bg-white hover:text-black max-[480px]:hidden',
+        'gtm-menu gtm-boton gtm-agendar inline-flex h-[32px] items-center gap-[.7rem] rounded-full border px-4 font-display text-[.92rem] font-light transition-colors hover:bg-white hover:text-black max-[480px]:hidden',
         contactActive ? 'border-secondary text-secondary' : 'border-white/60',
       ]}
     >
@@ -63,7 +63,7 @@ const contactActive = isActive(site.contact.href);
       aria-expanded="false"
       aria-controls="nav-sheet"
       aria-label="Abrir menú"
-      class="grid h-[32px] w-[32px] place-items-center rounded-full border border-white/40 sm:hidden"
+      class="gtm-menu gtm-menu-movil grid h-[32px] w-[32px] place-items-center rounded-full border border-white/40 sm:hidden"
     >
       <span class="relative block h-[10px] w-[14px]">
         <i class="absolute inset-x-0 top-0 h-[1.5px] bg-white transition-transform duration-300"></i>
@@ -85,7 +85,7 @@ const contactActive = isActive(site.contact.href);
             href={l.href}
             id={`menu-movil-${gtmId(l.label)}`}
             class:list={[
-              'rounded-xl px-4 py-3 transition-colors hover:bg-white/10',
+              'gtm-menu gtm-menu-movil rounded-xl px-4 py-3 transition-colors hover:bg-white/10',
               isActive(l.href) ? 'text-secondary' : 'text-white',
             ]}
           >
@@ -93,7 +93,7 @@ const contactActive = isActive(site.contact.href);
           </a>
         ))
       }
-      <a href={site.contact.href} id="menu-movil-agendar" class="mt-1 rounded-xl bg-secondary px-4 py-3 text-center font-medium text-black">{site.cta}</a>
+      <a href={site.contact.href} id="menu-movil-agendar" class="gtm-menu gtm-menu-movil gtm-boton gtm-agendar mt-1 rounded-xl bg-secondary px-4 py-3 text-center font-medium text-black">{site.cta}</a>
     </nav>
   </div>
 </header>
