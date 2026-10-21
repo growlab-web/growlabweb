@@ -20,7 +20,22 @@ const values = [
   description="Somos un equipo de estrategas, analistas y desarrolladores que combina datos y creatividad para hacer crecer marcas."
 >
   <Nav />
-  <main class="page-in">
+  <!-- Fondo de toda la página: degradados que derivan y partículas flotando (scripts/dust.js). Va fijo detrás del contenido, así que
+       acompaña el scroll sin ocupar más que una pantalla (más ligero que un lienzo del alto de toda la página). -->
+  <div class="pointer-events-none fixed inset-0 z-0 overflow-hidden" aria-hidden="true">
+    <div class="absolute -left-[16vw] top-[8vh] h-[34vw] w-[64vw] rotate-[-14deg] opacity-40 blur-[90px] max-sm:h-[80vw] max-sm:w-[130vw]">
+      <i class="aurora-blob aurora-blob--a bg-[radial-gradient(closest-side,#386fde,#1d3f94_55%,transparent)]"></i>
+    </div>
+    <div class="absolute -right-[14vw] top-[46vh] h-[30vw] w-[60vw] opacity-[.22] blur-[90px] max-sm:h-[70vw] max-sm:w-[120vw]">
+      <i class="aurora-blob aurora-blob--b bg-[radial-gradient(closest-side,#6df2c0,#1f8f68_55%,transparent)]"></i>
+    </div>
+    <div class="absolute bottom-[-12vh] left-[18vw] h-[26vw] w-[52vw] opacity-30 blur-[100px] max-sm:h-[70vw] max-sm:w-[110vw]">
+      <i class="aurora-blob aurora-blob--a bg-[radial-gradient(closest-side,#5b8fe6,#26509f_55%,transparent)]"></i>
+    </div>
+    <canvas data-dust class="absolute inset-0 h-full w-full"></canvas>
+  </div>
+
+  <main class="page-in relative z-[1]">
     <PageHero
       shape="brain"
       eyebrow="Nosotros"
@@ -61,5 +76,5 @@ const values = [
 
     <Cta />
   </main>
-  <Footer />
+  <div class="relative z-[1]"><Footer /></div>
 </Layout>
