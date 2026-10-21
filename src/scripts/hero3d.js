@@ -164,21 +164,23 @@ export function initHero3D() {
       const x0 = x | 0, y0 = y | 0, tx = x - x0, ty = y - y0, i = y0 * W + x0;
       return (A[i] * (1 - tx) + A[i + 1] * tx) * (1 - ty) + (A[i + W] * (1 - tx) + A[i + W + 1] * tx) * ty;
     };
-    const S = 2.55 / (maxY - minY), cx = W / 2, cy = (minY + maxY) / 2, thick = 1.1;
+    const S = 2.55 / (maxY - minY), cx = W / 2, cy = (minY + maxY) / 2, thick = 1.2;   // grosor de cada hemisferio
     const cdf = new Float32Array(W * H); let acc = 0;
     for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
       const i = y * W + x;
       // en los costados la superficie está de canto y ocupa pocos píxeles: se le dan más partículas para que no queden vacíos al girar
       const gx = (Z[y * W + Math.min(W - 1, x + 1)] - Z[y * W + Math.max(0, x - 1)]) * thick / (2 * S);
       const gy = (Z[Math.min(H - 1, y + 1) * W + x] - Z[Math.max(0, y - 1) * W + x]) * thick / (2 * S);
-      acc += D[i] > 0.04 && !outside[i] ? (0.1 + 0.9 * Math.pow(D[i], 1.5)) * Math.min(2.4, Math.sqrt(1 + gx * gx + gy * gy)) : 0;
+      // toda la silueta recibe partículas (también las zonas lisas del dibujo, como el lóbulo frontal): si no, esas zonas quedaban
+      // vacías y el cerebro parecía hueco; los surcos siguen marcándose porque reciben más
+      acc += !outside[i] ? (0.42 + 0.58 * Math.pow(D[i], 1.5)) * Math.min(1.5, Math.sqrt(1 + gx * gx + gy * gy)) : 0;
       cdf[i] = acc;
     }
     for (let n = 0; n < N2; n++) {
       const t = Math.random() * acc; let lo = 0, hi = W * H - 1;
       while (lo < hi) { const m = (lo + hi) >> 1; if (cdf[m] < t) lo = m + 1; else hi = m; }
       const fx = (lo % W) + Math.random() - 0.5, fy = ((lo / W) | 0) + Math.random() - 0.5;
-      const side = Math.random() < 0.8 ? 1 : -1;            // casi todas en la cara que se ve: la de atrás queda apagada
+      const side = Math.random() < 0.72 ? 1 : -1;            // más en la cara de delante, pero la de atrás también existe: se lee como un volumen cerrado
       const zf = sample(Z, fx, fy);
       // normal hacia fuera de la superficie (en la cara de atrás sólo cambia el sentido en profundidad)
       let nx = -(sample(Z, fx + 1.5, fy) - sample(Z, fx - 1.5, fy)) * thick / (3 * S);
@@ -375,7 +377,9 @@ export function initHero3D() {
         vec3 nb = xf(aN2, uTilt.z, uYaw.z, uRoll.z);
         vec3 vdir = normalize(cameraPosition - wp.xyz);
         float facing = dot(normalize(nb + vec3(1e-5)), vdir);
-        float vis = mix(1.0, 0.03 + 0.97*smoothstep(-0.05, 0.3, facing), w2);
+        // cerebro: la cara de atrás no desaparece del todo (se ve más tenue, como la parte lejana de un objeto sólido); si se apagaba
+        // del todo, al girar quedaba una franja vacía entre el borde y el cuerpo
+        float vis = mix(1.0, 0.16 + 0.84*smoothstep(-0.3, 0.3, facing), w2);
         // luz desde arriba a la izquierda: da volumen al cerebro (zonas iluminadas y en sombra)
         float lit = mix(1.0, 0.55 + 0.65 * max(dot(normalize(nb + vec3(1e-5)), normalize(vec3(-0.35, 0.55, 0.76))), 0.0), w2);
         float alive = aVis.x*w0 + aVis.y*w1 + aVis.z*w2;
