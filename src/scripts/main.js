@@ -50,7 +50,7 @@ if ($('[data-hero][data-pin]') || isApp) lenis.stop();
 // la inercia del trackpad sigue mandando scroll un buen rato después de soltar: sin esto, un gesto rápido cruza toda la página
 // Paradas: las etapas del hero y las secciones marcadas con data-stop (sólo en páginas con pin)
 let stops = [];
-const gesture = { t: 0, dir: 0, limit: null, held: false, heldAt: 0, low: 0 };
+const gesture = { t: 0, dir: 0, limit: null, held: false, heldAt: 0, low: 0, prev: 0 };
 function measureStops() {
   const max = ScrollTrigger.maxScroll(window), out = [];
   const pins = ScrollTrigger.getAll().filter((st) => st.pin);
@@ -76,9 +76,12 @@ function limitWheel(data) {
   const e = data.event, dy = data.deltaY;
   if (!e.type.includes('wheel') || e.ctrlKey || !stops.length || !dy || Math.abs(data.deltaX) > Math.abs(dy)) return true;
   const g = gesture, now = e.timeStamp, dir = Math.sign(dy), abs = Math.abs(dy);
-  // gesto nuevo: tras una pausa, al cambiar de sentido o, ya detenido, cuando el impulso vuelve a crecer (la inercia sólo decae)
-  const fresh = now - g.t > 160 || dir !== g.dir || (g.held && now - g.heldAt > 220 && abs > Math.max(g.low * 3, g.low + 30));
-  g.t = now;
+  // gesto nuevo: tras una pausa, al cambiar de sentido o, ya detenido en una parada, en cuanto el impulso vuelve a crecer (la inercia
+  // del trackpad sólo decae; un deslizamiento nuevo empieza con valores que suben). Antes se exigía un salto grande y los trackpads,
+  // que mandan valores pequeños y encadenan un gesto con la inercia del anterior, quedaban bloqueados en la galaxia.
+  const rising = g.held && now - g.heldAt > 120 && abs > g.prev * 1.25 && abs > g.low + 2;
+  const fresh = now - g.t > 160 || dir !== g.dir || rising;
+  g.t = now; g.prev = abs;
   if (fresh) {
     const from = lenis.targetScroll;
     g.dir = dir; g.held = false;
