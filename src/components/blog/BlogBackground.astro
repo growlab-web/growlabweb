@@ -1,5 +1,6 @@
 ---
-// Fondo de las páginas del blog: el mismo cielo oscuro con degradados del sitio, fijo detrás del contenido (sin 3D, para que carguen rápido)
+// Fondo de las páginas del blog: el mismo cielo oscuro con degradados del sitio y polvo flotando (scripts/dust.js), fijo detrás del contenido
+// (sin 3D, para que carguen rápido)
 ---
 <div class="pointer-events-none fixed inset-0 z-0 overflow-hidden" aria-hidden="true">
   <div class="absolute -left-[16vw] top-[-6vh] h-[34vw] w-[64vw] rotate-[-14deg] opacity-35 blur-[90px] max-sm:h-[80vw] max-sm:w-[130vw]">
@@ -8,4 +9,5 @@
   <div class="absolute -right-[14vw] top-[40vh] h-[30vw] w-[60vw] opacity-[.16] blur-[90px] max-sm:h-[70vw] max-sm:w-[120vw]">
     <i class="aurora-blob aurora-blob--b bg-[radial-gradient(closest-side,#6df2c0,#1f8f68_55%,transparent)]"></i>
   </div>
+  <canvas data-dust class="absolute inset-0 h-full w-full"></canvas>
 </div>

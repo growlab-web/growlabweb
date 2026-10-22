@@ -404,7 +404,7 @@ a :where(svg, span, i, img, b), button :where(svg, span, i, img, b), summary :wh
 .prose-blog pre { overflow-x: auto; border: 1px solid rgba(255, 255, 255, .1); border-radius: 14px; background: #0b0f1a !important; padding: 1.1em 1.3em; font-size: 0.86em; line-height: 1.6; }
 .prose-blog pre code { background: none; padding: 0; }
 .prose-blog table { display: block; overflow-x: auto; width: 100%; border-collapse: collapse; font-size: 0.95em; }
-.prose-blog th, .prose-blog td { border-bottom: 1px solid rgba(255, 255, 255, .1); padding: 0.65em 0.9em; text-align: left; white-space: nowrap; }
+.prose-blog th, .prose-blog td { border-bottom: 1px solid rgba(255, 255, 255, .1); padding: 0.65em 0.9em; text-align: left; vertical-align: top; white-space: nowrap; }
 .prose-blog th { color: #fff; font-weight: 600; }
 /* en móvil la tabla no se corta: las celdas pasan a varias líneas y, si aun así no cabe, se desliza dentro de su marco */
 @media (max-width: 639px) {
