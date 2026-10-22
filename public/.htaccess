@@ -32,6 +32,9 @@ ErrorDocument 410 /404.html
   RewriteCond %{HTTPS}:%{HTTP_HOST} !^on:growlab\.pe$ [NC]
   RewriteRule ^ https://growlab.pe%{REQUEST_URI} [R=301,L]
 
+  # 1b) los nombres de sitemap habituales (y los del WordPress anterior) llevan al sitemap real
+  RewriteRule ^(sitemap_index|sitemap|wp-sitemap)\.xml$ /sitemap-index.xml [R=301,L]
+
   # 2) la antigua página de servicios es ahora una sección del inicio
   RewriteRule ^servicios/?$ /#servicios [R=301,NE,L]
 
