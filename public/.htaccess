@@ -3,6 +3,7 @@
 Options -Indexes
 AddDefaultCharset UTF-8
 ErrorDocument 404 /404.html
+ErrorDocument 410 /404.html
 
 <IfModule mod_dir.c>
   # las carpetas no añaden la barra final por su cuenta: de eso se encargan las reglas de abajo
@@ -19,6 +20,12 @@ ErrorDocument 404 /404.html
   RewriteCond %{REQUEST_URI} \.(php\d?|phtml|phar|pl|py|cgi|sh)$ [NC]
   RewriteCond %{REQUEST_URI} !^/api/contacto\.php$
   RewriteRule ^ - [F]
+
+  # 0b) direcciones basura que dejó el uso anterior del dominio (spam del tipo /?j=… o /?items/…): «410, ya no existen»,
+  #     para que Google las borre del índice y deje de rastrearlas. Los parámetros de campañas (utm_, gclid, fbclid…) no se tocan
+  RewriteCond %{QUERY_STRING} (^|&)j=[a-z0-9]+ [NC,OR]
+  RewriteCond %{QUERY_STRING} ^items/ [NC]
+  RewriteRule ^ - [G]
 
   # 1) siempre https y sin www (sólo en el dominio real: no afecta a pruebas en otras direcciones)
   RewriteCond %{HTTP_HOST} ^(www\.)?growlab\.pe$ [NC]
