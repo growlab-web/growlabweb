@@ -1,5 +1,6 @@
 ---
 title: Plantilla de artículo (borrador, no se publica)
+slug: plantilla-de-articulo
 description: Ejemplo del formato de un artículo del blog de GrowLab. Está marcado como borrador, así que no aparece en la web.
 date: 2026-10-21
 category: tracking-analitica
