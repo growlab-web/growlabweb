@@ -60,7 +60,7 @@ const jsonld = [
 <Layout title={`${title} | GrowLab`} description={description} image={cover || '/og.jpg'} type="article" published={date} modified={updated || date} jsonld={jsonld}>
   <BlogBackground />
   <Nav />
-  <main class="page-in relative z-[1]">
+  <main id="contenido" tabindex="-1" class="page-in relative z-[1]">
     <article data-blog-post data-category={category} class="mx-auto max-w-[1180px] px-(--pad) pb-[10vh] pt-[clamp(104px,18vh,180px)]">
       <nav aria-label="Migas de pan" class="mb-6 flex flex-wrap items-center font-ui text-[.85rem] text-white/55 sm:mb-8">
         <a href="/blog" id="blog-migas-blog" class="-my-2 py-2 transition-colors hover:text-secondary">Blog</a>
