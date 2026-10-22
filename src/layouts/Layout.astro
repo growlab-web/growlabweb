@@ -57,6 +57,8 @@ const gtm = /^GTM-[A-Z0-9]+$/.test(site.gtm) ? site.gtm : '';
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- verificación de propiedad en Google Search Console (no borrar: si falta, Google deja de reconocer el sitio) -->
+    <meta name="google-site-verification" content="lBS8nLX6IZHio0Nv10is7NlVqvQU3PmptiiEvhDqMdg" />
     <meta name="description" content={description} />
     <meta name="theme-color" content="#000000" />
     <link rel="canonical" href={canonical} />
