@@ -3,6 +3,7 @@
  * nodos que derivan despacio, se conectan entre sí y por cuyas líneas viajan "paquetes" de luz.
  * Sólo anima mientras el panel está en pantalla.
  */
+import { onResize } from './onResize.js';
 const BLUE = '56,111,222', SKY = '123,165,240', GREEN = '109,242,192';
 
 export function initDataFlow(canvas) {
@@ -25,7 +26,7 @@ export function initDataFlow(canvas) {
     packets = [];
   }
   resize();
-  window.addEventListener('resize', resize);
+  onResize(canvas, resize);      // también al abrir un panel lateral del navegador (ver onResize.js)
   canvas.parentElement.addEventListener('pointermove', (e) => {
     const r = canvas.getBoundingClientRect();
     mouse.x = e.clientX - r.left; mouse.y = e.clientY - r.top;

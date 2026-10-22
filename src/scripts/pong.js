@@ -5,6 +5,7 @@
  *
  * initPong(canvas, { onScore(puntos, récord), onState('espera' | 'juego' | 'fin') }) → { stop() }
  */
+import { onResize } from './onResize.js';
 const MINT = '#6df2c0', SKY = '#7ba5f0';
 
 export function initPong(canvas, { onScore = () => {}, onState = () => {} } = {}) {
@@ -104,7 +105,7 @@ export function initPong(canvas, { onScore = () => {}, onState = () => {} } = {}
   const holdScroll = (e) => { if (state === 'juego') { e.preventDefault(); e.stopImmediatePropagation(); } };
   window.addEventListener('pointermove', move, { passive: true });
   canvas.addEventListener('pointerdown', press);
-  window.addEventListener('resize', resize);
+  onResize(canvas, resize);      // también al abrir un panel lateral del navegador (ver onResize.js)
   window.addEventListener('wheel', holdScroll, { passive: false, capture: true });
   resize(); onScore(score, best); onState(state);
   raf = requestAnimationFrame(frame);

@@ -11,6 +11,7 @@ import { projects, getProject } from '../data/projects.js';
 import { makeArt, projectImageKinds } from './projectArt.js';
 import { track } from './track.js';
 import { isSoftwareGL } from './gpu.js';
+import { onResize } from './onResize.js';
 
 const N = projects.length;
 let CARD_W = 3.6, CARD_H = 2.25;                  // en móvil se cambian a un formato vertical (ver initPortfolio)
@@ -239,7 +240,7 @@ export async function initPortfolio(root) {
     cam.baseZ = aspect >= 1.25 ? 8 : aspect >= 0.8 ? 8 + (1.25 - aspect) * 9 : (CARD_W / 0.86) / (2 * Math.tan((camera.fov * Math.PI) / 360) * aspect);
     cam.offX = aspect >= 1.25 ? 0.3 : 0;
   }
-  window.addEventListener('resize', resize);
+  onResize(root, resize);      // también al abrir un panel lateral del navegador (ver onResize.js)
   resize();
 
   /* ===================== Entrada: rueda, arrastre, teclado ===================== */

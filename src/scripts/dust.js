@@ -3,6 +3,7 @@
  * polvo fino que sube muy despacio, se mece de lado y parpadea, con el mismo aire que el polvo del hero.
  * Las de "delante" son más grandes, más rápidas y se desplazan un poco con el cursor. Sólo anima mientras está en pantalla.
  */
+import { onResize } from './onResize.js';
 const COLORS = ['235,245,255', '123,165,240', '109,242,192'];   // blanco, celeste y menta
 
 export function initDust(canvas) {
@@ -59,7 +60,7 @@ export function initDust(canvas) {
   }
 
   resize();
-  window.addEventListener('resize', resize);
+  onResize(canvas, resize);      // también al abrir un panel lateral del navegador (ver onResize.js)
   if (still) return;
   if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
     window.addEventListener('pointermove', (e) => { mouse.tx = 0.5 - e.clientX / window.innerWidth; mouse.ty = 0.5 - e.clientY / window.innerHeight; }, { passive: true });

@@ -5,6 +5,7 @@
  *  - setConverge: 0 = cae en diagonal; 1 = todas las líneas se encogen y viajan hacia el centro,
  *    donde el hero 3D está ensamblando la esfera (la lluvia "se convierte" en las partículas).
  */
+import { onResize } from './onResize.js';
 const PALETTE = ['255,255,255', '255,255,255', '140,180,255', '56,111,222', '109,242,192'];
 
 export function startRain(canvas, opts = {}) {
@@ -38,7 +39,7 @@ export function startRain(canvas, opts = {}) {
     drops = Array.from({ length: n }, () => makeDrop(true));
   }
   resize();
-  window.addEventListener('resize', resize);
+  onResize(canvas, resize);      // también al abrir un panel lateral del navegador (ver onResize.js)
 
   function frame(now) {
     raf = requestAnimationFrame(frame);
