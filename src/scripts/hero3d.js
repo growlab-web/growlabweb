@@ -161,13 +161,14 @@ export function initHero3D() {
     let dmax = 0; for (let i = 0; i < W * H; i++) dmax = Math.max(dmax, dist[i]);
     // perfil redondo (un cuarto de círculo): el borde sube en vertical y el centro queda abombado, como un cuerpo con volumen
     const Z = new Float32Array(W * H);
-    for (let i = 0; i < W * H; i++) { const u = Math.min(1, dist[i] / (dmax * 0.9)); Z[i] = Math.sqrt(1 - (1 - u) * (1 - u)); }
+    // el máximo sólo en el centro y con la cima más ancha: de frente y desde arriba se lee como un cuerpo redondeado, no como una tabla
+    for (let i = 0; i < W * H; i++) { const u = Math.min(1, dist[i] / dmax); Z[i] = Math.pow(1 - (1 - u) * (1 - u), 0.42); }
     const sample = (A, fx, fy) => {                       // lectura entre píxeles: sin esto cada píxel es un escalón plano
       const x = Math.min(W - 1.001, Math.max(0, fx)), y = Math.min(H - 1.001, Math.max(0, fy));
       const x0 = x | 0, y0 = y | 0, tx = x - x0, ty = y - y0, i = y0 * W + x0;
       return (A[i] * (1 - tx) + A[i + 1] * tx) * (1 - ty) + (A[i + W] * (1 - tx) + A[i + W + 1] * tx) * ty;
     };
-    const S = 2.55 / (maxY - minY), cx = W / 2, cy = (minY + maxY) / 2, thick = 1.2;   // grosor de cada hemisferio
+    const S = 2.55 / (maxY - minY), cx = W / 2, cy = (minY + maxY) / 2, thick = 1.25;  // grosor de cada hemisferio
     const cdf = new Float32Array(W * H); let acc = 0;
     for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
       const i = y * W + x;
@@ -176,10 +177,31 @@ export function initHero3D() {
       const gy = (Z[Math.min(H - 1, y + 1) * W + x] - Z[Math.max(0, y - 1) * W + x]) * thick / (2 * S);
       // toda la silueta recibe partículas (también las zonas lisas del dibujo, como el lóbulo frontal): si no, esas zonas quedaban
       // vacías y el cerebro parecía hueco; los surcos siguen marcándose porque reciben más
-      acc += !outside[i] ? (0.42 + 0.58 * Math.pow(D[i], 1.5)) * Math.min(5, Math.sqrt(1 + gx * gx + gy * gy)) : 0;   // los costados (muy inclinados) reciben partículas según su superficie real: sin hueco al girar
+      acc += !outside[i] ? (0.42 + 0.58 * Math.pow(D[i], 1.5)) * Math.min(8, Math.sqrt(1 + gx * gx + gy * gy)) : 0;   // los costados (muy inclinados) reciben partículas según su superficie real: sin hueco al girar
       cdf[i] = acc;
     }
-    for (let n = 0; n < N2; n++) {
+    // pared del contorno: donde se juntan las dos caras la superficie está de canto y, repartida por píxeles, quedaba casi vacía.
+    // Al girar, esa franja se veía como un hueco oscuro a lo largo del borde. Una parte de las partículas va directamente ahí,
+    // repartida de una cara a la otra (con normal hacia fuera en el plano), para que el cerebro se lea cerrado desde cualquier ángulo.
+    const rim = [];
+    for (let y = 1; y < H - 1; y++) for (let x = 1; x < W - 1; x++) {
+      const i = y * W + x;
+      if (!outside[i] && (outside[i - 1] || outside[i + 1] || outside[i - W] || outside[i + W])) rim.push(i);
+    }
+    const NW = Math.round(N2 * 0.16);
+    for (let n = 0; n < NW; n++) {
+      const i = rim[(Math.random() * rim.length) | 0];
+      const fx = (i % W) + Math.random() - 0.5, fy = ((i / W) | 0) + Math.random() - 0.5;
+      // normal en el plano: hacia donde la distancia al borde baja (hacia fuera)
+      let nx = -(sample(dist, fx + 1.5, fy) - sample(dist, fx - 1.5, fy)), ny = sample(dist, fx, fy + 1.5) - sample(dist, fx, fy - 1.5);
+      const nl = Math.hypot(nx, ny) || 1; nx /= nl; ny /= nl;
+      const h = Math.max(sample(Z, fx - nx * 3, fy + ny * 3), 0.12) * thick;    // alto de la pared: hasta donde empiezan las caras
+      const zf = (Math.random() * 2 - 1) * h;
+      const out = Math.sqrt(Math.max(0, 1 - (zf / h) * (zf / h))) * 0.02;        // la pared se curva un poco hacia fuera
+      set3(P2, n, (fx + 0.5 - cx) * S + nx * out, -(fy + 0.5 - cy) * S + ny * out, zf);
+      set3(N2v, n, nx, ny, 0);
+    }
+    for (let n = NW; n < N2; n++) {
       const t = Math.random() * acc; let lo = 0, hi = W * H - 1;
       while (lo < hi) { const m = (lo + hi) >> 1; if (cdf[m] < t) lo = m + 1; else hi = m; }
       const fx = (lo % W) + Math.random() - 0.5, fy = ((lo / W) | 0) + Math.random() - 0.5;
