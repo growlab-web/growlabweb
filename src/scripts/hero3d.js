@@ -2,13 +2,13 @@
  * Hero 3D: un único sistema de partículas que cambia de forma con el scroll
  *   esfera cerrada  →  (explosión)  →  galaxia espiral  →  (explosión)  →  cerebro
  * El cursor deja un orbe luminoso y aparta/ilumina las partículas de forma sutil.
- * El cerebro se construye con la silueta y los surcos de data/brainData.js.
+ * El cerebro es una forma anatómica en 3D generada en brainShape.js.
  * Los degradados del fondo ([data-aurora]) derivan solos y cambian con cada etapa.
  */
 import { AdditiveBlending, BufferAttribute, BufferGeometry, CanvasTexture, Group, PerspectiveCamera, Points, PointsMaterial, Scene, ShaderMaterial, Sprite, SpriteMaterial, Vector2, Vector3, Vector4, WebGLRenderer } from 'three';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import BRAIN_DATA from '../data/brainData.js';
+import { buildBrainShape } from './brainShape.js';
 import { startHeroStages } from './heroStages.js';
 import { lowEndDevice } from './gpu.js';
 
@@ -35,7 +35,7 @@ export function initHero3D() {
   const LITE = MOB && lowEndDevice();
   const COUNT = LITE ? 16000 : MOB ? 28000 : 90000;     // la casi-esfera usa todas
   const N1 = LITE ? 15000 : MOB ? 26000 : 86000;        // galaxia (densa)
-  const N2 = LITE ? 15000 : MOB ? 26000 : 62000;        // cerebro (muy fino)
+  const N2 = COUNT;                                      // cerebro: todas las partículas (su superficie es grande y lleva pliegues)
   const N0 = COUNT;
 
   /* ================= Utilidades ================= */
@@ -123,107 +123,9 @@ export function initHero3D() {
   }
   for (let i = N1; i < COUNT; i++) { const k = (Math.random() * N1) | 0; copy3(P1, i, k); copy3(C1, i, k); PATH[i] = PATH[k]; SPD[i] = SPD[k]; GSZ[i] = GSZ[k]; }
 
-  const brainBox = { x0: 0, x1: 0, y0: 0, y1: 0 };
-  /* --- 3) Cerebro: silueta + surcos reales de la referencia, inflados en 3D con perfil redondo --- */
-  (function buildBrain() {
-    const B = BRAIN_DATA;
-    const W = B.w, H = B.h, bin = atob(B.d), D = new Float32Array(W * H);
-    for (let i = 0; i < W * H; i++) D[i] = bin.charCodeAt(i) / 255;
-    const mask = new Uint8Array(W * H);
-    let minY = H, maxY = 0;
-    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) if (D[y * W + x] > 0.12) { mask[y * W + x] = 1; minY = Math.min(minY, y); maxY = Math.max(maxY, y); }
-    // silueta maciza: todo lo que queda dentro del contorno cuenta, aunque el dibujo tenga zonas oscuras entre surcos
-    // (si no, el relieve se hunde hasta el centro en cada hueco y de lado el cerebro se ve hecho de capas)
-    const outside = new Uint8Array(W * H), queue = [];
-    for (let x = 0; x < W; x++) queue.push(x, (H - 1) * W + x);
-    for (let y = 0; y < H; y++) queue.push(y * W, y * W + W - 1);
-    while (queue.length) {
-      const i = queue.pop();
-      if (outside[i] || mask[i]) continue;
-      outside[i] = 1;
-      const x = i % W, y = (i / W) | 0;
-      if (x > 0) queue.push(i - 1); if (x < W - 1) queue.push(i + 1); if (y > 0) queue.push(i - W); if (y < H - 1) queue.push(i + W);
-    }
-    let dist = new Float32Array(W * H);
-    for (let i = 0; i < W * H; i++) dist[i] = outside[i] ? 0 : 1e6;
-    for (let y = 1; y < H; y++) for (let x = 1; x < W - 1; x++) { const i = y * W + x; dist[i] = Math.min(dist[i], dist[i - 1] + 1, dist[i - W] + 1, dist[i - W - 1] + 1.41, dist[i - W + 1] + 1.41); }
-    for (let y = H - 2; y >= 0; y--) for (let x = W - 2; x >= 1; x--) { const i = y * W + x; dist[i] = Math.min(dist[i], dist[i + 1] + 1, dist[i + W] + 1, dist[i + W + 1] + 1.41, dist[i + W - 1] + 1.41); }
-    for (let i = 0; i < W * H; i++) if (dist[i] > 1e5) dist[i] = 0;
-    // la distancia al borde sale en escalones: se suaviza para que la superficie sea continua
-    for (let pass = 0; pass < 3; pass++) {
-      const next = new Float32Array(W * H);
-      for (let y = 1; y < H - 1; y++) for (let x = 1; x < W - 1; x++) {
-        const i = y * W + x;
-        next[i] = outside[i] ? 0 : (dist[i - W - 1] + dist[i - W] + dist[i - W + 1] + dist[i - 1] + dist[i] + dist[i + 1] + dist[i + W - 1] + dist[i + W] + dist[i + W + 1]) / 9;
-      }
-      dist = next;
-    }
-    let dmax = 0; for (let i = 0; i < W * H; i++) dmax = Math.max(dmax, dist[i]);
-    // perfil redondo (un cuarto de círculo): el borde sube en vertical y el centro queda abombado, como un cuerpo con volumen
-    const Z = new Float32Array(W * H);
-    // el máximo sólo en el centro y con la cima más ancha: de frente y desde arriba se lee como un cuerpo redondeado, no como una tabla
-    for (let i = 0; i < W * H; i++) { const u = Math.min(1, dist[i] / dmax); Z[i] = Math.pow(1 - (1 - u) * (1 - u), 0.42); }
-    const sample = (A, fx, fy) => {                       // lectura entre píxeles: sin esto cada píxel es un escalón plano
-      const x = Math.min(W - 1.001, Math.max(0, fx)), y = Math.min(H - 1.001, Math.max(0, fy));
-      const x0 = x | 0, y0 = y | 0, tx = x - x0, ty = y - y0, i = y0 * W + x0;
-      return (A[i] * (1 - tx) + A[i + 1] * tx) * (1 - ty) + (A[i + W] * (1 - tx) + A[i + W + 1] * tx) * ty;
-    };
-    const S = 2.55 / (maxY - minY), cx = W / 2, cy = (minY + maxY) / 2, thick = 1.25;  // grosor de cada hemisferio
-    const cdf = new Float32Array(W * H); let acc = 0;
-    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
-      const i = y * W + x;
-      // en los costados la superficie está de canto y ocupa pocos píxeles: se le dan más partículas para que no queden vacíos al girar
-      const gx = (Z[y * W + Math.min(W - 1, x + 1)] - Z[y * W + Math.max(0, x - 1)]) * thick / (2 * S);
-      const gy = (Z[Math.min(H - 1, y + 1) * W + x] - Z[Math.max(0, y - 1) * W + x]) * thick / (2 * S);
-      // toda la silueta recibe partículas (también las zonas lisas del dibujo, como el lóbulo frontal): si no, esas zonas quedaban
-      // vacías y el cerebro parecía hueco; los surcos siguen marcándose porque reciben más
-      acc += !outside[i] ? (0.42 + 0.58 * Math.pow(D[i], 1.5)) * Math.min(8, Math.sqrt(1 + gx * gx + gy * gy)) : 0;   // los costados (muy inclinados) reciben partículas según su superficie real: sin hueco al girar
-      cdf[i] = acc;
-    }
-    // pared del contorno: donde se juntan las dos caras la superficie está de canto y, repartida por píxeles, quedaba casi vacía.
-    // Al girar, esa franja se veía como un hueco oscuro a lo largo del borde. Una parte de las partículas va directamente ahí,
-    // repartida de una cara a la otra (con normal hacia fuera en el plano), para que el cerebro se lea cerrado desde cualquier ángulo.
-    const rim = [];
-    for (let y = 1; y < H - 1; y++) for (let x = 1; x < W - 1; x++) {
-      const i = y * W + x;
-      if (!outside[i] && (outside[i - 1] || outside[i + 1] || outside[i - W] || outside[i + W])) rim.push(i);
-    }
-    const NW = Math.round(N2 * 0.16);
-    for (let n = 0; n < NW; n++) {
-      const i = rim[(Math.random() * rim.length) | 0];
-      const fx = (i % W) + Math.random() - 0.5, fy = ((i / W) | 0) + Math.random() - 0.5;
-      // normal en el plano: hacia donde la distancia al borde baja (hacia fuera)
-      let nx = -(sample(dist, fx + 1.5, fy) - sample(dist, fx - 1.5, fy)), ny = sample(dist, fx, fy + 1.5) - sample(dist, fx, fy - 1.5);
-      const nl = Math.hypot(nx, ny) || 1; nx /= nl; ny /= nl;
-      const h = Math.max(sample(Z, fx - nx * 3, fy + ny * 3), 0.12) * thick;    // alto de la pared: hasta donde empiezan las caras
-      const zf = (Math.random() * 2 - 1) * h;
-      const out = Math.sqrt(Math.max(0, 1 - (zf / h) * (zf / h))) * 0.02;        // la pared se curva un poco hacia fuera
-      set3(P2, n, (fx + 0.5 - cx) * S + nx * out, -(fy + 0.5 - cy) * S + ny * out, zf);
-      set3(N2v, n, nx, ny, 0);
-    }
-    for (let n = NW; n < N2; n++) {
-      const t = Math.random() * acc; let lo = 0, hi = W * H - 1;
-      while (lo < hi) { const m = (lo + hi) >> 1; if (cdf[m] < t) lo = m + 1; else hi = m; }
-      const fx = (lo % W) + Math.random() - 0.5, fy = ((lo / W) | 0) + Math.random() - 0.5;
-      const side = Math.random() < 0.72 ? 1 : -1;            // más en la cara de delante, pero la de atrás también existe: se lee como un volumen cerrado
-      const zf = sample(Z, fx, fy);
-      // normal hacia fuera de la superficie (en la cara de atrás sólo cambia el sentido en profundidad)
-      let nx = -(sample(Z, fx + 1.5, fy) - sample(Z, fx - 1.5, fy)) * thick / (3 * S);
-      let ny = (sample(Z, fx, fy + 1.5) - sample(Z, fx, fy - 1.5)) * thick / (3 * S);
-      const nl = Math.hypot(nx, ny, 1);
-      nx /= nl; ny /= nl; const nz = side / nl;
-      const bump = (sample(D, fx, fy) - 0.5) * 0.07 + (Math.random() - 0.5) * 0.015;   // los pliegues sobresalen un poco, siguiendo la curvatura
-      set3(P2, n, (fx + 0.5 - cx) * S + nx * bump, -(fy + 0.5 - cy) * S + ny * bump, side * zf * thick + nz * bump);
-      set3(N2v, n, nx, ny, nz);
-    }
-    // caja que ocupa el cerebro (en unidades de la escena): sirve para encajarlo entre los textos en pantallas estrechas
-    for (let n = 0; n < N2; n++) {
-      const x = P2[n * 3], y = P2[n * 3 + 1];
-      if (x < brainBox.x0) brainBox.x0 = x; if (x > brainBox.x1) brainBox.x1 = x;
-      if (y < brainBox.y0) brainBox.y0 = y; if (y > brainBox.y1) brainBox.y1 = y;
-    }
-    fill(N2, [P2, N2v]);
-  })();
+  /* --- 3) Cerebro: forma anatómica en 3D (hemisferios, lóbulos, cerebelo, tronco y circunvoluciones), ver brainShape.js --- */
+  const brainBox = buildBrainShape(N2, P2, N2v, set3);      // caja que ocupa: sirve para encajarlo entre los textos en pantallas estrechas
+  fill(N2, [P2, N2v]);
 
   const geo = new BufferGeometry();
   const attr = (name, arr, n) => geo.setAttribute(name, new BufferAttribute(arr, n || 3));
