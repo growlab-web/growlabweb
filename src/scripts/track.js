@@ -3,7 +3,10 @@
  * El sitio no habla con GA4 ni con ningún píxel directamente: eso se configura dentro de GTM (ID en data/site.js).
  *
  * Eventos que se envían:
- *   generate_lead   formulario enviado          → lead_services, lead_services_count, form_location  (+ user_data, ver abajo)
+ *   generate_lead   formulario enviado o reunión agendada → lead_method (formulario, agenda), lead_service_primary,
+ *                   lead_services, lead_services_count, form_location  (+ user_data sólo en el formulario, ver abajo)
+ *   lead_service    uno por cada servicio pedido → lead_service, form_location  (en GA4: contactos por servicio)
+ *   schedule_start  fecha y hora elegidas en la agenda (Calendly) → form_location
  *   form_start      primer campo que se toca    → form_location
  *   cta_click       botones «Agendar reunión»   → cta_location (menu, hero, portafolio, pie…)
  *   contact_click   correo, teléfono y redes    → contact_method (email, telefono, whatsapp, instagram, linkedin)

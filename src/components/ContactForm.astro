@@ -212,11 +212,15 @@ const { formId = 'form-contacto' } = Astro.props;
         if (!showThanks()) say('¡Gracias por tus datos! Recibimos tu mensaje y te responderemos en menos de 24 horas laborables.', 'ok');
         track('generate_lead', {
           form_location: where,
+          lead_method: 'formulario',
+          lead_service_primary: servicios[0] || '(sin especificar)',
           lead_services: servicios.join(', ') || '(sin especificar)',
           lead_services_count: servicios.length,
           // sólo para conversiones mejoradas (Google Ads / Meta); no se envía a GA4, ver scripts/track.js
           user_data: { email: email.toLowerCase(), phone_number: '+' + phone.replace(/\D/g, '') },     // teléfono en formato internacional
         });
+        // un evento por cada servicio marcado: en GA4 se cuenta cuántos contactos pide cada servicio (dimensión lead_service)
+        (servicios.length ? servicios : ['(sin especificar)']).forEach((s) => track('lead_service', { lead_service: s, form_location: where }));
         form.reset();
         resetServices();
         paintPrefix();

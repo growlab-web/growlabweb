@@ -24,6 +24,7 @@ export const site = {
   ],
   contact: { href: '/contacto', label: 'Contacto' },
   privacy: { href: '/privacidad', label: 'Política de privacidad y protección de datos' },   // enlace del pie y del formulario
+  calendly: 'https://calendly.com/hola-grow-lab/30min',   // agenda de reuniones (pestaña «Agendar reunión» de /contacto)
   cta: 'Agendar reunión', // texto del botón del menú (lleva a la página de contacto)
   social: [
     { label: 'Instagram', href: 'https://www.instagram.com/lab.grow/' },   // @lab.grow
