@@ -86,7 +86,7 @@ el clic es siempre el botón o enlace (nunca su icono o texto interior), así qu
 | Menú | `menu-logo`, `menu-inicio`, `menu-servicios`, `menu-portafolio`, `menu-nosotros`, `menu-agendar`, `menu-movil-abrir`, `menu-movil-…` (mismos nombres), `menu-movil-agendar` |
 | Inicio | `hero-agendar`, `servicios-anterior`, `servicios-siguiente` |
 | WhatsApp | `whatsapp-boton` |
-| Formulario | `form-contacto` (página de contacto) y `form-contacto-inicio` (inicio) como **Form ID**; `form-servicios`, `form-prefijo`, `form-enviar`, `form-privacidad`, `form-otro-mensaje`, `juego-pong` |
+| Formulario | `form-contacto` (página de contacto) y `form-contacto-inicio` (inicio) como **Form ID**; `form-servicios`, `form-prefijo`, `form-enviar`, `form-privacidad`, `form-otro-mensaje`, `form-contacto-calendly-externo` |
 | Página de contacto | `contacto-correo`, `contacto-telefono`, `contacto-instagram`, `contacto-linkedin` |
 | Nosotros | `nosotros-hablemos` |
 | Portafolio | `portafolio-anterior`, `portafolio-siguiente`, `portafolio-destacados`, `portafolio-todos`, `portafolio-agendar`, `portafolio-nombre-<proyecto>`, `portafolio-ver-<proyecto>`, `portafolio-lista-<proyecto>` |
