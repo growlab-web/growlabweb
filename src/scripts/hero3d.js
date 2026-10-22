@@ -469,7 +469,9 @@ export function initHero3D() {
   }
 
   function resize() {
-    const w = hero.clientWidth, h = hero.clientHeight;
+    // se mide el propio lienzo (lo que de verdad ocupa en pantalla): el hero fijado al scroll conserva un momento su ancho anterior
+    // cuando cambia la ventana (p. ej. al abrir un panel lateral del navegador) y medirlo a él deformaba el 3D
+    const w = canvas.clientWidth || hero.clientWidth, h = canvas.clientHeight || hero.clientHeight;
     // en móvil la barra del navegador aparece y desaparece al hacer scroll y dispara "resize": si el tamaño no cambió de verdad, no se rehace nada
     if (w === lastW && (h === lastH || (MOB && Math.abs(h - lastH) < 140))) return;
     lastW = w; lastH = h;
@@ -620,6 +622,8 @@ export function initHero3D() {
   }
 
   window.addEventListener('resize', resize);
+  // además, cada vez que el lienzo cambia de tamaño por cualquier motivo (paneles laterales, pines del scroll que se recalculan)
+  if ('ResizeObserver' in window) new ResizeObserver(() => resize()).observe(canvas);
   resize();
   // los textos cambian de alto cuando terminan de cargar las tipografías: se vuelve a medir el hueco del cerebro
   if (pinned && document.fonts) document.fonts.ready.then(() => { if (window.innerWidth < 1024) fitBrain(hero.clientWidth, hero.clientHeight); });
