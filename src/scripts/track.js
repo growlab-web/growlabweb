@@ -6,8 +6,8 @@
  *   generate_lead   formulario enviado          → lead_method (formulario), lead_service_primary, lead_services,
  *                   lead_services_count, form_location  (+ user_data, ver abajo)
  *   lead_service    uno por cada servicio pedido → lead_service, form_location  (en GA4: contactos por servicio)
- *   schedule_start  fecha y hora elegidas en la agenda (Calendly, tras enviar el formulario) → form_location
- *   meeting_scheduled reunión agendada en Calendly → form_location  (el lead ya se contó con el formulario)
+ *   schedule_click  botón «Agendar reunión» tras enviar el formulario (abre Calendly) → form_location
+ *   thanks_game_play alguien juega tras enviar  → form_location
  *   form_start      primer campo que se toca    → form_location
  *   cta_click       botones «Agendar reunión»   → cta_location (menu, hero, portafolio, pie…)
  *   contact_click   correo, teléfono y redes    → contact_method (email, telefono, whatsapp, instagram, linkedin)
