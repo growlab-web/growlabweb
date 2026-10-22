@@ -12,6 +12,14 @@ ErrorDocument 404 /404.html
 <IfModule mod_rewrite.c>
   RewriteEngine On
 
+  # 0) seguridad: nadie puede abrir archivos ocultos (p. ej. el registro de la publicación automática, .ftp-deploy-sync-state.json)
+  #    salvo /.well-known, que usa cPanel para renovar el certificado SSL; y el único PHP que se ejecuta es el del formulario:
+  #    si alguien lograra subir otro .php (una «puerta trasera»), el servidor se negaría a ejecutarlo
+  RewriteRule (^|/)\.(?!well-known/) - [F]
+  RewriteCond %{REQUEST_URI} \.(php\d?|phtml|phar|pl|py|cgi|sh)$ [NC]
+  RewriteCond %{REQUEST_URI} !^/api/contacto\.php$
+  RewriteRule ^ - [F]
+
   # 1) siempre https y sin www (sólo en el dominio real: no afecta a pruebas en otras direcciones)
   RewriteCond %{HTTP_HOST} ^(www\.)?growlab\.pe$ [NC]
   RewriteCond %{HTTPS}:%{HTTP_HOST} !^on:growlab\.pe$ [NC]
@@ -41,6 +49,12 @@ ErrorDocument 404 /404.html
   </FilesMatch>
   Header always set X-Content-Type-Options "nosniff"
   Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  # seguridad: sólo https (1 año), ninguna web ajena puede mostrar ésta dentro de un marco (evita engaños de «clic oculto»),
+  # sin acceso a cámara, micrófono, ubicación ni pagos, y sin plugins ni formularios que envíen datos a otros dominios
+  Header always set Strict-Transport-Security "max-age=31536000"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
+  Header always set Content-Security-Policy "frame-ancestors 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; upgrade-insecure-requests"
 </IfModule>
 
 # compresión de texto
