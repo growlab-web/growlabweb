@@ -12,7 +12,7 @@ import { initDataFlow } from './dataflow.js';
 import { initDust } from './dust.js';
 import { initCursor } from './cursor.js';
 import { initTracking, track } from './track.js';
-import { softwareGL } from './gpu.js';
+import { softwareGL, lowEndDevice } from './gpu.js';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -109,6 +109,8 @@ $$('a[href^="#"], a[href^="/#"]').forEach((a) => {
     if (!target) return;
     e.preventDefault();
     lenis.scrollTo(id === '#top' ? 0 : target, { duration: 1.1 });
+    // «Saltar al contenido»: además del desplazamiento, el foco del teclado pasa al contenido
+    if (a.classList.contains('skip-link')) target.focus({ preventScroll: true });
   });
 });
 
@@ -120,7 +122,7 @@ const startHero = () => { if (!hero3d) { heroWanted = true; return; } hero3d.sta
 const heroReady = hasHero
   // sin aceleración gráfica (equipos muy básicos y herramientas de medición) el hero usa imágenes fijas en vez de la escena 3D: ver gpu.js
   ? softwareGL()
-      .then((soft) => { track('render_mode', { render_mode: soft ? 'imagenes' : '3d' });   // medición: cuántas visitas ven cada versión
+      .then((soft) => { track('render_mode', { render_mode: soft ? 'imagenes' : innerWidth < 800 && lowEndDevice() ? '3d-ligero' : '3d' });   // medición: cuántas visitas ven cada versión
         if (soft) document.documentElement.classList.add('no-3d'); return soft ? import('./heroStatic.js').then((m) => m.initHeroStatic()) : import('./hero3d.js').then((m) => m.initHero3D()); })
       .then((h) => Promise.race([h.ready, new Promise((r) => setTimeout(r, 3000))]).then(() => {   // espera a que la gráfica esté lista (máx. 3 s)
         hero3d = h;

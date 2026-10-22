@@ -217,7 +217,7 @@ export async function initPortfolio(root) {
     const label = document.createElement('button');
     label.type = 'button'; label.id = `portafolio-nombre-${p.slug}`; label.className = 'gtm-boton pf-label'; label.textContent = p.name; label.dataset.i = i; label.tabIndex = -1;
     const plus = document.createElement('button');
-    plus.type = 'button'; plus.id = `portafolio-ver-${p.slug}`; plus.className = 'gtm-boton pf-plus'; plus.setAttribute('aria-label', `Abrir proyecto ${p.name}`); plus.dataset.i = i;
+    plus.type = 'button'; plus.id = `portafolio-ver-${p.slug}`; plus.className = 'gtm-boton pf-plus'; plus.setAttribute('aria-label', `Ver proyecto ${p.name}`); plus.dataset.i = i;
     // el «+» se abre en una pastilla «Ver proyecto» al acercar el cursor al proyecto (clase is-open, la pone el bucle de dibujo)
     plus.innerHTML = '<span class="pf-plus__text">Ver proyecto</span><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>';
     labelsEl.append(label, plus);

@@ -10,6 +10,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import BRAIN_DATA from '../data/brainData.js';
 import { startHeroStages } from './heroStages.js';
+import { lowEndDevice } from './gpu.js';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -19,7 +20,7 @@ export function initHero3D() {
   if (!canvas) return { start() {}, ready: Promise.resolve() };
 
   const renderer = new WebGLRenderer({ canvas, antialias: false, alpha: true, powerPreference: 'high-performance' });
-  const PR = Math.min(window.devicePixelRatio || 1, window.innerWidth < 800 ? 1.25 : 2);   // en móvil se dibuja a menos resolución: va bastante más fluido
+  const PR = Math.min(window.devicePixelRatio || 1, window.innerWidth < 800 ? (lowEndDevice() ? 1 : 1.25) : 2);   // en móvil se dibuja a menos resolución: va bastante más fluido
   renderer.setPixelRatio(PR);
   renderer.setClearColor(0x000000, 0);
 
@@ -30,9 +31,11 @@ export function initHero3D() {
   const clamp01 = (v) => Math.min(1, Math.max(0, v));
   const isMobile = () => window.innerWidth < 800;
   const MOB = isMobile();
-  const COUNT = MOB ? 28000 : 90000;     // la casi-esfera usa todas
-  const N1 = MOB ? 26000 : 86000;        // galaxia (densa)
-  const N2 = MOB ? 26000 : 62000;        // cerebro (muy fino)
+  // celular de gama baja: menos partículas (algo más grandes, para que la forma se vea igual de llena) y menos resolución
+  const LITE = MOB && lowEndDevice();
+  const COUNT = LITE ? 16000 : MOB ? 28000 : 90000;     // la casi-esfera usa todas
+  const N1 = LITE ? 15000 : MOB ? 26000 : 86000;        // galaxia (densa)
+  const N2 = LITE ? 15000 : MOB ? 26000 : 62000;        // cerebro (muy fino)
   const N0 = COUNT;
 
   /* ================= Utilidades ================= */
@@ -236,7 +239,7 @@ export function initHero3D() {
     transparent: true, depthWrite: false, blending: AdditiveBlending,
     defines: { ...(CAN_HOVER ? { HOVER: 1 } : {}), ...(MOB ? { LITE: 1 } : {}) },   // LITE: móvil, sin los ruidos secundarios
     uniforms: {
-      uTime: { value: 0 }, uIntro: { value: 0 }, uPR: { value: PR }, uSize: { value: MOB ? 2.4 : 2.3 }, uSm: { value: MOB ? new Vector3(0.85, 0.58, 0.72) : new Vector3(1.0, 0.92, 1.1) },
+      uTime: { value: 0 }, uIntro: { value: 0 }, uPR: { value: PR }, uSize: { value: LITE ? 3.0 : MOB ? 2.4 : 2.3 }, uSm: { value: MOB ? new Vector3(0.85, 0.58, 0.72) : new Vector3(1.0, 0.92, 1.1) },
       uMouse: { value: new Vector3(99, 99, 0) }, uPush: { value: 0 }, uRadius: { value: 0.7 },
       uMorph: { value: 0 }, uGal: { value: 1 },
       uTilt: { value: new Vector3(1.2, 0.26, 0.0) },

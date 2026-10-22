@@ -131,6 +131,7 @@ const gtm = /^GTM-[A-Z0-9]+$/.test(site.gtm) ? site.gtm : '';
   <body class:list={['bg-black font-body text-white antialiased', app ? 'h-screen overflow-hidden' : 'overflow-x-hidden']} data-app={app ? '' : undefined}>
     {gtm && <noscript><iframe src={`https://www.googletagmanager.com/ns.html?id=${gtm}`} height="0" width="0" style="display:none;visibility:hidden" title="Google Tag Manager"></iframe></noscript>}
     {intro && <Loader />}
+    <a href="#contenido" class="skip-link" id="saltar-al-contenido">Saltar al contenido</a>
     <slot />
     <WhatsApp />
     {gtm && <Consent />}

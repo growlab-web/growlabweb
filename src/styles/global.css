@@ -65,6 +65,13 @@ html.lenis body {
 /* títulos en Syne: sólo con peso grueso tiene el aspecto ancho del logo */
 h1, h2, h3 { font-weight: 700 !important; letter-spacing: -0.02em !important; }
 
+/* teclado: quien navega con Tab ve siempre dónde está (con ratón o dedo no aparece) */
+:where(a, button, summary, select, [tabindex]:not([tabindex='-1'])):focus-visible { outline: 2px solid var(--color-secondary); outline-offset: 3px; }
+main:focus { outline: none; }
+/* enlace «Saltar al contenido»: invisible hasta que se llega a él con Tab, es lo primero de cada página */
+.skip-link { position: fixed; left: 16px; top: -60px; z-index: 200; padding: .7rem 1.1rem; border-radius: 999px; background: var(--color-secondary); color: #000; font-weight: 600; transition: top .2s; }
+.skip-link:focus { top: 16px; }
+
 @layer components {
   /* menú, botones y formularios conservan la letra de interfaz (más estrecha) */
   [data-nav],
@@ -185,7 +192,7 @@ h1, h2, h3 { font-weight: 700 !important; letter-spacing: -0.02em !important; }
 .pf-modal { position: fixed; inset: 0; z-index: 80; display: grid; grid-template-columns: 14px 1fr 14px; align-items: center; gap: 8px; padding: 76px 8px 10px; background: rgba(0,0,0,.35); backdrop-filter: blur(2px); font-family: var(--font-ui); }
 .pf-panel { position: relative; height: 100%; background: #fff; color: #0a0a0a; border-radius: 20px; display: grid; grid-template-columns: 42% 1fr; overflow: hidden; }
 .pf-left { padding: clamp(24px, 3vw, 46px); display: flex; flex-direction: column; align-items: flex-start; gap: 16px; overflow-y: auto; }
-.pf-count { font-size: .62rem; letter-spacing: .14em; color: rgba(0,0,0,.4); }
+.pf-count { font-size: .62rem; letter-spacing: .14em; color: rgba(0,0,0,.62); }
 .pf-title { font-family: var(--font-accent); font-weight: 700 !important; font-size: clamp(1.8rem, 2.8vw, 2.9rem); line-height: 1.05; letter-spacing: -0.02em !important; }
 .pf-desc { max-width: 38ch; font-size: .82rem; line-height: 1.5; color: rgba(0,0,0,.72); }
 .pf-chips { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
@@ -193,7 +200,7 @@ h1, h2, h3 { font-weight: 700 !important; letter-spacing: -0.02em !important; }
 .pf-chip { background: #efefef; border-radius: 9999px; padding: 6px 12px; font-size: .6rem; letter-spacing: .08em; text-transform: uppercase; }
 .pf-chip--result { background: var(--color-secondary); color: #0a0a0a; }
 .pf-chip--result b { font-weight: 700; }
-.pf-label-s { font-size: .6rem; letter-spacing: .14em; text-transform: uppercase; color: rgba(0,0,0,.4); margin-bottom: 8px; }
+.pf-label-s { font-size: .6rem; letter-spacing: .14em; text-transform: uppercase; color: rgba(0,0,0,.62); margin-bottom: 8px; }
 .pf-services { list-style: none; display: grid; gap: 4px; font-size: .82rem; }
 .pf-cta { margin-top: auto; display: inline-flex; align-items: center; gap: 10px; background: #000; color: #fff; border-radius: 9999px; padding: 12px 20px; font-size: .78rem; font-weight: 500; transition: background .2s, color .2s; }
 .pf-cta:hover { background: var(--color-secondary); color: #000; }
