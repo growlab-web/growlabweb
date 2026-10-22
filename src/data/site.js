@@ -3,6 +3,7 @@ export const site = {
   name: 'GrowLab',
   url: 'https://growlab.pe',
   country: 'Perú',
+  city: 'Arequipa',     // sede: se usa en los datos estructurados para Google
   /* --- Medición ---
      gtm: ID del contenedor de Google Tag Manager (formato GTM-XXXXXXX). Mientras esté vacío no se carga GTM ni se muestra el aviso de cookies.
      GA4 y los píxeles se configuran DENTRO de Tag Manager; el sitio sólo deja los eventos preparados (ver scripts/track.js).

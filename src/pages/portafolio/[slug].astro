@@ -10,7 +10,7 @@ export function getStaticPaths() {
 const { project } = Astro.props;
 ---
 
-<Layout app title={`${project.name} · Portafolio · GrowLab`} description={project.desc}>
+<Layout app title={project.seo?.title || `${project.name} · Portafolio · GrowLab`} description={project.seo?.description || project.desc}>
   <Nav />
   <Portfolio open={project.slug} />
 </Layout>

@@ -10,7 +10,7 @@ const posts = await getPosts();
 const jsonld = [{ '@context': 'https://schema.org', '@type': 'Blog', name: 'Blog de GrowLab', url: `${site.url}/blog`, inLanguage: 'es-PE', publisher: { '@id': `${site.url}/#organizacion` } }];
 ---
 
-<Layout title="Blog · Marketing digital, datos y crecimiento · GrowLab" description="Guías y casos sobre paid media, SEO, tracking, ecommerce e inteligencia artificial aplicada al marketing, desde la experiencia de GrowLab en Perú." jsonld={jsonld}>
+<Layout title="Blog de marketing digital: SEO, Ads y analítica | GrowLab" description="Guías prácticas sobre Google Ads, Meta Ads, SEO, analítica, ecommerce e IA aplicada al marketing, escritas por el equipo de GrowLab en Arequipa." jsonld={jsonld}>
   <BlogBackground />
   <Nav />
   <main class="page-in relative z-[1]">
