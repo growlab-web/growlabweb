@@ -89,23 +89,25 @@ export function initHero3D() {
       return out;
     },
   });
-  const VIO = [0.56, 0.36, 1.0], DEEP = [0.27, 0.24, 0.82], GCY = [0.32, 0.78, 1.0], GTL = [0.16, 0.82, 0.72], GGR = [0.43, 0.95, 0.75];   // GGR = verde del sitio #6df2c0
+  const VIO = [0.56, 0.36, 1.0], DEEP = [0.27, 0.24, 0.82], GBL = [0.26, 0.45, 1.0], GCY = [0.32, 0.78, 1.0],   // GBL: azul intenso entre el violeta y el celeste
+        GTL = [0.16, 0.82, 0.72], GGR = [0.43, 0.95, 0.75];   // GGR = verde del sitio #6df2c0
   for (let i = 0; i < N1; i++) {
     const q = Math.random();
     let rr, th = Math.random() * Math.PI * 2, y = 0, col, spd, gsz = 1;
     if (q < 0.055) {                          // núcleo: punto fijo muy denso y luminoso
       rr = Math.abs(g()) * 0.085 + 0.003; y = g() * 0.03; spd = GAL_SPIN; gsz = 1.35;
       col = mix3([1, 1, 1], VIO, Math.min(1, rr / 0.16));
-    } else if (q < 0.2) {                   // resplandor violeta alrededor del núcleo
-      rr = Math.pow(Math.random(), 1.2) * 0.75; y = g() * 0.06 * (1.15 - rr); spd = GAL_SPIN;
-      col = mix3(VIO, DEEP, Math.min(1, rr / 0.7)).map((x) => x * 0.8);
+    } else if (q < 0.22) {                  // resplandor violeta alrededor del núcleo (llega más lejos: el morado abarca más disco)
+      rr = Math.pow(Math.random(), 1.1) * 0.95; y = g() * 0.06 * (1.15 - rr * 0.8); spd = GAL_SPIN;
+      col = mix3(VIO, DEEP, Math.min(1, rr / 0.95)).map((x) => x * 0.82);
     } else if (q < 0.6) {                    // dos brazos continuos: nacen en el núcleo y dan vuelta y media hasta el borde (sin anillos cerrados)
       const t = Math.pow(Math.random(), 0.9);
       rr = Math.pow(t, 1.08) * 2.08;
       th = Math.floor(Math.random() * 2) * Math.PI + t * Math.PI * 3.0;
       rr += g() * (0.012 + 0.028 * t * t) + (t > 0.94 ? g() * (t - 0.94) * 2 : 0);   // la punta se deshace en polvo
       y = g() * (0.012 + 0.02 * t); spd = GAL_SPIN;
-      col = t < 0.1 ? mix3([1, 1, 1], VIO, t / 0.1) : t < 0.3 ? mix3(VIO, GCY, (t - 0.1) / 0.2) : t < 0.62 ? mix3(GCY, GTL, (t - 0.3) / 0.32) : mix3(GTL, GGR, (t - 0.62) / 0.38);
+      // del núcleo a la punta: blanco → violeta (se mantiene un tramo) → azul intenso → celeste → turquesa → verde
+      col = t < 0.08 ? mix3([1, 1, 1], VIO, t / 0.08) : t < 0.24 ? VIO : t < 0.42 ? mix3(VIO, GBL, (t - 0.24) / 0.18) : t < 0.58 ? mix3(GBL, GCY, (t - 0.42) / 0.16) : t < 0.78 ? mix3(GCY, GTL, (t - 0.58) / 0.2) : mix3(GTL, GGR, (t - 0.78) / 0.22);
       if (t > 0.94) col = col.map((x) => x * (1 - (t - 0.94) * 9));
     } else {                                 // polvo y estrellas sueltas por todo el disco
       rr = 0.2 + Math.pow(Math.random(), 1.3) * 2.4; y = g() * (0.03 + rr * 0.035);   // más denso hacia el centro, se va vaciando hacia el borde
@@ -114,7 +116,7 @@ export function initHero3D() {
       if (Math.random() < 0.13) {                           // partículas sueltas más allá del borde: el final queda irregular
         rr = 1.9 + Math.pow(Math.random(), 1.7) * 1.35; y = g() * (0.08 + (rr - 1.9) * 0.22); gsz = 0.9 + Math.pow(Math.random(), 4) * 1.8;
       }
-      col = (rr < 0.9 ? mix3(DEEP, GCY, rr / 0.9) : mix3(GCY, GGR, Math.min(1, (rr - 0.9) / 1.2))).map((x) => x * 0.8);
+      col = (rr < 0.7 ? mix3(VIO, DEEP, rr / 0.7) : rr < 1.3 ? mix3(DEEP, GBL, (rr - 0.7) / 0.6) : rr < 1.8 ? mix3(GBL, GCY, (rr - 1.3) / 0.5) : mix3(GCY, GGR, Math.min(1, (rr - 1.8) / 0.8))).map((x) => x * 0.8);
     }
     col = sparkle(col, 0.06);
     set3(P1, i, Math.cos(th) * rr, y, Math.sin(th) * rr);
