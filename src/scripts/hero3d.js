@@ -98,8 +98,8 @@ export function initHero3D() {
       rr = Math.abs(g()) * 0.085 + 0.003; y = g() * 0.03; spd = GAL_SPIN; gsz = 1.35;
       col = mix3([1, 1, 1], VIO, Math.min(1, rr / 0.16));
     } else if (q < 0.22) {                  // resplandor violeta alrededor del núcleo (llega más lejos: el morado abarca más disco)
-      rr = Math.pow(Math.random(), 1.1) * 0.95; y = g() * 0.06 * (1.15 - rr * 0.8); spd = GAL_SPIN;
-      col = mix3(VIO, DEEP, Math.min(1, rr / 0.95)).map((x) => x * 0.82);
+      rr = Math.pow(Math.random(), 1.05) * 1.15; y = g() * 0.06 * (1.15 - rr * 0.7); spd = GAL_SPIN;
+      col = mix3(VIO, DEEP, Math.min(1, rr / 1.15)).map((x) => x * 0.82);
     } else if (q < 0.6) {                    // dos brazos continuos: nacen en el núcleo y dan vuelta y media hasta el borde (sin anillos cerrados)
       const t = Math.pow(Math.random(), 0.9);
       rr = Math.pow(t, 1.08) * 2.08;
@@ -107,7 +107,7 @@ export function initHero3D() {
       rr += g() * (0.012 + 0.028 * t * t) + (t > 0.94 ? g() * (t - 0.94) * 2 : 0);   // la punta se deshace en polvo
       y = g() * (0.012 + 0.02 * t); spd = GAL_SPIN;
       // del núcleo a la punta: blanco → violeta (se mantiene un tramo) → azul intenso → celeste → turquesa → verde
-      col = t < 0.08 ? mix3([1, 1, 1], VIO, t / 0.08) : t < 0.24 ? VIO : t < 0.42 ? mix3(VIO, GBL, (t - 0.24) / 0.18) : t < 0.58 ? mix3(GBL, GCY, (t - 0.42) / 0.16) : t < 0.78 ? mix3(GCY, GTL, (t - 0.58) / 0.2) : mix3(GTL, GGR, (t - 0.78) / 0.22);
+      col = t < 0.08 ? mix3([1, 1, 1], VIO, t / 0.08) : t < 0.32 ? VIO : t < 0.52 ? mix3(VIO, GBL, (t - 0.32) / 0.2) : t < 0.68 ? mix3(GBL, GCY, (t - 0.52) / 0.16) : t < 0.86 ? mix3(GCY, GTL, (t - 0.68) / 0.18) : mix3(GTL, GGR, (t - 0.86) / 0.14);
       if (t > 0.94) col = col.map((x) => x * (1 - (t - 0.94) * 9));
     } else {                                 // polvo y estrellas sueltas por todo el disco
       rr = 0.2 + Math.pow(Math.random(), 1.3) * 2.4; y = g() * (0.03 + rr * 0.035);   // más denso hacia el centro, se va vaciando hacia el borde
@@ -116,7 +116,7 @@ export function initHero3D() {
       if (Math.random() < 0.13) {                           // partículas sueltas más allá del borde: el final queda irregular
         rr = 1.9 + Math.pow(Math.random(), 1.7) * 1.35; y = g() * (0.08 + (rr - 1.9) * 0.22); gsz = 0.9 + Math.pow(Math.random(), 4) * 1.8;
       }
-      col = (rr < 0.7 ? mix3(VIO, DEEP, rr / 0.7) : rr < 1.3 ? mix3(DEEP, GBL, (rr - 0.7) / 0.6) : rr < 1.8 ? mix3(GBL, GCY, (rr - 1.3) / 0.5) : mix3(GCY, GGR, Math.min(1, (rr - 1.8) / 0.8))).map((x) => x * 0.8);
+      col = (rr < 0.9 ? mix3(VIO, DEEP, rr / 0.9) : rr < 1.6 ? mix3(DEEP, GBL, (rr - 0.9) / 0.7) : rr < 2.05 ? mix3(GBL, GCY, (rr - 1.6) / 0.45) : mix3(GCY, GGR, Math.min(1, (rr - 2.05) / 0.7))).map((x) => x * 0.8);
     }
     col = sparkle(col, 0.06);
     set3(P1, i, Math.cos(th) * rr, y, Math.sin(th) * rr);
