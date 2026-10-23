@@ -145,9 +145,10 @@ export function buildBrainShape(count, P, Nrm, set3) {
       if (Math.random() > Math.min(1, target / cell.get(key(x, y, z))) * (pass === 0 ? 1 : 1.6)) continue;
       const g = groove(x, y, z, kind);
       const inGroove = g < (kind === 1 ? 0.38 : 0.3);
-      if (inGroove && Math.random() > (pass === 2 ? 0.3 : 0.06)) continue;
-      // dentro de la cisura entre hemisferios se juntan muchas partículas y, vista de frente o desde arriba, parecía una línea de luz
-      if (kind === 0 && Math.abs(z) < 0.05 && Math.random() > 0.15) continue;
+      // superficie pareja, como la esfera: los surcos casi no pierden partículas, se marcan oscureciéndolas (ver «brillo» abajo)
+      if (inGroove && Math.random() > (pass === 2 ? 0.8 : 0.55)) continue;
+      // la cara interna de cada hemisferio (dentro de la cisura) no se ve: sus partículas van mejor a la superficie visible
+      if (kind === 0 && Math.abs(z) < 0.16 && Math.abs(normalAt(x, y, z)[2]) > 0.7 && Math.random() > 0.08) continue;
       let [nx, ny, nz] = normalAt(x, y, z);
       const sx = nx, sy = ny, sz = nz;                           // normal de la forma lisa (para el relieve)
       // la normal se inclina hacia los surcos siguiendo la pendiente de cada pliegue: así la luz de la escena dibuja las circunvoluciones
@@ -163,7 +164,10 @@ export function buildBrainShape(count, P, Nrm, set3) {
       // relieve: los surcos se hunden y las crestas sobresalen un poco
       const lift = kind === 2 ? 0 : (inGroove ? -0.06 : 0.02 * Math.min(1, g)) + (Math.random() - 0.5) * 0.01;
       x += sx * lift; y += sy * lift; z += sz * lift;
-      set3(P, n, x, y, z); set3(Nrm, n, nx, ny, nz);
+      // brillo de cada partícula guardado en el largo de la normal (el sombreador la normaliza para la luz y usa el largo como brillo):
+      // en los surcos, apagadas; en las crestas, plenas. Así se dibujan las circunvoluciones sin dejar huecos.
+      const glow = kind === 2 ? 0.8 : inGroove ? 0.28 : 0.72 + 0.28 * Math.min(1, g);
+      set3(P, n, x, y, z); set3(Nrm, n, nx * glow, ny * glow, nz * glow);
       if (x < box.x0) box.x0 = x; if (x > box.x1) box.x1 = x; if (y < box.y0) box.y0 = y; if (y > box.y1) box.y1 = y;
       cand[i * 4 + 3] = -1;
       n++;

@@ -163,7 +163,7 @@ export function initHero3D() {
     transparent: true, depthWrite: false, blending: AdditiveBlending,
     defines: { ...(CAN_HOVER ? { HOVER: 1 } : {}), ...(MOB ? { LITE: 1 } : {}) },   // LITE: móvil, sin los ruidos secundarios
     uniforms: {
-      uTime: { value: 0 }, uIntro: { value: 0 }, uPR: { value: PR }, uSize: { value: LITE ? 3.0 : MOB ? 2.4 : 2.3 }, uSm: { value: MOB ? new Vector3(0.85, 0.58, 0.72) : new Vector3(1.0, 0.92, 1.1) },
+      uTime: { value: 0 }, uIntro: { value: 0 }, uPR: { value: PR }, uSize: { value: LITE ? 3.0 : MOB ? 2.4 : 2.3 }, uSm: { value: MOB ? new Vector3(0.85, 0.58, 0.95) : new Vector3(1.0, 0.92, 0.8) },   // uSm.z: cerebro con partículas finas, como la esfera
       uMouse: { value: new Vector3(99, 99, 0) }, uPush: { value: 0 }, uRadius: { value: 0.7 },
       uMorph: { value: 0 }, uGal: { value: 1 },
       uTilt: { value: new Vector3(1.2, 0.26, 0.0) },
@@ -307,6 +307,10 @@ export function initHero3D() {
         // cerebro: la cara de atrás no desaparece del todo (se ve más tenue, como la parte lejana de un objeto sólido); si se apagaba
         // del todo, al girar quedaba una franja vacía entre el borde y el cuerpo
         float vis = mix(1.0, 0.38 + 0.62*smoothstep(-0.45, 0.35, facing), w2);
+        // contorno más brillante, como el borde de la esfera (ahí la superficie se ve de canto): la forma se lee de un vistazo
+        float rim = pow(1.0 - abs(facing), 2.0);
+        // surcos y crestas: el brillo de cada partícula viaja en el largo de su normal (ver brainShape.js)
+        float gb = mix(1.0, clamp(length(aN2), 0.0, 1.0) * (1.0 + rim * 0.9), w2);
         // luz desde arriba a la izquierda: da volumen al cerebro (zonas iluminadas y en sombra)
         float lit = mix(1.0, 0.55 + 0.65 * max(dot(normalize(nb + vec3(1e-5)), normalize(vec3(-0.35, 0.55, 0.76))), 0.0), w2);
         float alive = aVis.x*w0 + aVis.y*w1 + aVis.z*w2;
@@ -322,9 +326,9 @@ export function initHero3D() {
 
         col = mix(col, mix(col, vec3(1.0), 0.55), star * gm);
         col = mix(col, vec3(0.78, 1.0, 0.93), clamp(syn, 0.0, 1.0)) * (1.0 + syn * 0.7);
-        vColor = col * colD * lit * (1.0 + burst*0.25) + f*0.12 + vec3(0.55,0.95,0.6) * pulse * line;
-        float base = 0.9*w0 + mix(0.95, 0.62, uGal)*w1 + 1.0*w2;
-        vAlpha = base * mix(1.0, 0.5 + 0.9*pulse, line) * (0.45 + 0.55*smoothstep(-0.2,0.8,n+0.4)) * e * vis * alive * alphD * (1.0 + syn * 1.4) / (1.0 + max(sz/uPR - 7.0, 0.0)*0.08);
+        vColor = col * colD * lit * mix(1.0, 0.55 + 0.45 * gb, w2) * (1.0 + burst*0.25) + f*0.12 + vec3(0.55,0.95,0.6) * pulse * line;
+        float base = 0.9*w0 + mix(0.95, 0.62, uGal)*w1 + 1.2*w2;
+        vAlpha = base * mix(1.0, 0.5 + 0.9*pulse, line) * (0.45 + 0.55*smoothstep(-0.2,0.8,n+0.4)) * e * vis * gb * alive * alphD * (1.0 + syn * 1.4) / (1.0 + max(sz/uPR - 7.0, 0.0)*0.08);
       }`,
     fragmentShader: `
       varying vec3 vColor; varying float vAlpha;
