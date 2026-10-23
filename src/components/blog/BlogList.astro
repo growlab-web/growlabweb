@@ -12,10 +12,11 @@ const used = new Set(all.map((p) => p.data.category));
 const cats = blogCategories.filter((c) => used.has(c.slug));            // sólo categorías con artículos
 const visible = all.filter((p) => !current || p.data.category === current);
 const featuredId = visible[0]?.id;
-const chip = 'blog-chip gtm-blog-categoria shrink-0 whitespace-nowrap rounded-full border px-4 py-2.5 font-ui text-[.88rem] transition-colors';
+const chip = 'blog-chip gtm-blog-categoria inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-full border px-4 py-2.5 font-ui text-[.88rem] transition-colors';
+const ALL = 'var(--color-secondary)';      // «Todo» usa el verde de la marca
 // textos de cada vista, para que el filtro pueda cambiar la cabecera sin recargar
-const views = { '': { eyebrow: 'Blog', title: 'Ideas para crecer con datos', text: 'Guías prácticas, casos y aprendizajes sobre campañas, medición, SEO, ecommerce e inteligencia artificial, desde lo que vemos cada día con nuestros clientes.', doc: 'Blog · Marketing digital, datos y crecimiento · GrowLab' } };
-cats.forEach((c) => { views[c.slug] = { eyebrow: 'Blog · Categoría', title: c.name, text: c.description, doc: `${c.name} · Blog · GrowLab` }; });
+const views = { '': { color: ALL, eyebrow: 'Blog', title: 'Ideas para crecer con datos', text: 'Guías prácticas, casos y aprendizajes sobre campañas, medición, SEO, ecommerce e inteligencia artificial, desde lo que vemos cada día con nuestros clientes.', doc: 'Blog · Marketing digital, datos y crecimiento · GrowLab' } };
+cats.forEach((c) => { views[c.slug] = { color: c.color, eyebrow: 'Blog · Categoría', title: c.name, text: c.description, doc: `${c.name} · Blog · GrowLab` }; });
 ---
 
 <section data-blog-list data-views={JSON.stringify(views)} class="relative z-[1] mx-auto max-w-[1240px] px-(--pad) pb-[12vh] pt-[clamp(130px,20vh,200px)]">
@@ -23,7 +24,7 @@ cats.forEach((c) => { views[c.slug] = { eyebrow: 'Blog · Categoría', title: c.
        mueve nada de lo que hay debajo. -->
   <header data-reveal class="blog-head relative max-w-[760px]">
     <div data-blog-head class="blog-head__live">
-      <p data-blog-eyebrow class="eyebrow">{eyebrow}</p>
+      <p data-blog-eyebrow class="eyebrow" style={`color:${(views[current || ""] || views[""]).color}`}>{eyebrow}</p>
       <h1 data-blog-title class="blog-head__title">{title}</h1>
       <p data-blog-text class="blog-head__text">{text}</p>
     </div>
@@ -31,8 +32,9 @@ cats.forEach((c) => { views[c.slug] = { eyebrow: 'Blog · Categoría', title: c.
 
   {cats.length > 1 && (
     <nav data-reveal data-blog-chips aria-label="Categorías del blog" class="blog-chips relative mt-10 flex gap-2.5 max-sm:-mx-(--pad) max-sm:overflow-x-auto max-sm:px-(--pad) sm:flex-wrap">
-      <a href="/blog" data-cat="" id="blog-categoria-todas" aria-current={!current ? 'page' : undefined} class={chip}>Todo</a>
-      {cats.map((c) => <a href={`/blog/categoria/${c.slug}`} data-cat={c.slug} id={`blog-categoria-${c.slug}`} aria-current={current === c.slug ? 'page' : undefined} class={chip}>{c.name}</a>)}
+      <!-- cada filtro con el color de su categoría (--c): un punto de color, el borde teñido y, al estar activo, el fondo -->
+      <a href="/blog" data-cat="" id="blog-categoria-todas" aria-current={!current ? 'page' : undefined} class={chip} style={`--c:${ALL}`}><i class="blog-chip__dot blog-chip__dot--all" aria-hidden="true"></i>Todo</a>
+      {cats.map((c) => <a href={`/blog/categoria/${c.slug}`} data-cat={c.slug} id={`blog-categoria-${c.slug}`} aria-current={current === c.slug ? 'page' : undefined} class={chip} style={`--c:${c.color}`}><i class="blog-chip__dot" aria-hidden="true"></i>{c.name}</a>)}
     </nav>
   )}
 
@@ -60,9 +62,13 @@ cats.forEach((c) => { views[c.slug] = { eyebrow: 'Blog · Categoría', title: c.
   }
   .blog-chip { transition: background-color 0.35s, border-color 0.35s, color 0.35s, transform 0.2s; }
   .blog-chip:active { transform: scale(0.95); }
-  .blog-chip { border-color: rgba(255, 255, 255, 0.2); color: rgba(255, 255, 255, 0.8); }
-  .blog-chip:hover { border-color: #fff; }
-  .blog-chip[aria-current='page'] { border-color: var(--color-secondary); background: var(--color-secondary); color: #000; }
+  .blog-chip { border-color: color-mix(in srgb, var(--c) 42%, transparent); color: rgba(255, 255, 255, 0.85); }
+  .blog-chip:hover { border-color: var(--c); color: #fff; background: color-mix(in srgb, var(--c) 12%, transparent); }
+  .blog-chip[aria-current='page'] { border-color: var(--c); background: var(--c); color: #0a0a0a; }
+  .blog-chip__dot { width: 7px; height: 7px; flex: none; border-radius: 50%; background: var(--c); box-shadow: 0 0 10px var(--c); transition: background-color 0.35s, box-shadow 0.35s; }
+  /* «Todo»: el punto reúne los colores de todas las categorías */
+  .blog-chip__dot--all { background: conic-gradient(#ff9f7a, #ffd27a, #6df2c0, #6fe3f2, #7fa8ff, #b69cff, #ff8fd0, #ff9f7a); box-shadow: 0 0 10px rgba(182, 156, 255, 0.6); }
+  .blog-chip[aria-current='page'] .blog-chip__dot { background: #0a0a0a; box-shadow: none; }
 </style>
 
 <script>
@@ -114,6 +120,7 @@ cats.forEach((c) => { views[c.slug] = { eyebrow: 'Blog · Categoría', title: c.
     function apply(cat: string) {
       const v = views[cat] || views[''];
       set('[data-blog-eyebrow]', v.eyebrow); set('[data-blog-title]', v.title); set('[data-blog-text]', v.text);
+      const eb = list.querySelector<HTMLElement>('[data-blog-eyebrow]'); if (eb && v.color) eb.style.color = v.color;   // la cabecera toma el color de la categoría
       document.title = v.doc;
       chips.forEach((c) => { if (c.dataset.cat === cat) c.setAttribute('aria-current', 'page'); else c.removeAttribute('aria-current'); });
       centerChip(cat);

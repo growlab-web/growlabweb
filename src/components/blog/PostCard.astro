@@ -15,7 +15,7 @@ const href = `/blog/${post.id}`;
       : <div class="grid h-full w-full place-items-center bg-[radial-gradient(circle_at_30%_30%,#1d3f94,transparent_60%),radial-gradient(circle_at_80%_80%,#1f8f68,transparent_55%)]"><span class="font-display text-[1.1rem] text-white/70">{cat?.name}</span></div>}
   </div>
   <div class="post-card__body flex flex-1 flex-col gap-3 p-6">
-    <p class="font-ui text-[.78rem] uppercase tracking-[.12em] text-secondary">{cat?.name}</p>
+    <p class="font-ui text-[.78rem] uppercase tracking-[.12em] text-secondary" style={cat?.color ? `color:${cat.color}` : undefined}>{cat?.name}</p>
     <p class="-mt-1 font-ui text-[.8rem] text-white/50"><time datetime={date.toISOString()}>{formatDate(date)}</time> · {readingTime(post.body)} min de lectura</p>
     <h2 class="post-card__title font-display text-[1.3rem] font-medium leading-[1.15] tracking-[-0.02em]">
       <a href={href} id={`blog-articulo-${post.id}`} class="gtm-blog-articulo after:absolute after:inset-0 after:content-['']">{title}</a>
