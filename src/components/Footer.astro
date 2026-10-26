@@ -26,6 +26,7 @@ const link = 'transition-colors hover:text-secondary';
       <p class="mt-6 max-w-[32ch] leading-relaxed">{t('Agencia de marketing digital. Creatividad y datos para hacer crecer tu negocio.', 'Digital marketing agency. Creativity and data to grow your business.')}</p>
       <a href={`mailto:${site.email}`} id="pie-correo" class={`mt-5 block w-fit break-all text-white/85 ${link}`}>{site.email}</a>
       <a href={site.phone.href} id="pie-telefono" class={`mt-2 block w-fit whitespace-nowrap text-white/85 ${link}`}>{site.phone.label}</a>
+      <address class="mt-2 not-italic text-white/85">{t('Arequipa, Perú', 'Arequipa, Peru')}</address>
     </div>
 
     <!-- Los tres grupos son desplegables: en móvil empiezan cerrados para no alargar el pie (los cierra el script de abajo);

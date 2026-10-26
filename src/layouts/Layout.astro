@@ -137,6 +137,7 @@ const gtm = /^GTM-[A-Z0-9]+$/.test(site.gtm) ? site.gtm : '';
       try {
         if (location.hash.length > 1) {
           window.__glHash = location.hash;
+          window.__glHashArrived = true;       // se llegó con ancla (la dirección queda sin ella, ver main.js)
           history.replaceState(null, '', location.pathname + location.search);
           document.documentElement.classList.add('hash-pending');
           setTimeout(function () { document.documentElement.classList.remove('hash-pending'); }, 4500);   // por si el script principal no llega a ejecutarse

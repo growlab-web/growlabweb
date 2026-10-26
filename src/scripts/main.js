@@ -99,12 +99,14 @@ function limitWheel(data) {
   return false;
 }
 
-// enlaces internos con ancla (#algo) dentro de la misma página
-$$('a[href^="#"], a[href^="/#"]').forEach((a) => {
+// enlaces internos con ancla (#algo, /#servicios, /en#servicios): si llevan a esta misma página, se desplaza sin cambiar la dirección
+const samePath = (a, b) => (a.replace(/\/+$/, '') || '/') === (b.replace(/\/+$/, '') || '/');
+$$('a[href*="#"]').forEach((a) => {
   a.addEventListener('click', (e) => {
     const raw = a.getAttribute('href');
-    if (raw.startsWith('/#') && location.pathname !== '/') return;      // desde otra página: navega al inicio y allí se desplaza
-    const id = raw.startsWith('/#') ? raw.slice(1) : raw;
+    const i = raw.indexOf('#'), path = raw.slice(0, i);
+    if (path && (/^[a-z]+:/i.test(path) || !samePath(path, location.pathname))) return;   // a otra página: navega y allí se desplaza
+    const id = raw.slice(i);
     const target = id && id.length > 1 ? $(id) : document.body;
     if (!target) return;
     e.preventDefault();
@@ -211,7 +213,8 @@ function scrollToHash() {
     root.classList.remove('hash-pending');
     gsap.fromTo('main, footer', { opacity: 0 }, { opacity: 1, duration: 0.45, ease: 'power1.out', clearProps: 'opacity' });
   };
-  if (window.__glHash) { history.replaceState(null, '', id); window.__glHash = null; }      // la URL recupera su ancla (sin provocar salto)
+  // la dirección queda limpia, sin el #ancla (growlab.pe/ en vez de growlab.pe/#servicios): la página ya se coloca en la sección
+  if (window.__glHash) window.__glHash = null;
   const target = id && id.length > 1 ? $(id) : null;
   if (!target) return show();
   // Lenis mide el alto de la página con retraso: se le pide que lo actualice antes, o recortaría el salto al alto anterior a los pines
@@ -352,5 +355,5 @@ function initPage() {
   ScrollTrigger.refresh();
   scrollToHash();
   };
-  if (isTouch && hasHero && !location.hash) setTimeout(initSections, 900); else initSections();
+  if (isTouch && hasHero && !location.hash && !window.__glHashArrived) setTimeout(initSections, 900); else initSections();
 }
