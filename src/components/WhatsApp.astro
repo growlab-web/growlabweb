@@ -4,7 +4,9 @@
 // se transforma en el círculo verde flotante: es un único botón que cambia de forma, tamaño y color según el scroll.
 // En el resto de páginas y en móvil aparece directamente como botón flotante.
 import { siWhatsapp } from 'simple-icons';
-import { site } from '../data/site.js';
+import { siteFor } from '../data/site.js';
+import { langOf } from '../i18n.js';
+const site = siteFor(langOf(Astro));
 ---
 
 <a

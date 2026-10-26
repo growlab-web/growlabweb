@@ -1,8 +1,9 @@
 ---
 import Icon from './Icon.astro';
 // Cifras con contador animado (GSAP): data-count / data-dec / data-suffix.
-import { site } from '../data/site.js';
-const stats = site.stats;
+import { siteFor } from '../data/site.js';
+import { langOf } from '../i18n.js';
+const stats = siteFor(langOf(Astro)).stats;
 ---
 
 <!-- móvil: dos columnas, para que «Quiénes somos» y las cifras quepan juntos en una pantalla -->

@@ -1,0 +1,29 @@
+---
+// Inicio (español en /, inglés en /en)
+import Layout from '../layouts/Layout.astro';
+import { useLang } from '../i18n.js';
+import Nav from '../components/Nav.astro';
+import Hero from '../components/Hero.astro';
+import Marquee from '../components/Marquee.astro';
+import Manifesto from '../components/Manifesto.astro';
+import Services from '../components/Services.astro';
+import ContactSection from '../components/ContactSection.astro';
+import Footer from '../components/Footer.astro';
+const { t } = useLang(Astro);
+---
+
+<Layout
+  intro
+  title={t('Agencia de marketing digital en Arequipa, Perú | GrowLab', 'Digital marketing agency in Peru, working worldwide | GrowLab')}
+  description={t('Agencia de marketing digital en Arequipa: Google Ads, Meta Ads, SEO, tiendas online, analítica e IA. Hacemos crecer marcas de todo el Perú y del mundo.', 'Data-driven digital marketing agency: Google Ads, Meta Ads, SEO, online stores, analytics and AI. We grow brands in Peru and around the world.')}
+>
+  <Nav />
+  <main id="contenido" tabindex="-1">
+    <Hero />
+    <Marquee />
+    <Manifesto />
+    <Services />
+    <ContactSection />
+  </main>
+  <Footer />
+</Layout>

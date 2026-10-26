@@ -1,0 +1,83 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Nav from '../components/Nav.astro';
+import PageHero from '../components/PageHero.astro';
+import Manifesto from '../components/Manifesto.astro';
+import Stats from '../components/Stats.astro';
+import Cta from '../components/Cta.astro';
+import Footer from '../components/Footer.astro';
+import Icon from '../components/Icon.astro';
+import { useLang } from '../i18n.js';
+const { t } = useLang(Astro);
+
+const values = [
+  { i: 'chart-column', t: t('Datos primero', 'Data first'), d: t('Cada decisión parte de un número. Medimos, probamos y optimizamos semana a semana, sin métricas vanidosas.', 'Every decision starts with a number. We measure, test and optimize week after week, with no vanity metrics.') },
+  { i: 'sparkles', t: t('Creatividad con propósito', 'Creativity with purpose'), d: t('La idea buena es la que vende. Diseñamos mensajes y piezas pensadas para convertir, no solo para gustar.', 'A good idea is one that sells. We design messages and creative built to convert, not just to be liked.') },
+  { i: 'eye', t: t('Transparencia total', 'Full transparency'), d: t('Accesos, reportes y presupuesto a la vista. Sabes siempre dónde está cada sol y qué resultado está dando.', 'Access, reports and budget in plain sight. You always know where every dollar is and what it is delivering.') },
+];
+---
+
+<Layout
+  title={t('Nosotros: agencia de marketing digital en Arequipa | GrowLab', 'About us: data-driven digital marketing agency | GrowLab')}
+  description={t('Somos estrategas, analistas y desarrolladores en Arequipa que unen datos y creatividad para hacer crecer marcas en el Perú y en otros países.', 'We are strategists, analysts and developers based in Arequipa, Peru, combining data and creativity to grow brands in Peru and abroad.')}
+>
+  <Nav />
+  <!-- Fondo de toda la página: degradados que derivan y partículas flotando (scripts/dust.js). Va fijo detrás del contenido, así que
+       acompaña el scroll sin ocupar más que una pantalla (más ligero que un lienzo del alto de toda la página). -->
+  <div class="pointer-events-none fixed inset-0 z-0 overflow-hidden" aria-hidden="true">
+    <div class="absolute -left-[16vw] top-[8vh] h-[34vw] w-[64vw] rotate-[-14deg] opacity-40 blur-[90px] max-sm:h-[80vw] max-sm:w-[130vw]">
+      <i class="aurora-blob aurora-blob--a bg-[radial-gradient(closest-side,#386fde,#1d3f94_55%,transparent)]"></i>
+    </div>
+    <div class="absolute -right-[14vw] top-[46vh] h-[30vw] w-[60vw] opacity-[.22] blur-[90px] max-sm:h-[70vw] max-sm:w-[120vw]">
+      <i class="aurora-blob aurora-blob--b bg-[radial-gradient(closest-side,#6df2c0,#1f8f68_55%,transparent)]"></i>
+    </div>
+    <div class="absolute bottom-[-12vh] left-[18vw] h-[26vw] w-[52vw] opacity-30 blur-[100px] max-sm:h-[70vw] max-sm:w-[110vw]">
+      <i class="aurora-blob aurora-blob--a bg-[radial-gradient(closest-side,#5b8fe6,#26509f_55%,transparent)]"></i>
+    </div>
+    <canvas data-dust class="absolute inset-0 h-full w-full"></canvas>
+  </div>
+
+  <main id="contenido" tabindex="-1" class="page-in relative z-[1]">
+    <PageHero
+      seamless
+      shape="brain"
+      eyebrow={t('Nosotros', 'About us')}
+      lines={[t('Datos, creatividad', 'Data, creativity'), t('y obsesión por crecer.', 'and an obsession with growth.')]}
+      text={t('Somos un equipo de estrategas, analistas y desarrolladores que trabaja como una sola unidad para escalar tu negocio.', 'We are a team of strategists, analysts and developers working as a single unit to scale your business.')}
+    />
+
+    <!-- cada bloque ocupa al menos el alto de la pantalla, con su contenido centrado -->
+    <div class="flex min-h-svh flex-col justify-center">
+    <Manifesto
+      eyebrow={t('Quiénes somos', 'Who we are')}
+      text={t('GrowLab nace de una idea simple: el marketing tiene que medirse en resultados. Unimos performance, analítica, desarrollo web y automatización con IA para que cada acción tenga un porqué, un número y un siguiente paso.', 'GrowLab was born from a simple idea: marketing has to be measured in results. We combine performance, analytics, web development and AI automation so every action has a reason, a number and a next step.')}
+    />
+
+    <Stats />
+    </div>
+
+    <section class="flex min-h-svh flex-col justify-center px-(--pad) py-[12vh]">
+      <div data-reveal class="mb-[7vh]">
+        <p class="eyebrow">{t('Cómo pensamos', 'How we think')}</p>
+        <h2 class="max-w-[16em] text-[clamp(1.7rem,3.6vw,3.3rem)] font-medium leading-[1.02] tracking-[-0.03em]">
+          {t('Tres ideas que guían cada proyecto', 'Three ideas behind every project')}
+        </h2>
+      </div>
+
+      <div class="grid gap-6 md:grid-cols-3">
+        {
+          values.map((v, i) => (
+            <article data-reveal class="rounded-[28px] border border-white/10 bg-panel p-8 transition-colors duration-300 hover:border-secondary">
+              <div class="flex items-center justify-between"><span class="grid h-12 w-12 place-items-center rounded-2xl border border-white/15 bg-white/[.04] text-secondary"><Icon name={v.i} size={22} /></span><span class="font-display text-[.85rem] font-medium text-white/30">0{i + 1}</span></div>
+              <h3 class="mb-4 mt-6 text-[1.7rem] font-medium tracking-[-0.03em]">{v.t}</h3>
+              <p class="text-copy">{v.d}</p>
+            </article>
+          ))
+        }
+      </div>
+    </section>
+
+    <Cta />
+  </main>
+  <div class="relative z-[1]"><Footer seamless /></div>
+</Layout>

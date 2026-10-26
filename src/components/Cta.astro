@@ -1,5 +1,7 @@
 ---
 import { site } from '../data/site.js';
+import { useLang } from '../i18n.js';
+const { t, href } = useLang(Astro);
 ---
 
 <section
@@ -13,20 +15,20 @@ import { site } from '../data/site.js';
   </div>
 
   <h2 class="relative z-[2] font-medium leading-[.9] tracking-[-0.05em]">
-    <span class="block overflow-hidden text-[clamp(2.5rem,8vw,7rem)]"><span data-cta-line class="block">¿Listo para</span></span>
+    <span class="block overflow-hidden text-[clamp(2.5rem,8vw,7rem)]"><span data-cta-line class="block">{t('¿Listo para', 'Ready to')}</span></span>
     <span
       data-cta-big
       class="grad-text block font-accent font-bold text-[clamp(3.5rem,15vw,13rem)] will-change-transform"
     >
-      crecer?
+      {t('crecer?', 'grow?')}
     </span>
   </h2>
 
   <a
-    href={site.contact.href}
+    href={href(site.contact.href)}
     id="nosotros-hablemos"
     class="gtm-boton gtm-agendar btn relative z-[2] !px-12 !py-[1.4rem] text-[clamp(1.2rem,3.5vw,2.6rem)]"
   >
-    Hablemos <b class="font-normal">→</b>
+    {t('Hablemos', 'Let’s talk')} <b class="font-normal">→</b>
   </a>
 </section>

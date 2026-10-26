@@ -1,0 +1,23 @@
+---
+// Portafolio (lista y página de cada proyecto) en los dos idiomas: /portafolio y /en/portfolio
+import Layout from '../layouts/Layout.astro';
+import Nav from '../components/Nav.astro';
+import Portfolio from '../components/Portfolio.astro';
+import { projectsFor } from '../data/projects.js';
+import { useLang } from '../i18n.js';
+interface Props { slug?: string }
+const { slug } = Astro.props;
+const { lang, t } = useLang(Astro);
+const project = slug ? projectsFor(lang).find((p) => p.slug === slug) : undefined;
+const title = project
+  ? project.seo?.title || `${project.name} · ${t('Portafolio', 'Portfolio')} · GrowLab`
+  : t('Portafolio: webs, ecommerce y Shopify | GrowLab', 'Portfolio: websites, ecommerce and Shopify | GrowLab');
+const description = project
+  ? project.seo?.description || project.desc
+  : t('Proyectos reales de GrowLab: webs corporativas, tiendas online y diseño UX/UI para marcas como Kuna, Pacomarca, Alpaca 111 y Relengcorp.', 'Real GrowLab projects: corporate websites, online stores and UX/UI design for brands like Kuna, Pacomarca, Alpaca 111 and Relengcorp.');
+---
+
+<Layout app title={title} description={description}>
+  <Nav />
+  <Portfolio open={project?.slug} />
+</Layout>

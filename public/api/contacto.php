@@ -21,6 +21,10 @@ header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-store');
 header('X-Robots-Tag: noindex');
 
+// idioma de la página que envía (el formulario manda lang=en desde la versión en inglés): los errores se responden en ese idioma
+$EN = (($_POST['lang'] ?? '') === 'en');
+function tr(string $es, string $en): string { global $EN; return $EN ? $en : $es; }
+
 function respond(int $status, array $body): void {
     http_response_code($status);
     echo json_encode($body, JSON_UNESCAPED_UNICODE);
@@ -34,7 +38,7 @@ function line($value, int $max): string {
 }
 
 if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
-    respond(405, ['ok' => false, 'error' => 'Método no permitido.']);
+    respond(405, ['ok' => false, 'error' => tr('Método no permitido.', 'Method not allowed.')]);
 }
 
 // sólo se aceptan envíos hechos desde el propio sitio
@@ -43,7 +47,7 @@ if ($origin !== '') {
     $originHost = parse_url($origin, PHP_URL_HOST) ?: '';
     $selfHost   = preg_replace('/:\d+$/', '', $_SERVER['HTTP_HOST'] ?? '');
     if (strcasecmp(preg_replace('/^www\./i', '', $originHost), preg_replace('/^www\./i', '', $selfHost)) !== 0) {
-        respond(403, ['ok' => false, 'error' => 'Origen no permitido.']);
+        respond(403, ['ok' => false, 'error' => tr('Origen no permitido.', 'Origin not allowed.')]);
     }
 }
 
@@ -66,10 +70,10 @@ $servicios = array_values(array_filter(array_map(function ($s) { return line($s,
 
 // obligatorios: nombre, correo y teléfono (con al menos 6 dígitos); los servicios y el mensaje son opcionales
 if ($nombre === '' || !filter_var($email, FILTER_VALIDATE_EMAIL) || strlen(preg_replace('/\D/', '', $telefono)) < 6) {
-    respond(422, ['ok' => false, 'error' => 'Completa tu nombre, un correo válido y un teléfono válido.']);
+    respond(422, ['ok' => false, 'error' => tr('Completa tu nombre, un correo válido y un teléfono válido.', 'Please enter your name, a valid email and a valid phone number.')]);
 }
 if (!$consent) {
-    respond(422, ['ok' => false, 'error' => 'Para enviar el mensaje debes aceptar que se recopilen tus datos.']);
+    respond(422, ['ok' => false, 'error' => tr('Para enviar el mensaje debes aceptar que se recopilen tus datos.', 'To send your message, please agree to the collection of your data.')]);
 }
 
 // carpeta de datos FUERA de public_html: no se puede abrir desde el navegador
@@ -87,7 +91,7 @@ if ($canStore) {
         if (is_array($saved)) { $hits = array_values(array_filter($saved, function ($t) use ($now) { return is_int($t) && $t > $now - 3600; })); }
     }
     if (count($hits) >= MAX_PER_HOUR) {
-        respond(429, ['ok' => false, 'error' => 'Has enviado varios mensajes seguidos. Inténtalo de nuevo más tarde o escríbenos a ' . TO . '.']);
+        respond(429, ['ok' => false, 'error' => tr('Has enviado varios mensajes seguidos. Inténtalo de nuevo más tarde o escríbenos a ', 'You have sent several messages in a row. Please try again later or email us at ') . TO . '.']);
     }
     $hits[] = $now;
     @file_put_contents($rateFile, json_encode($hits), LOCK_EX);
@@ -121,6 +125,7 @@ if ($canStore) {
 
 // 2) aviso por correo
 $subject = $servicios ? 'Nuevo lead: ' . $lista . ' · ' . $nombre : 'Nuevo contacto: ' . $nombre;
+if ($EN) { $subject = '[EN] ' . $subject; }      // contacto desde la versión en inglés: responder en inglés
 $body = implode("\n", [
     'Nombre: ' . $nombre,
     'Correo: ' . $email,
@@ -147,6 +152,6 @@ if (!$sent && $canStore) {
 }
 
 if (!$sent && !$stored) {
-    respond(500, ['ok' => false, 'error' => 'No pudimos enviar tu mensaje. Escríbenos directamente a ' . TO . '.']);
+    respond(500, ['ok' => false, 'error' => tr('No pudimos enviar tu mensaje. Escríbenos directamente a ', 'We could not send your message. Please email us directly at ') . TO . '.']);
 }
 respond(200, ['ok' => true]);

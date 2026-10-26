@@ -1,0 +1,29 @@
+---
+// Portada del blog en los dos idiomas: /blog y /en/blog
+import Layout from '../layouts/Layout.astro';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import BlogBackground from '../components/blog/BlogBackground.astro';
+import BlogList from '../components/blog/BlogList.astro';
+import { site } from '../data/site.js';
+import { useLang } from '../i18n.js';
+const { en, t, href } = useLang(Astro);
+const jsonld = [{ '@context': 'https://schema.org', '@type': 'Blog', name: t('Blog de GrowLab', 'GrowLab Blog'), url: `${site.url}${href('/blog')}`, inLanguage: en ? 'en' : 'es-PE', publisher: { '@id': `${site.url}/#organizacion` } }];
+---
+
+<Layout
+  title={t('Blog de marketing digital: SEO, Ads y analítica | GrowLab', 'Digital marketing blog: SEO, Ads and analytics | GrowLab')}
+  description={t('Guías prácticas sobre Google Ads, Meta Ads, SEO, analítica, ecommerce e IA aplicada al marketing, escritas por el equipo de GrowLab en Arequipa.', 'Practical guides on Google Ads, Meta Ads, SEO, analytics, ecommerce and AI for marketing, written by the GrowLab team.')}
+  jsonld={jsonld}
+>
+  <BlogBackground />
+  <Nav />
+  <main id="contenido" tabindex="-1" class="page-in relative z-[1]">
+    <BlogList
+      eyebrow="Blog"
+      title={t('Ideas para crecer con datos', 'Ideas to grow with data')}
+      text={t('Guías prácticas, casos y aprendizajes sobre campañas, medición, SEO, ecommerce e inteligencia artificial, desde lo que vemos cada día con nuestros clientes.', 'Practical guides, cases and lessons on campaigns, measurement, SEO, ecommerce and artificial intelligence, from what we see every day with our clients.')}
+    />
+  </main>
+  <div class="relative z-[1]"><Footer seamless /></div>
+</Layout>

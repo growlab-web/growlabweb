@@ -1,0 +1,168 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import { site } from '../data/site.js';
+import { useLang } from '../i18n.js';
+const { en, t } = useLang(Astro);
+
+// ⚠ BORRADOR para revisar con asesoría legal. Describe lo que hace el sitio: formulario que se envía al servidor de growlab.pe,
+//   y cookies de medición sólo si hay Tag Manager configurado (site.gtm). Marco legal: Perú (Ley N.° 29733 y su reglamento).
+//   Falta completar en data/site.js → legal: razón social, RUC y domicilio del responsable.
+const updated = { es: 'Octubre de 2026', en: 'October 2026' };
+const { legal } = site;
+const who = [legal.name, legal.ruc && `RUC ${legal.ruc}`, legal.address && `con domicilio en ${legal.address}`].filter(Boolean).join(', ');
+const sectionsEs = [
+  {
+    t: 'Quién es el responsable',
+    p: [
+      `${site.name}${who ? ` (${who})` : ''} es responsable del tratamiento de los datos personales que nos envías a través de este sitio, conforme a la Ley N.° 29733, Ley de Protección de Datos Personales del Perú, y su reglamento.`,
+      `Para cualquier consulta sobre tus datos puedes escribirnos a ${site.email}.`,
+    ],
+  },
+  {
+    t: 'Qué datos recopilamos',
+    p: [
+      'Los que tú decides enviarnos en el formulario de contacto: nombre, correo electrónico, teléfono y, si quieres, los servicios que te interesan y un mensaje. También registramos la fecha del envío y la página desde la que se hizo.',
+      'Si solicitas el diagnóstico gratuito, además puedes indicarnos la web o red que revisaremos, las áreas que te interesan y tu inversión mensual aproximada en anuncios.',
+      'No pedimos datos sensibles ni datos de menores de edad.',
+    ],
+  },
+  {
+    t: 'Para qué los usamos',
+    p: [
+      'Para responder a tu consulta, preparar una propuesta y mantener la comunicación relacionada con los servicios que nos pides. Tratamos tus datos con tu consentimiento, que nos das al marcar la casilla del formulario antes de enviarlo.',
+      'No usamos tus datos para otros fines sin pedírtelo antes.',
+    ],
+  },
+  {
+    t: 'Dónde se guardan y con quién se comparten',
+    p: [
+      'Tu mensaje se guarda en el servidor que aloja este sitio y nos llega por correo electrónico. Solo acceden a él las personas del equipo que atienden tu solicitud.',
+      'Después de enviar el formulario puedes agendar una reunión. La agenda la gestiona Calendly: si pulsas «Agendar reunión», se abre con tu nombre y tu correo ya completados para que no tengas que escribirlos de nuevo, y lo que confirmes ahí lo recibe Calendly para reservar la cita y avisarnos. Calendly usa sus propias cookies necesarias para funcionar.',
+      'No vendemos ni cedemos tus datos a terceros. Los proveedores que usamos para trabajar (alojamiento web, correo electrónico y agenda de reuniones) los tratan por encargo nuestro; algunos pueden tener sus servidores fuera del Perú.',
+    ],
+  },
+  {
+    t: 'Cuánto tiempo los conservamos',
+    p: ['Mientras dure la relación contigo o sea necesario para atender tu solicitud. Después los eliminamos, salvo que debamos conservarlos por una obligación legal.'],
+  },
+  {
+    t: 'Tus derechos',
+    p: [
+      `Puedes ejercer en cualquier momento tus derechos de acceso, rectificación, cancelación y oposición, así como revocar tu consentimiento, escribiendo a ${site.email} e indicando tu solicitud.`,
+      'Si consideras que no hemos atendido tu solicitud, puedes acudir a la Autoridad Nacional de Protección de Datos Personales, del Ministerio de Justicia y Derechos Humanos.',
+    ],
+  },
+  {
+    t: 'Cookies y medición',
+    p: site.gtm
+      ? [
+          'Usamos Google Tag Manager y Google Analytics para saber cómo se usa el sitio (páginas vistas, secciones recorridas, formularios enviados) y, si corresponde, medir el resultado de nuestras campañas publicitarias. Estas herramientas utilizan cookies.',
+          'Al entrar por primera vez puedes aceptar esas cookies o seguir solo con las necesarias, y cambiar tu elección cuando quieras desde «Preferencias de cookies», al pie de la página. Tu nombre, correo y teléfono no se envían a Google Analytics.',
+          'Los enlaces a redes sociales te llevan a sitios externos con sus propias políticas.',
+        ]
+      : [
+          'Este sitio no utiliza cookies de publicidad ni de analítica.',
+          'Los enlaces a redes sociales te llevan a sitios externos que tienen sus propias políticas de privacidad.',
+        ],
+  },
+  {
+    t: 'Cambios en esta política',
+    p: ['Podemos actualizar este texto si cambia el sitio o la normativa aplicable. La versión vigente es siempre la publicada en esta página.'],
+  },
+];
+const whoEn = [legal.name, legal.ruc && `RUC ${legal.ruc}`, legal.address && `registered at ${legal.address}`].filter(Boolean).join(', ');
+
+// versión en inglés (mismo contenido; el texto que rige es el español, conforme a la ley peruana)
+const sectionsEn = [
+  {
+    t: 'Who is responsible',
+    p: [
+      `${site.name}${whoEn ? ` (${whoEn})` : ''} is responsible for processing the personal data you send us through this website, in accordance with Law No. 29733, Peru’s Personal Data Protection Law, and its regulations.`,
+      `For any question about your data you can write to us at ${site.email}.`,
+    ],
+  },
+  {
+    t: 'What data we collect',
+    p: [
+      'The data you choose to send us through the contact form: name, email address, phone number and, if you wish, the services you are interested in and a message. We also record the date of submission and the page it was sent from.',
+      'If you request the free audit, you can also tell us the website or social profile we will review, the areas you are interested in and your approximate monthly ad spend.',
+      'We do not request sensitive data or data from minors.',
+    ],
+  },
+  {
+    t: 'What we use it for',
+    p: [
+      'To answer your inquiry, prepare a proposal and keep in touch about the services you request. We process your data with your consent, which you give by ticking the box on the form before sending it.',
+      'We do not use your data for other purposes without asking you first.',
+    ],
+  },
+  {
+    t: 'Where it is stored and who it is shared with',
+    p: [
+      'Your message is stored on the server that hosts this website and reaches us by email. Only the team members handling your request have access to it.',
+      'After sending the form you can book a meeting. The calendar is managed by Calendly: when you click “Book a meeting” it opens with your name and email already filled in so you don’t have to type them again, and whatever you confirm there is received by Calendly to book the appointment and notify us. Calendly uses its own cookies, which are necessary for it to work.',
+      'We do not sell or transfer your data to third parties. The providers we work with (web hosting, email and meeting scheduling) process it on our behalf; some of them may have servers outside Peru.',
+    ],
+  },
+  {
+    t: 'How long we keep it',
+    p: ['For as long as our relationship lasts or as needed to handle your request. After that we delete it, unless we are legally required to keep it.'],
+  },
+  {
+    t: 'Your rights',
+    p: [
+      `You can exercise your rights of access, rectification, cancellation and objection at any time, and withdraw your consent, by writing to ${site.email} with your request.`,
+      'If you believe we have not handled your request, you can contact Peru’s National Authority for Personal Data Protection, part of the Ministry of Justice and Human Rights.',
+    ],
+  },
+  {
+    t: 'Cookies and measurement',
+    p: site.gtm
+      ? [
+          'We use Google Tag Manager and Google Analytics to understand how the website is used (page views, sections viewed, forms submitted) and, where applicable, to measure the results of our advertising campaigns. These tools use cookies.',
+          'On your first visit you can accept those cookies or continue with only the essential ones, and change your choice at any time from “Cookie preferences” at the bottom of the page. Your name, email and phone number are not sent to Google Analytics.',
+          'Links to social networks take you to external websites with their own policies.',
+        ]
+      : [
+          'This website does not use advertising or analytics cookies.',
+          'Links to social networks take you to external websites with their own privacy policies.',
+        ],
+  },
+  {
+    t: 'Changes to this policy',
+    p: ['We may update this text if the website or the applicable regulations change. The version in force is always the one published on this page. In case of discrepancy, the Spanish version prevails.'],
+  },
+];
+const sections = en ? sectionsEn : sectionsEs;
+---
+
+<Layout
+  title={t('Política de privacidad y protección de datos | GrowLab', 'Privacy and data protection policy | GrowLab')}
+  description={t('Cómo trata GrowLab los datos personales que recibe a través de este sitio y cómo puedes ejercer tus derechos.', 'How GrowLab handles the personal data it receives through this website and how you can exercise your rights.')}
+>
+  <Nav />
+  <main id="contenido" tabindex="-1" class="page-in">
+    <section class="mx-auto max-w-[820px] px-(--pad) pb-[12vh] pt-[clamp(130px,20vh,210px)]">
+      <p data-reveal class="eyebrow">Legal</p>
+      <h1 data-reveal class="display-xl !text-[clamp(2rem,3.8vw,4rem)]">{t('Política de privacidad y protección de datos', 'Privacy and data protection policy')}</h1>
+      <p data-reveal class="mt-6 text-[.9rem] text-white/50">{t('Última actualización', 'Last updated')}: {en ? updated.en : updated.es}</p>
+
+      <div class="mt-[7vh] grid gap-12">
+        {
+          sections.map((s, i) => (
+            <article data-reveal class="border-t border-white/10 pt-8">
+              <h2 class="mb-4 flex items-baseline gap-4 text-[clamp(1.15rem,1.7vw,1.5rem)] font-medium tracking-[-0.02em]">
+                <span class="font-display text-[.85rem] font-medium text-secondary">{String(i + 1).padStart(2, '0')}</span>
+                {s.t}
+              </h2>
+              {s.p.map((t) => <p class="mb-3 max-w-[68ch] leading-relaxed text-copy last:mb-0">{t}</p>)}
+            </article>
+          ))
+        }
+      </div>
+    </section>
+  </main>
+  <Footer />
+</Layout>

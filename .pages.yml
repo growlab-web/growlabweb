@@ -7,7 +7,7 @@ media:
 
 content:
   - name: blog
-    label: Blog
+    label: Blog (español)
     type: collection
     path: src/content/blog
     filename: '{fields.slug}.md'
@@ -78,3 +78,83 @@ content:
       - name: body
         label: Artículo
         type: rich-text
+
+  # Blog en inglés (growlab.pe/en/blog): mismos campos y, además, la dirección del artículo en español del que es traducción
+  # (así el botón ES | EN del menú lleva de uno al otro). Usa las categorías de siempre: la web las muestra en inglés.
+  - name: blogEn
+    label: Blog (English)
+    type: collection
+    path: src/content/blog-en
+    filename: '{fields.slug}.md'
+    format: yaml-frontmatter
+    view:
+      fields: [title, category, date, draft]
+      primary: title
+      sort: [date]
+      default:
+        sort: date
+        order: desc
+    fields:
+      - name: title
+        label: Title
+        type: string
+        required: true
+      - name: slug
+        label: Article address (lowercase, hyphens)
+        description: 'E.g.: meta-conversions-api → growlab.pe/en/blog/meta-conversions-api. Do not change it once published.'
+        type: string
+        required: true
+        pattern:
+          regex: '^[a-z0-9]+(-[a-z0-9]+)*$'
+          message: Only lowercase letters, numbers and hyphens.
+      - name: translationOf
+        label: Dirección del artículo en español del que es traducción (p. ej. pixel-meta-api-conversiones)
+        type: string
+        required: true
+      - name: description
+        label: Summary (shown on Google and when shared; max 160 characters)
+        type: text
+        required: true
+        options:
+          maxlength: 170
+      - name: date
+        label: Publication date
+        type: date
+        required: true
+      - name: updated
+        label: Updated date (optional)
+        type: date
+      - name: category
+        label: Category
+        type: select
+        required: true
+        options:
+          values:
+            - { value: paid-media, label: Paid Media }
+            - { value: seo, label: SEO }
+            - { value: tracking-analitica, label: Tracking & analytics }
+            - { value: ecommerce-web, label: Ecommerce & web }
+            - { value: ia-automatizacion, label: AI & automation }
+            - { value: email-marketing, label: Email marketing }
+      - name: cover
+        label: Cover image (landscape, 1600×900 recommended)
+        type: image
+      - name: coverAlt
+        label: Cover image description (accessibility and Google)
+        type: string
+      - name: author
+        label: Author
+        type: string
+        default: GrowLab
+      - name: tags
+        label: Tags
+        type: string
+        list: true
+      - name: draft
+        label: Draft (if checked, it is not published)
+        type: boolean
+        default: false
+      - name: body
+        label: Article
+        type: rich-text
+

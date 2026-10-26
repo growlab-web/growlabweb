@@ -1,6 +1,8 @@
 ---
 const a = 'Paid Media ✦ SEO ✦ Web Development & Ecommerce ✦ UX/UI Design ✦ AI Automation ✦ Data Analytics ✦ Tracking & Attribution ✦ Reporting ✦ ';
-const b = 'Estrategia ✦ Creatividad ✦ Datos ✦ Crecimiento ✦ ';
+import { useLang } from '../i18n.js';
+const { t } = useLang(Astro);
+const b = t('Estrategia ✦ Creatividad ✦ Datos ✦ Crecimiento ✦ ', 'Strategy ✦ Creativity ✦ Data ✦ Growth ✦ ');
 ---
 
 <section data-marquee class="overflow-hidden border-y border-white/10 bg-panel py-[3vw]">

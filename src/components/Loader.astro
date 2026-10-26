@@ -1,5 +1,7 @@
 ---
 // Pantalla de carga: negro, texto técnico en las esquinas y una lluvia de líneas diagonales (canvas 2D).
+import { useLang } from '../i18n.js';
+const { t } = useLang(Astro);
 ---
 
 <div id="loader" class="fixed inset-0 z-[100] bg-black" aria-hidden="true">
@@ -13,6 +15,6 @@
   <div
     class="absolute bottom-5 left-[1.8vw] font-body text-[.6rem] uppercase tracking-[.14em] text-white/40"
   >
-    Iniciando experiencia interactiva
+    {t('Iniciando experiencia interactiva', 'Starting interactive experience')}
   </div>
 </div>

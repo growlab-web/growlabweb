@@ -5,15 +5,29 @@
 import Layout from '../layouts/Layout.astro';
 import { site } from '../data/site.js';
 
+// textos en inglés en data-en (y enlaces en data-en-href): el servidor usa esta misma página para cualquier dirección que no existe,
+// así que si la dirección empieza por /en/ el script del principio la cambia al inglés antes de pintarse
 const metrics = [
-  { v: '1', l: 'Visita', n: 'la tuya' },
-  { v: '0', l: 'Clics', n: 'aquí no hay nada que pulsar' },
-  { v: '0', l: 'Conversiones', n: 'ni una sola' },
-  { v: '100%', l: 'Rebote', n: 'si te vas ahora', count: 100 },
+  { v: '1', l: 'Visita', n: 'la tuya', le: 'Visit', ne: 'yours' },
+  { v: '0', l: 'Clics', n: 'aquí no hay nada que pulsar', le: 'Clicks', ne: 'nothing to click here' },
+  { v: '0', l: 'Conversiones', n: 'ni una sola', le: 'Conversions', ne: 'not a single one' },
+  { v: '100%', l: 'Rebote', n: 'si te vas ahora', le: 'Bounce', ne: 'if you leave now', count: 100 },
 ];
 ---
 
 <Layout title="404 · Esta página tiene un ROAS de 0x · GrowLab" description="La página que buscas no existe o cambió de dirección." noindex>
+  <script is:inline>
+    // versión en inglés (direcciones /en/…): se cambia antes de que se vea nada
+    (function () {
+      if (!/^\/en(\/|$)/.test(location.pathname)) return;
+      document.documentElement.lang = 'en';
+      document.title = '404 · This page has a 0x ROAS · GrowLab';
+      document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('[data-en]').forEach(function (el) { el.innerHTML = el.getAttribute('data-en'); });
+        document.querySelectorAll('[data-en-href]').forEach(function (el) { el.setAttribute('href', el.getAttribute('data-en-href')); });
+      });
+    })();
+  </script>
   <main id="contenido" tabindex="-1" data-notfound class="relative flex h-[100svh] min-h-[540px] flex-col overflow-hidden bg-[linear-gradient(175deg,#030814_0%,#000_55%,#000_100%)] text-white lining-nums">
     <!-- degradados del fondo, como en las demás páginas -->
     <div class="pointer-events-none absolute -left-[16vw] -top-[10vw] h-[30vw] w-[62vw] rotate-[-16deg] opacity-45 blur-[80px] max-sm:h-[80vw] max-sm:w-[130vw]" aria-hidden="true">
@@ -24,7 +38,7 @@ const metrics = [
     </div>
 
     <header class="relative z-[2] flex shrink-0 items-center justify-between px-(--pad) pt-[clamp(14px,3vh,28px)]">
-      <a href="/" id="error-logo" aria-label="GrowLab, ir al inicio"><img src="/logo.webp" alt="GrowLab" width="290" height="56" class="h-[22px] w-auto" /></a>
+      <a href="/" data-en-href="/en" id="error-logo" aria-label="GrowLab, ir al inicio"><img src="/logo.webp" alt="GrowLab" width="290" height="56" class="h-[22px] w-auto" /></a>
       <span class="font-display text-[.72rem] uppercase tracking-[.22em] text-secondary">Error 404</span>
     </header>
 
@@ -32,15 +46,15 @@ const metrics = [
     <div class="relative z-[1] min-h-[100px] w-full flex-1">
       <canvas data-notfound-canvas class="absolute inset-0 h-full w-full touch-manipulation" aria-hidden="true"></canvas>
       <p class="pointer-events-none absolute inset-x-0 bottom-0 text-center font-display text-[.66rem] uppercase tracking-[.2em] text-white/45 max-sm:text-[.56rem]">
-        <span data-notfound-hint><span class="nf-fine">Pasa el cursor por el número · haz clic para romperlo</span><span class="nf-coarse">Toca el número para romperlo</span></span>
+        <span data-notfound-hint><span class="nf-fine" data-en="Hover over the number · click to break it">Pasa el cursor por el número · haz clic para romperlo</span><span class="nf-coarse" data-en="Tap the number to break it">Toca el número para romperlo</span></span>
       </p>
     </div>
 
     <section class="relative z-[2] mx-auto w-full max-w-[1100px] shrink-0 px-(--pad) pb-[clamp(14px,3.5vh,40px)] pt-[clamp(10px,2.5vh,24px)] text-center">
       <h1 class="mx-auto max-w-[16em] font-accent text-[clamp(1.45rem,min(4.6vw,6.6vh),4.2rem)] font-bold uppercase leading-[1.02] tracking-[-0.02em]">
-        <span class="sr-only">Error 404. </span>Esta página tiene un ROAS de <span class="text-secondary">0x.</span>
+        <span class="sr-only">Error 404. </span><span data-en="This page has a ROAS of">Esta página tiene un ROAS de</span> <span class="text-secondary">0x.</span>
       </h1>
-      <p class="mx-auto mt-[clamp(10px,2.2vh,24px)] max-w-[52ch] font-body text-[clamp(.9rem,1.2vw,1.1rem)] leading-relaxed text-copy max-sm:leading-snug">
+      <p class="mx-auto mt-[clamp(10px,2.2vh,24px)] max-w-[52ch] font-body text-[clamp(.9rem,1.2vw,1.1rem)] leading-relaxed text-copy max-sm:leading-snug" data-en="We looked for it in Analytics, in Tag Manager and even in the spam folder. Nothing: not one impression, not one click. The good news is that the rest of the site works just fine.">
         La buscamos en Analytics, en Tag Manager y hasta en la carpeta de spam. Nada: ni una impresión, ni un clic. Lo bueno es que el resto del sitio sí funciona.
       </p>
 
@@ -50,23 +64,23 @@ const metrics = [
           metrics.map((m, i) => (
             <div class:list={['px-1 py-[clamp(10px,2vh,20px)] sm:px-3', i > 0 && 'border-l border-white/20']}>
               <dd class="font-accent text-[clamp(1.4rem,min(4vw,5.4vh),3.4rem)] font-bold leading-none tracking-[-0.03em]" data-count={m.count} data-suffix={m.count ? '%' : undefined}>{m.v}</dd>
-              <dt class="mt-2 font-display text-[.78rem] font-medium uppercase tracking-[.14em] text-secondary max-sm:text-[.5rem] max-sm:tracking-[.04em]">{m.l}</dt>
-              <p class="mt-1 font-body text-[.8rem] text-muted max-md:hidden">{m.n}</p>
+              <dt class="mt-2 font-display text-[.78rem] font-medium uppercase tracking-[.14em] text-secondary max-sm:text-[.5rem] max-sm:tracking-[.04em]" data-en={m.le}>{m.l}</dt>
+              <p class="mt-1 font-body text-[.8rem] text-muted max-md:hidden" data-en={m.ne}>{m.n}</p>
             </div>
           ))
         }
       </dl>
 
       <div class="mt-[clamp(14px,3.2vh,40px)] flex flex-wrap justify-center gap-x-4 gap-y-2.5">
-        <a href="/" id="error-inicio" class="inline-flex items-center gap-3 rounded-full bg-secondary px-8 py-[clamp(10px,1.8vh,16px)] font-display font-medium text-black transition-colors duration-300 hover:bg-white">Volver al inicio</a>
-        <a href={site.contact.href} id="error-avisar" class="inline-flex items-center rounded-full border border-white/30 px-8 py-[clamp(10px,1.8vh,16px)] font-display font-medium transition-colors hover:border-white">Avísanos del enlace roto</a>
+        <a href="/" data-en-href="/en" data-en="Back to home" id="error-inicio" class="inline-flex items-center gap-3 rounded-full bg-secondary px-8 py-[clamp(10px,1.8vh,16px)] font-display font-medium text-black transition-colors duration-300 hover:bg-white">Volver al inicio</a>
+        <a href={site.contact.href} data-en-href="/en/contact" data-en="Tell us about the broken link" id="error-avisar" class="inline-flex items-center rounded-full border border-white/30 px-8 py-[clamp(10px,1.8vh,16px)] font-display font-medium transition-colors hover:border-white">Avísanos del enlace roto</a>
       </div>
     </section>
 
     <!-- cinta de "noticias" al pie -->
     <div class="relative z-[2] shrink-0 overflow-hidden border-t border-white/10 bg-panel py-[clamp(7px,1.3vh,12px)] text-white/80" aria-hidden="true">
       <div class="nf-ticker flex w-max whitespace-nowrap font-accent text-[.95rem] font-bold uppercase tracking-[.06em]">
-        {[0, 1].map(() => <span class="pr-10">Página no encontrada ✦ CTR 0 % ✦ Presupuesto gastado: 0 ✦ Leads generados: 0 ✦ Seguimos optimizando ✦ La culpa fue del enlace ✦ </span>)}
+        {[0, 1].map(() => <span class="pr-10" data-en="Page not found ✦ CTR 0% ✦ Budget spent: 0 ✦ Leads generated: 0 ✦ Still optimizing ✦ Blame the link ✦ ">Página no encontrada ✦ CTR 0 % ✦ Presupuesto gastado: 0 ✦ Leads generados: 0 ✦ Seguimos optimizando ✦ La culpa fue del enlace ✦ </span>)}
       </div>
     </div>
   </main>
@@ -150,7 +164,7 @@ const metrics = [
     // clic o toque: el número estalla desde ese punto y ya no se recompone
     const hint = document.querySelector('[data-notfound-hint]');
     function burst(cx: number, cy: number) {
-      if (!broken) { broken = true; if (hint) hint.textContent = 'Listo, lo rompiste. Recarga la página si lo quieres de vuelta'; track('notfound_broken'); }
+      if (!broken) { broken = true; if (hint) hint.textContent = document.documentElement.lang === 'en' ? 'Done, you broke it. Reload the page if you want it back' : 'Listo, lo rompiste. Recarga la página si lo quieres de vuelta'; track('notfound_broken'); }
       for (const d of dots) {
         const dx = d.x - cx, dy = d.y - cy, dist = Math.hypot(dx, dy) || 1, f = Math.max(0, 1 - dist / (w * 0.7)) * (16 + Math.random() * 22);
         d.vx += (dx / dist) * f + (Math.random() - 0.5) * 3; d.vy += (dy / dist) * f + (Math.random() - 0.5) * 3;   // con algo de azar, para que no queden filas

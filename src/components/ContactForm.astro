@@ -3,6 +3,8 @@ import { site } from '../data/site.js';
 import { services } from '../data/services.js';
 
 import { countries } from '../data/countries.js';
+import { useLang } from '../i18n.js';
+const { en, t, href } = useLang(Astro);
 
 // Campos con línea inferior e icono, como un formulario editorial
 const wrap = 'group relative flex items-center gap-3 border-b border-white/20 transition-colors focus-within:border-secondary';
@@ -19,8 +21,8 @@ const { formId = 'form-contacto' } = Astro.props;
 <form id={formId} data-contact-form data-email={site.email} class="grid gap-x-10 gap-y-7 sm:grid-cols-2" novalidate>
   <label class={wrap}>
     <svg class={icon} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"></path></svg>
-    <span class="sr-only">Nombre</span>
-    <input class={input} name="nombre" type="text" placeholder="Nombre *" autocomplete="name" required aria-required="true" />
+    <span class="sr-only">{t('Nombre', 'Name')}</span>
+    <input class={input} name="nombre" type="text" placeholder={t('Nombre *', 'Name *')} autocomplete="name" required aria-required="true" />
   </label>
 
   <label class={wrap}>
@@ -36,14 +38,14 @@ const { formId = 'form-contacto' } = Astro.props;
       <span data-prefix-label>+51</span>
       <svg class="h-3.5 w-3.5 text-white/45" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
       <!-- el desplegable real va encima, invisible: se ve sólo el prefijo y al tocarlo se abre la lista del sistema -->
-      <select name="prefijo" id="form-prefijo" data-prefix aria-label="País del teléfono" autocomplete="tel-country-code" class="absolute inset-0 h-full w-full cursor-pointer bg-[#0b1226] text-white opacity-0">
-        {countries.map(([name, code], i) => <option value={code} selected={i === 0}>{name} ({code})</option>)}
+      <select name="prefijo" id="form-prefijo" data-prefix aria-label={t('País del teléfono', 'Phone country')} autocomplete="tel-country-code" class="absolute inset-0 h-full w-full cursor-pointer bg-[#0b1226] text-white opacity-0">
+        {countries.map(([name, code, nameEn], i) => <option value={code} selected={i === 0}>{en ? nameEn : name} ({code})</option>)}
       </select>
     </span>
     <i class="h-5 w-px shrink-0 bg-white/20" aria-hidden="true"></i>
     <label class="flex-1">
-      <span class="sr-only">Teléfono</span>
-      <input class={input} name="telefono" type="tel" inputmode="tel" placeholder="Teléfono *" autocomplete="tel-national" required aria-required="true" />
+      <span class="sr-only">{t('Teléfono', 'Phone')}</span>
+      <input class={input} name="telefono" type="tel" inputmode="tel" placeholder={t('Teléfono *', 'Phone *')} autocomplete="tel-national" required aria-required="true" />
     </label>
   </div>
 
@@ -51,10 +53,10 @@ const { formId = 'form-contacto' } = Astro.props;
   <div data-services-select class={wrap + ' z-20'}>
     <svg class={icon} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"></path></svg>
     <button type="button" id="form-servicios" data-ss-toggle aria-haspopup="true" aria-expanded="false" class="gtm-boton flex w-full cursor-pointer items-center justify-between gap-3 bg-transparent py-4 text-left font-body text-[1rem] outline-none">
-      <span data-ss-label class="truncate text-white/40">Servicios de interés (opcional)</span>
+      <span data-ss-label class="truncate text-white/40">{t('Servicios de interés (opcional)', 'Services of interest (optional)')}</span>
       <svg data-ss-chevron class="h-4 w-4 shrink-0 text-white/45 transition-transform duration-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
     </button>
-    <div data-ss-panel data-lenis-prevent hidden role="group" aria-label="Servicios de interés" class="absolute inset-x-0 top-full z-20 mt-2 max-h-[300px] overflow-y-auto overscroll-contain rounded-2xl border border-white/15 bg-[#0b1226] p-2 shadow-[0_24px_60px_rgba(0,0,0,.6)]">
+    <div data-ss-panel data-lenis-prevent hidden role="group" aria-label={t('Servicios de interés', 'Services of interest')} class="absolute inset-x-0 top-full z-20 mt-2 max-h-[300px] overflow-y-auto overscroll-contain rounded-2xl border border-white/15 bg-[#0b1226] p-2 shadow-[0_24px_60px_rgba(0,0,0,.6)]">
       {
         services.map((s) => (
           <label class="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 font-body text-[.95rem] text-white/85 transition-colors hover:bg-white/[.06]">
@@ -68,23 +70,23 @@ const { formId = 'form-contacto' } = Astro.props;
 
   <label class={wrap + ' items-start sm:col-span-2'}>
     <svg class={icon + ' mt-4'} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20l1-4L16.5 4.5a2 2 0 0 1 3 0l0 0a2 2 0 0 1 0 3L8 19l-4 1Z"></path><path d="m14 7 3 3"></path></svg>
-    <span class="sr-only">Mensaje</span>
-    <textarea class={input + ' min-h-[110px] resize-none'} name="mensaje" placeholder="¿Cómo podemos ayudar? ¡No dudes en ponerte en contacto con nosotros!"></textarea>
+    <span class="sr-only">{t('Mensaje', 'Message')}</span>
+    <textarea class={input + ' min-h-[110px] resize-none'} name="mensaje" placeholder={t('¿Cómo podemos ayudar? ¡No dudes en ponerte en contacto con nosotros!', 'How can we help? Don’t hesitate to get in touch!')}></textarea>
   </label>
 
   <!-- campo trampa para robots: las personas no lo ven ni llegan a él con el teclado -->
   <div class="absolute -left-[9999px] h-0 w-0 overflow-hidden" aria-hidden="true">
-    <label>No rellenes este campo <input type="text" name="website" tabindex="-1" autocomplete="off" /></label>
+    <label>{t('No rellenes este campo', 'Leave this field empty')} <input type="text" name="website" tabindex="-1" autocomplete="off" /></label>
   </div>
 
   <div class="flex flex-wrap items-center gap-x-8 gap-y-4 pt-3 sm:col-span-2">
     <button type="submit" id="form-enviar" data-form-submit class="gtm-boton gtm-enviar inline-flex h-[54px] cursor-pointer disabled:cursor-wait disabled:opacity-60 items-center gap-3 bg-secondary px-8 font-display text-[.85rem] font-semibold uppercase tracking-[.12em] text-black transition-colors hover:bg-white">
       <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21 3-9.5 18-2.5-7.5L1.5 11 21 3Z"></path><path d="M21 3 9 13.5"></path></svg>
-      Enviar
+      {t('Enviar', 'Send')}
     </button>
     <label class="flex cursor-pointer items-center gap-3 font-body text-[.9rem] text-white/60">
       <input type="checkbox" name="consent" class="h-[18px] w-[18px] shrink-0 cursor-pointer accent-secondary" />
-      <span>Acepto que se recopilen mis <a href={site.privacy.href} id="form-privacidad" target="_blank" class="underline underline-offset-2 transition-colors hover:text-secondary">datos</a>.</span>
+      <span>{t('Acepto que se recopilen mis', 'I agree to the collection of my')} <a href={href(site.privacy.href)} id="form-privacidad" target="_blank" class="underline underline-offset-2 transition-colors hover:text-secondary">{t('datos', 'data')}</a>.</span>
     </label>
   </div>
 
@@ -95,22 +97,22 @@ const { formId = 'form-contacto' } = Astro.props;
      en otra pestaña con el nombre y el correo ya escritos) y debajo un mini juego para la espera (scripts/pong.js) -->
 <div data-form-thanks hidden class="scroll-mt-[96px] text-center">
   <div role="status" aria-live="polite">
-    <p data-form-test hidden class="mx-auto mb-5 w-fit rounded-full border border-[#ffcf7a]/50 px-4 py-1.5 font-ui text-[.78rem] text-[#ffcf7a]">Modo de prueba: aquí no se envía ningún correo</p>
-    <h3 class="font-display text-[clamp(1.7rem,3.2vw,2.8rem)] font-medium leading-[1.04] tracking-[-0.03em] text-secondary">¡Gracias<span data-thanks-name></span>!</h3>
-    <p class="mx-auto mt-4 max-w-[46ch] font-body text-[clamp(1rem,1.3vw,1.2rem)] leading-relaxed text-copy">Recibimos tus datos. Si quieres adelantar, elige ya el día y la hora para una videollamada de 30 minutos.</p>
+    <p data-form-test hidden class="mx-auto mb-5 w-fit rounded-full border border-[#ffcf7a]/50 px-4 py-1.5 font-ui text-[.78rem] text-[#ffcf7a]">{t('Modo de prueba: aquí no se envía ningún correo', 'Test mode: no email is sent here')}</p>
+    <h3 class="font-display text-[clamp(1.7rem,3.2vw,2.8rem)] font-medium leading-[1.04] tracking-[-0.03em] text-secondary">{t('¡Gracias', 'Thank you')}<span data-thanks-name></span>!</h3>
+    <p class="mx-auto mt-4 max-w-[46ch] font-body text-[clamp(1rem,1.3vw,1.2rem)] leading-relaxed text-copy">{t('Recibimos tus datos. Si quieres adelantar, elige ya el día y la hora para una videollamada de 30 minutos.', 'We received your details. To get ahead, pick a day and time for a 30-minute video call now.')}</p>
   </div>
-  <a href={site.calendly} id={`${formId}-agendar`} data-calendly-link target="_blank" rel="noopener noreferrer" class="gtm-boton gtm-agendar btn mt-7">Agendar reunión</a>
+  <a href={site.calendly} id={`${formId}-agendar`} data-calendly-link target="_blank" rel="noopener noreferrer" class="gtm-boton gtm-agendar btn mt-7">{t('Agendar reunión', 'Book a meeting')}</a>
 
-  <p class="mx-auto mt-[clamp(2.5rem,6vh,3.5rem)] max-w-[40ch] font-body text-[.95rem] text-white/60">O, mientras esperas nuestra respuesta, juega un poco.</p>
+  <p class="mx-auto mt-[clamp(2.5rem,6vh,3.5rem)] max-w-[40ch] font-body text-[.95rem] text-white/60">{t('O, mientras esperas nuestra respuesta, juega un poco.', 'Or, while you wait for our reply, play a little.')}</p>
   <div class="mx-auto mt-5 max-w-[720px]">
-    <canvas id="juego-pong" data-pong class="block h-[clamp(220px,38vh,340px)] w-full cursor-none touch-none rounded-[22px] border border-white/15 bg-white/[.03]" aria-label="Juego: para la pelota con las barras moviendo el ratón arriba y abajo"></canvas>
+    <canvas id="juego-pong" data-pong class="block h-[clamp(220px,38vh,340px)] w-full cursor-none touch-none rounded-[22px] border border-white/15 bg-white/[.03]" aria-label={t('Juego: para la pelota con las barras moviendo el ratón arriba y abajo', 'Game: stop the ball with the paddles by moving the mouse up and down')}></canvas>
     <p class="mt-3 flex flex-wrap items-center justify-between gap-x-6 gap-y-1 font-ui text-[.8rem] uppercase tracking-[.14em] text-white/55">
-      <span>Rebotes: <b data-pong-score class="font-medium text-secondary">0</b></span>
-      <span>Tu récord: <b data-pong-best class="font-medium text-white">0</b></span>
+      <span>{t('Rebotes', 'Bounces')}: <b data-pong-score class="font-medium text-secondary">0</b></span>
+      <span>{t('Tu récord', 'Your best')}: <b data-pong-best class="font-medium text-white">0</b></span>
     </p>
   </div>
 
-  <button type="button" id="form-otro-mensaje" data-form-again class="gtm-boton mt-6 cursor-pointer font-body text-[.9rem] text-white/60 underline underline-offset-4 transition-colors hover:text-secondary">Enviar otro mensaje</button>
+  <button type="button" id="form-otro-mensaje" data-form-again class="gtm-boton mt-6 cursor-pointer font-body text-[.9rem] text-white/60 underline underline-offset-4 transition-colors hover:text-secondary">{t('Enviar otro mensaje', 'Send another message')}</button>
 </div>
 
 <script>
@@ -186,6 +188,8 @@ const { formId = 'form-contacto' } = Astro.props;
     // medición: primer campo que toca el visitante
     form.addEventListener('focusin', () => track('form_start', { form_location: where }), { once: true });
 
+    const EN = document.documentElement.lang === 'en';
+    const T = (es, en) => (EN ? en : es);
     const say = (msg, kind) => { note.textContent = msg; note.style.color = kind === 'error' ? '#ff9a9a' : kind === 'ok' ? '#6df2c0' : ''; };
 
     form.addEventListener('submit', async (e) => {
@@ -197,23 +201,26 @@ const { formId = 'form-contacto' } = Astro.props;
       const mensaje = String(f.get('mensaje') || '').trim();
       const servicios = f.getAll('servicios').map(String);
       // obligatorios: nombre, correo y teléfono (el teléfono, con al menos 6 dígitos); servicios y mensaje son opcionales
-      const missing = [!nombre && 'tu nombre', !/^\S+@\S+\.\S+$/.test(email) && 'un correo válido', telefono.replace(/\D/g, '').length < 6 && 'un teléfono válido'].filter(Boolean);
+      const badMail = !/^\S+@\S+\.\S+$/.test(email);
+      const missing = [!nombre && T('tu nombre', 'your name'), badMail && T('un correo válido', 'a valid email'), telefono.replace(/\D/g, '').length < 6 && T('un teléfono válido', 'a valid phone number')].filter(Boolean);
       if (missing.length) {
-        const field = form.querySelector(!nombre ? '[name=nombre]' : missing[0] === 'un correo válido' ? '[name=email]' : '[name=telefono]');
+        const field = form.querySelector(!nombre ? '[name=nombre]' : badMail ? '[name=email]' : '[name=telefono]');
         if (field) field.focus();
-        return say(`Completa ${missing.join(missing.length > 2 ? ', ' : ' y ').replace(/, ([^,]*)$/, ' y $1')}.`, 'error');
+        const and = T(' y ', ' and ');
+        return say(`${T('Completa', 'Please enter')} ${missing.join(missing.length > 2 ? ', ' : and).replace(/, ([^,]*)$/, `${and}$1`)}.`, 'error');
       }
-      if (!f.get('consent')) return say('Para enviar el mensaje debes aceptar que se recopilen tus datos.', 'error');
+      if (!f.get('consent')) return say(T('Para enviar el mensaje debes aceptar que se recopilen tus datos.', 'To send your message, please agree to the collection of your data.'), 'error');
 
       // el teléfono viaja completo, con el prefijo del país delante (salvo que la persona ya lo haya escrito con +)
       const phone = telefono.startsWith('+') ? telefono : `${f.get('prefijo') || ''} ${telefono}`.trim();
       f.set('telefono', phone);
       f.delete('prefijo');
       f.set('pagina', location.href);
+      f.set('lang', EN ? 'en' : 'es');      // el servidor responde los errores en el idioma de la página
       // varios servicios marcados: PHP sólo recibe todos si el nombre lleva [] (con «servicios» a secas llegaba sólo el último)
       f.delete('servicios'); servicios.forEach((s) => f.append('servicios[]', s));
       button.disabled = true;
-      say('Enviando…');
+      say(T('Enviando…', 'Sending…'));
 
       let result = null;          // respuesta del servidor; null = el servicio no está disponible
       try {
@@ -224,7 +231,7 @@ const { formId = 'form-contacto' } = Astro.props;
       button.disabled = false;
 
       if (result && result.ok) {
-        if (!showThanks(nombre, email)) say('¡Gracias por tus datos! Recibimos tu mensaje y te responderemos en menos de 24 horas laborables.', 'ok');
+        if (!showThanks(nombre, email)) say(T('¡Gracias por tus datos! Recibimos tu mensaje y te responderemos en menos de 24 horas laborables.', 'Thank you! We received your message and will reply within 24 business hours.'), 'ok');
         track('generate_lead', {
           form_location: where,
           lead_method: 'formulario',
@@ -241,16 +248,16 @@ const { formId = 'form-contacto' } = Astro.props;
         paintPrefix();
         return;
       }
-      if (result) return say(result.error || 'No pudimos enviar tu mensaje. Inténtalo de nuevo.', 'error');
+      if (result) return say(result.error || T('No pudimos enviar tu mensaje. Inténtalo de nuevo.', 'We couldn’t send your message. Please try again.'), 'error');
 
       // el servicio no respondió
       if (['localhost', '127.0.0.1'].includes(location.hostname) || location.hostname.endsWith('.vercel.app')) {
         // en local y en la vista previa de Vercel no hay PHP: se enseña la pantalla de gracias como prueba, sin enviar nada ni contar el lead
         if (showThanks(nombre, email)) { const p = thanks.querySelector('[data-form-test]'); if (p) p.hidden = false; }
         form.reset(); resetServices(); paintPrefix();
-        return say('Modo de prueba: aquí no se envía el correo. El envío real funciona con el sitio subido al hosting de growlab.pe.');
+        return say(T('Modo de prueba: aquí no se envía el correo. El envío real funciona con el sitio subido al hosting de growlab.pe.', 'Test mode: no email is sent here. Real sending works on the live site at growlab.pe.'));
       }
-      say(`No pudimos enviar tu mensaje. Inténtalo de nuevo en unos minutos o escríbenos a ${form.dataset.email}.`, 'error');
+      say(T(`No pudimos enviar tu mensaje. Inténtalo de nuevo en unos minutos o escríbenos a ${form.dataset.email}.`, `We couldn’t send your message. Please try again in a few minutes or email us at ${form.dataset.email}.`), 'error');
     });
   });
 </script>

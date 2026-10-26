@@ -16,28 +16,45 @@ export const site = {
   phone: { href: 'tel:+51989134545', label: '+51 989 134 545' },   // teléfono de la empresa (contacto y pie)
   // WhatsApp (botón del hero y botón flotante): abre el chat con un mensaje ya escrito
   whatsapp: { href: 'https://wa.me/51989134545?text=' + encodeURIComponent('Hola GrowLab, quiero más información sobre sus servicios.'), label: 'Escríbenos por WhatsApp' },
+  whatsappEn: { href: 'https://wa.me/51989134545?text=' + encodeURIComponent('Hi GrowLab, I would like more information about your services.'), label: 'Message us on WhatsApp' },
   nav: [
-    { href: '/', label: 'Inicio' },
-    { href: '/#servicios', label: 'Servicios' },
-    { href: '/portafolio', label: 'Portafolio' },
-    { href: '/nosotros', label: 'Nosotros' },
+    { href: '/', label: 'Inicio', en: 'Home' },
+    { href: '/#servicios', label: 'Servicios', en: 'Services' },
+    { href: '/portafolio', label: 'Portafolio', en: 'Portfolio' },
+    { href: '/nosotros', label: 'Nosotros', en: 'About' },
   ],
-  contact: { href: '/contacto', label: 'Contacto' },
-  privacy: { href: '/privacidad', label: 'Política de privacidad y protección de datos' },   // enlace del pie y del formulario
+  contact: { href: '/contacto', label: 'Contacto', en: 'Contact' },
+  privacy: { href: '/privacidad', label: 'Política de privacidad y protección de datos', en: 'Privacy and data protection policy' },   // enlace del pie y del formulario
   calendly: 'https://calendly.com/lab-grow/30min',
   // agenda del diagnóstico gratuito (/diagnostico): si en Calendly creas un evento propio para el diagnóstico, pon aquí su enlace
   calendlyDiagnostico: 'https://calendly.com/lab-grow/30min',
-  instagram: { user: 'lab.grow', href: 'https://www.instagram.com/lab.grow/' },   // cuenta a la que invita a seguir el diagnóstico (aviso, no obligatorio)   // agenda de reuniones: botón «Agendar reunión» que aparece tras enviar el formulario
+  instagram: { user: 'lab.grow', href: 'https://www.instagram.com/lab.grow/' },   // cuenta a la que invita a seguir el diagnóstico (aviso, no obligatorio)
   cta: 'Agendar reunión', // texto del botón del menú (lleva a la página de contacto)
+  ctaEn: 'Book a meeting',
   social: [
     { label: 'Instagram', href: 'https://www.instagram.com/lab.grow/' },   // @lab.grow
     { label: 'LinkedIn', href: 'https://www.linkedin.com/company/grow-digital-marketing-lab/' },
   ],
   // cifras de la agencia: las mismas en la galaxia del inicio y en «Nosotros» (v = valor, s = sufijo, d = decimales, i = icono)
   stats: [
-    { v: 50, s: '+', l: 'Proyectos culminados', i: 'folder-check' },
-    { v: 5, s: 'M$', l: 'Facturación generada', i: 'money-bag' },
-    { v: 4.8, s: 'x', d: 1, l: 'ROAS promedio en campañas', i: 'trending-up' },
-    { v: 95, s: '%', l: 'Clientes recurrentes', i: 'repeat' },
+    { v: 50, s: '+', l: 'Proyectos culminados', en: 'Projects delivered', i: 'folder-check' },
+    { v: 5, s: 'M$', l: 'Facturación generada', en: 'Revenue generated', i: 'money-bag' },
+    { v: 4.8, s: 'x', d: 1, l: 'ROAS promedio en campañas', en: 'Average campaign ROAS', i: 'trending-up' },
+    { v: 95, s: '%', l: 'Clientes recurrentes', en: 'Returning clients', i: 'repeat' },
   ],
 };
+
+/** Textos del sitio en el idioma de la página (las etiquetas en inglés van en el campo `en` de cada elemento). */
+export function siteFor(lang) {
+  if (lang !== 'en') return site;
+  const L = (x) => ({ ...x, label: x.en || x.label });
+  return {
+    ...site,
+    whatsapp: site.whatsappEn,
+    nav: site.nav.map(L),
+    contact: L(site.contact),
+    privacy: L(site.privacy),
+    cta: site.ctaEn,
+    stats: site.stats.map((x) => ({ ...x, l: x.en || x.l })),
+  };
+}

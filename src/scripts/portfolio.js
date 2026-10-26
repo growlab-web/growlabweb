@@ -7,7 +7,12 @@
  */
 import { AdditiveBlending, BufferAttribute, BufferGeometry, CanvasTexture, Mesh, PerspectiveCamera, PlaneGeometry, Points, Raycaster, SRGBColorSpace, Scene, ShaderMaterial, TextureLoader, Vector2, Vector3, Vector4, VideoTexture, WebGLRenderer } from 'three';
 import gsap from 'gsap';
-import { projects, getProject } from '../data/projects.js';
+import { projectsFor } from '../data/projects.js';
+// idioma de la página: textos de los proyectos y direcciones (/portafolio/… o /en/portfolio/…)
+const EN = document.documentElement.lang === 'en';
+const projects = projectsFor(EN ? 'en' : 'es');
+const getProject = (slug) => projects.find((p) => p.slug === slug);
+const BASE = EN ? '/en/portfolio' : '/portafolio';
 import { makeArt, projectImageKinds } from './projectArt.js';
 import { track } from './track.js';
 import { isSoftwareGL } from './gpu.js';
@@ -218,9 +223,9 @@ export async function initPortfolio(root) {
     const label = document.createElement('button');
     label.type = 'button'; label.id = `portafolio-nombre-${p.slug}`; label.className = 'gtm-boton pf-label'; label.textContent = p.name; label.dataset.i = i; label.tabIndex = -1;
     const plus = document.createElement('button');
-    plus.type = 'button'; plus.id = `portafolio-ver-${p.slug}`; plus.className = 'gtm-boton pf-plus'; plus.setAttribute('aria-label', `Ver proyecto ${p.name}`); plus.dataset.i = i;
+    plus.type = 'button'; plus.id = `portafolio-ver-${p.slug}`; plus.className = 'gtm-boton pf-plus'; plus.setAttribute('aria-label', `${EN ? 'View project' : 'Ver proyecto'} ${p.name}`); plus.dataset.i = i;
     // el «+» se abre en una pastilla «Ver proyecto» al acercar el cursor al proyecto (clase is-open, la pone el bucle de dibujo)
-    plus.innerHTML = '<span class="pf-plus__text">Ver proyecto</span><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>';
+    plus.innerHTML = `<span class="pf-plus__text">${EN ? 'View project' : 'Ver proyecto'}</span><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>`;
     labelsEl.append(label, plus);
     return { label, plus };
   });
@@ -454,7 +459,7 @@ export async function initPortfolio(root) {
       `<span class="pf-dot" aria-hidden="true"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg></span>` +
       `<span class="pf-chip">${p.category}</span><span class="pf-chip">${p.year}</span>` +
       (p.result ? `<span class="pf-chip pf-chip--result"><b>${p.result.value}</b> ${p.result.label}</span>` : '') +
-      (p.url ? `<a id="proyecto-ver-sitio" class="gtm-boton pf-chip pf-chip--link" href="${p.url}" target="_blank" rel="noopener noreferrer">Ver sitio ↗</a>` : '');
+      (p.url ? `<a id="proyecto-ver-sitio" class="gtm-boton pf-chip pf-chip--link" href="${p.url}" target="_blank" rel="noopener noreferrer">${EN ? 'Visit site' : 'Ver sitio'} ↗</a>` : '');
     $('[data-pf-services]', modal).innerHTML = p.services.map((s) => `<li>${s}</li>`).join('');
     const prev = projects[(projects.indexOf(p) - 1 + N) % N], next = projects[(projects.indexOf(p) + 1) % N];
     $('[data-pf-prev-name]', modal).textContent = prev.name; $('[data-pf-next-name]', modal).textContent = next.name;
@@ -468,7 +473,7 @@ export async function initPortfolio(root) {
       v.src = src; v.muted = true; v.loop = true; v.playsInline = true; v.preload = 'metadata';
       v.setAttribute('muted', ''); v.setAttribute('playsinline', '');
       if (p.cover) v.poster = p.cover;
-      v.setAttribute('aria-label', `Grabación de la web de ${p.name}`);
+      v.setAttribute('aria-label', EN ? `Screen recording of the ${p.name} website` : `Grabación de la web de ${p.name}`);
       return v;
     };
     const imgs = (p.images && p.images.length) ? p.images.map(media) : imgCache.get(p.slug);
@@ -494,9 +499,9 @@ export async function initPortfolio(root) {
     S.open = slug;
     document.body.classList.add('pf-open');
     S.target = Math.round(S.pos) + wrapD(projects.indexOf(p) - Math.round(S.pos)); S.lastInput = performance.now();
-    document.title = `${p.name} · Portafolio · GrowLab`;
+    document.title = p.seo?.title || `${p.name} · ${EN ? 'Portfolio' : 'Portafolio'} · GrowLab`;
     track('project_view', { project: slug });
-    if (push && location.pathname !== `/portafolio/${slug}`) { try { history.pushState({ slug }, '', `/portafolio/${slug}`); } catch (e) { /* entorno sin historial (vista previa) */ } }
+    if (push && location.pathname !== `${BASE}/${slug}`) { try { history.pushState({ slug }, '', `${BASE}/${slug}`); } catch (e) { /* entorno sin historial (vista previa) */ } }
     if (wasOpen) {
       gsap.to(panel, { opacity: 0, y: 14, duration: 0.2, onComplete: () => { fillProject(p); gsap.to(panel, { opacity: 1, y: 0, duration: 0.45, ease: 'power3.out' }); } });
       return;
@@ -516,7 +521,7 @@ export async function initPortfolio(root) {
     S.open = null;
     document.body.classList.remove('pf-open');
     document.title = baseTitle;
-    if (push && location.pathname !== '/portafolio') { try { history.pushState({}, '', '/portafolio'); } catch (e) { /* idem */ } }
+    if (push && location.pathname !== BASE) { try { history.pushState({}, '', BASE); } catch (e) { /* idem */ } }
     gsap.to(S, { dim: 0, duration: 0.8, ease: 'power2.inOut' });
     gsap.to(panel, { y: reduce ? 0 : '6%', scale: reduce ? 1 : 0.97, autoAlpha: 0, duration: reduce ? 0.01 : 0.5, ease: 'power3.in' });
     gsap.to(modal, { autoAlpha: 0, duration: 0.45, delay: 0.1, onComplete: () => { modal.hidden = true; } });
@@ -532,7 +537,7 @@ export async function initPortfolio(root) {
   $('[data-pf-next]', modal).addEventListener('click', () => stepProject(1));
   modal.addEventListener('click', (e) => { if (e.target === modal) closeProject(); });
   window.addEventListener('popstate', () => {
-    const m = location.pathname.match(/^\/portafolio\/([^/]+)\/?$/);
+    const m = location.pathname.match(/^\/(?:portafolio|en\/portfolio)\/([^/]+)\/?$/);
     if (m && getProject(m[1])) openProject(m[1], { push: false }); else closeProject({ push: false });
   });
 

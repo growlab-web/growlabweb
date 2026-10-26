@@ -132,3 +132,13 @@ llega un cambio a `main` (artículos del blog o cualquier modificación). Necesi
 `FTP_PASSWORD` en GitHub (Settings → Secrets and variables → Actions). Se puede relanzar a mano desde la pestaña «Actions».
 La primera publicación sube toda la web; las siguientes, sólo las diferencias.
 
+## Idiomas (español e inglés)
+
+- **Español** sin prefijo (`/nosotros`) e **inglés** con prefijo y direcciones propias (`/en/about`). El mapa de direcciones está en `src/i18n.js` (`PAGES` y `PREFIXES`).
+- Cada página tiene su contenido en `src/views/` y dos archivos mínimos que la usan: `src/pages/…` (español) y `src/pages/en/…` (inglés).
+- Textos: `const { t, href } = useLang(Astro)` → `t('Texto', 'Text')` y `href('/contacto')` (devuelve `/en/contact` en inglés). En los scripts del navegador el idioma se lee de `document.documentElement.lang`.
+- Datos: los campos en inglés van junto al español (`en` en `site.js` y `projects.js`, `shortEn` en `services.js`, `nameEn`/`descriptionEn`/`slugEn` en `blog.js`).
+- Blog en inglés: `src/content/blog-en`, con `translationOf` = dirección del artículo en español (también se edita desde Pages CMS, «Blog (English)»).
+- El botón **ES | EN** del menú y las etiquetas `hreflang` llevan siempre a la misma página en el otro idioma. Los `id` para Tag Manager son los mismos en los dos idiomas; el idioma se distingue por la dirección (`/en/…`).
+- Formularios: desde la versión en inglés llegan con `[EN]` en el asunto del correo (responder en inglés).
+

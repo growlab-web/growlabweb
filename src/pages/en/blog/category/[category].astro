@@ -1,0 +1,12 @@
+---
+import BlogCategory from '../../../../views/BlogCategory.astro';
+import { getPosts } from '../../../../data/posts.js';
+import { catSlugEn, catSlugEs } from '../../../../data/blog.js';
+
+export async function getStaticPaths() {
+  const used = new Set((await getPosts('en')).map((p) => p.data.category));
+  return [...used].map((slug) => ({ params: { category: catSlugEn(slug) } }));
+}
+---
+
+<BlogCategory slug={catSlugEs(Astro.params.category)} />

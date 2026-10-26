@@ -1,7 +1,8 @@
-// Prefijos telefónicos de los formularios (contacto y diagnóstico): Perú primero (es el que sale elegido) y el resto por orden alfabético
+// Prefijos telefónicos de los formularios (contacto y diagnóstico): Perú primero (es el que sale elegido) y el resto por orden alfabético.
+// [nombre en español, prefijo, nombre en inglés]
 export const countries = [
-  ['Perú', '+51'], ['Alemania', '+49'], ['Argentina', '+54'], ['Bolivia', '+591'], ['Brasil', '+55'], ['Canadá', '+1'], ['Chile', '+56'],
-  ['Colombia', '+57'], ['Costa Rica', '+506'], ['Ecuador', '+593'], ['El Salvador', '+503'], ['España', '+34'], ['Estados Unidos', '+1'],
-  ['Francia', '+33'], ['Guatemala', '+502'], ['Honduras', '+504'], ['Italia', '+39'], ['México', '+52'], ['Nicaragua', '+505'], ['Panamá', '+507'],
-  ['Paraguay', '+595'], ['Portugal', '+351'], ['Puerto Rico', '+1'], ['Reino Unido', '+44'], ['República Dominicana', '+1'], ['Uruguay', '+598'], ['Venezuela', '+58'],
+  ['Perú', '+51', 'Peru'], ['Alemania', '+49', 'Germany'], ['Argentina', '+54', 'Argentina'], ['Bolivia', '+591', 'Bolivia'], ['Brasil', '+55', 'Brazil'], ['Canadá', '+1', 'Canada'], ['Chile', '+56', 'Chile'],
+  ['Colombia', '+57', 'Colombia'], ['Costa Rica', '+506', 'Costa Rica'], ['Ecuador', '+593', 'Ecuador'], ['El Salvador', '+503', 'El Salvador'], ['España', '+34', 'Spain'], ['Estados Unidos', '+1', 'United States'],
+  ['Francia', '+33', 'France'], ['Guatemala', '+502', 'Guatemala'], ['Honduras', '+504', 'Honduras'], ['Italia', '+39', 'Italy'], ['México', '+52', 'Mexico'], ['Nicaragua', '+505', 'Nicaragua'], ['Panamá', '+507', 'Panama'],
+  ['Paraguay', '+595', 'Paraguay'], ['Portugal', '+351', 'Portugal'], ['Puerto Rico', '+1', 'Puerto Rico'], ['Reino Unido', '+44', 'United Kingdom'], ['República Dominicana', '+1', 'Dominican Republic'], ['Uruguay', '+598', 'Uruguay'], ['Venezuela', '+58', 'Venezuela'],
 ];

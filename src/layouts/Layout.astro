@@ -4,7 +4,8 @@ import Loader from '../components/Loader.astro';
 import Consent from '../components/Consent.astro';
 import WhatsApp from '../components/WhatsApp.astro';
 import { site } from '../data/site.js';
-import { services } from '../data/services.js';
+import { servicesFor } from '../data/services.js';
+import { useLang, toEn, toEs } from '../i18n.js';
 
 interface Props {
   title: string;
@@ -17,8 +18,17 @@ interface Props {
   jsonld?: object[]; // datos estructurados extra de la página (artículo, migas de pan…)
   published?: Date; // artículos: fechas para redes y buscadores
   modified?: Date;
+  alt?: string; // dirección de esta misma página en el otro idioma (si no se da, se deduce: /nosotros ↔ /en/about)
 }
-const { title, description, app = false, image = '/og.jpg', noindex = false, intro = false, type = 'website', jsonld = [], published, modified } = Astro.props;
+const { title, description, app = false, image = '/og.jpg', noindex = false, intro = false, type = 'website', jsonld = [], published, modified, alt } = Astro.props;
+const { lang, en, t } = useLang(Astro);
+const services = servicesFor(lang);
+
+// versión de esta página en el otro idioma: la usan las etiquetas hreflang (Google) y el botón ES | EN del menú (Astro.locals)
+const here = Astro.url.pathname.replace(/\/$/, '') || '/';
+const other = alt || (en ? toEs(here) : toEn(here));
+const esPath = en ? other : here, enPath = en ? here : other;
+Astro.locals.altPath = other;
 
 // dirección oficial de la página (sin barra final) e imagen para redes, siempre con el dominio completo
 const canonical = new URL(Astro.url.pathname.replace(/\/$/, '') || '/', site.url).href;
@@ -32,7 +42,7 @@ const schema = {
       '@type': 'ProfessionalService',
       '@id': `${site.url}/#organizacion`,
       name: site.name,
-      description: 'Agencia de marketing digital en Arequipa, Perú, orientada a datos. Trabaja con marcas de todo el Perú y de otros países.',
+      description: t('Agencia de marketing digital en Arequipa, Perú, orientada a datos. Trabaja con marcas de todo el Perú y de otros países.', 'Data-driven digital marketing agency based in Arequipa, Peru, working with brands across Peru and around the world.'),
       url: site.url,
       logo: `${site.url}/logo.png`,
       image: `${site.url}/og.jpg`,
@@ -47,14 +57,14 @@ const schema = {
         itemListElement: services.map((s) => ({ '@type': 'Offer', itemOffered: { '@type': 'Service', name: s.name, description: s.short } })),
       },
     },
-    { '@type': 'WebSite', '@id': `${site.url}/#sitio`, url: site.url, name: site.name, inLanguage: 'es-PE', publisher: { '@id': `${site.url}/#organizacion` } },
+    { '@type': 'WebSite', '@id': `${site.url}/#sitio`, url: site.url, name: site.name, inLanguage: en ? 'en' : 'es-PE', publisher: { '@id': `${site.url}/#organizacion` } },
   ],
 };
 const gtm = /^GTM-[A-Z0-9]+$/.test(site.gtm) ? site.gtm : '';
 ---
 
 <!doctype html>
-<html lang="es-PE">
+<html lang={en ? 'en' : 'es-PE'}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -63,6 +73,10 @@ const gtm = /^GTM-[A-Z0-9]+$/.test(site.gtm) ? site.gtm : '';
     <meta name="description" content={description} />
     <meta name="theme-color" content="#000000" />
     <link rel="canonical" href={canonical} />
+    <!-- la misma página en el otro idioma (Google muestra a cada visitante la de su idioma; x-default = español) -->
+    {!noindex && <link rel="alternate" hreflang="es" href={new URL(esPath, site.url).href} />}
+    {!noindex && <link rel="alternate" hreflang="en" href={new URL(enPath, site.url).href} />}
+    {!noindex && <link rel="alternate" hreflang="x-default" href={new URL(esPath, site.url).href} />}
     {noindex && <meta name="robots" content="noindex" />}
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
@@ -71,7 +85,8 @@ const gtm = /^GTM-[A-Z0-9]+$/.test(site.gtm) ? site.gtm : '';
     {modified && <meta property="article:modified_time" content={modified.toISOString()} />}
     <meta property="og:url" content={canonical} />
     <meta property="og:site_name" content={site.name} />
-    <meta property="og:locale" content="es_PE" />
+    <meta property="og:locale" content={en ? 'en_US' : 'es_PE'} />
+    <meta property="og:locale:alternate" content={en ? 'es_PE' : 'en_US'} />
     <meta property="og:image" content={ogImage} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
@@ -80,7 +95,7 @@ const gtm = /^GTM-[A-Z0-9]+$/.test(site.gtm) ? site.gtm : '';
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImage} />
     <link rel="sitemap" href="/sitemap-index.xml" />
-    <link rel="alternate" type="application/rss+xml" title="Blog de GrowLab" href="/blog/rss.xml" />
+    <link rel="alternate" type="application/rss+xml" title={t('Blog de GrowLab', 'GrowLab Blog')} href={en ? '/en/blog/rss.xml' : '/blog/rss.xml'} />
     <script type="application/ld+json" set:html={JSON.stringify(schema)} />
     {jsonld.map((j) => <script type="application/ld+json" set:html={JSON.stringify(j)} />)}
     <link rel="icon" type="image/png" href="/favicon.png" />
@@ -132,7 +147,7 @@ const gtm = /^GTM-[A-Z0-9]+$/.test(site.gtm) ? site.gtm : '';
   <body class:list={['bg-black font-body text-white antialiased', app ? 'h-screen overflow-hidden' : 'overflow-x-hidden']} data-app={app ? '' : undefined}>
     {gtm && <noscript><iframe src={`https://www.googletagmanager.com/ns.html?id=${gtm}`} height="0" width="0" style="display:none;visibility:hidden" title="Google Tag Manager"></iframe></noscript>}
     {intro && <Loader />}
-    <a href="#contenido" class="skip-link" id="saltar-al-contenido">Saltar al contenido</a>
+    <a href="#contenido" class="skip-link" id="saltar-al-contenido">{t('Saltar al contenido', 'Skip to content')}</a>
     <slot />
     <WhatsApp />
     {gtm && <Consent />}

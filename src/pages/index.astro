@@ -1,26 +1,5 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import Nav from '../components/Nav.astro';
-import Hero from '../components/Hero.astro';
-import Marquee from '../components/Marquee.astro';
-import Manifesto from '../components/Manifesto.astro';
-import Services from '../components/Services.astro';
-import ContactSection from '../components/ContactSection.astro';
-import Footer from '../components/Footer.astro';
+import Home from '../views/Home.astro';
 ---
 
-<Layout
-  intro
-  title="Agencia de marketing digital en Arequipa, Perú | GrowLab"
-  description="Agencia de marketing digital en Arequipa: Google Ads, Meta Ads, SEO, tiendas online, analítica e IA. Hacemos crecer marcas de todo el Perú y del mundo."
->
-  <Nav />
-  <main id="contenido" tabindex="-1">
-    <Hero />
-    <Marquee />
-    <Manifesto />
-    <Services />
-    <ContactSection />
-  </main>
-  <Footer />
-</Layout>
+<Home />

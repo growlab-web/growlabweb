@@ -1,9 +1,11 @@
 ---
 // Las palabras se separan en JS (scripts/main.js) y se iluminan con el scroll.
+import { useLang } from '../i18n.js';
+const { t } = useLang(Astro);
 interface Props { eyebrow?: string; text?: string }
 const {
-  eyebrow = 'Quiénes somos',
-  text = 'No vendemos likes ni métricas vanidosas. Combinamos creatividad y datos para construir marcas memorables y campañas que generan ingresos reales. Cada decisión se mide, cada idea se prueba y cada sol invertido trabaja para tu crecimiento.',
+  eyebrow = t('Quiénes somos', 'Who we are'),
+  text = t('No vendemos likes ni métricas vanidosas. Combinamos creatividad y datos para construir marcas memorables y campañas que generan ingresos reales. Cada decisión se mide, cada idea se prueba y cada sol invertido trabaja para tu crecimiento.', 'We don’t sell likes or vanity metrics. We combine creativity and data to build memorable brands and campaigns that drive real revenue. Every decision is measured, every idea is tested and every dollar invested works for your growth.'),
 } = Astro.props;
 ---
 

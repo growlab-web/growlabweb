@@ -83,10 +83,14 @@ export function initPong(canvas, { onScore = () => {}, onState = () => {} } = {}
     // mensajes
     if (state !== 'juego') {
       ctx.fillStyle = '#fff'; ctx.font = `600 ${w < 500 ? 15 : 18}px "Host Grotesk", system-ui, sans-serif`;
-      const touch = window.matchMedia('(pointer: coarse)').matches;
-      ctx.fillText(state === 'fin' ? `Se te escapó · ${score} ${score === 1 ? 'rebote' : 'rebotes'}` : 'Para la pelota con las barras', w / 2, h / 2 - 44);
+      const touch = window.matchMedia('(pointer: coarse)').matches, EN = document.documentElement.lang === 'en';
+      ctx.fillText(state === 'fin'
+        ? (EN ? `It got away · ${score} ${score === 1 ? 'bounce' : 'bounces'}` : `Se te escapó · ${score} ${score === 1 ? 'rebote' : 'rebotes'}`)
+        : (EN ? 'Stop the ball with the paddles' : 'Para la pelota con las barras'), w / 2, h / 2 - 44);
       ctx.fillStyle = SKY; ctx.font = `500 ${w < 500 ? 12 : 13}px "Host Grotesk", system-ui, sans-serif`;
-      ctx.fillText(state === 'fin' ? (touch ? 'Toca para jugar otra vez' : 'Haz clic para jugar otra vez') : (touch ? 'Toca para empezar · mueve el dedo arriba y abajo' : 'Haz clic para empezar · mueve el ratón arriba y abajo'), w / 2, h / 2 + 48);
+      ctx.fillText(EN
+        ? (state === 'fin' ? (touch ? 'Tap to play again' : 'Click to play again') : (touch ? 'Tap to start · move your finger up and down' : 'Click to start · move the mouse up and down'))
+        : (state === 'fin' ? (touch ? 'Toca para jugar otra vez' : 'Haz clic para jugar otra vez') : (touch ? 'Toca para empezar · mueve el dedo arriba y abajo' : 'Haz clic para empezar · mueve el ratón arriba y abajo')), w / 2, h / 2 + 48);
     }
   }
 

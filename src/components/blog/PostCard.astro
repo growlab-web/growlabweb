@@ -1,10 +1,12 @@
 ---
-import { getCategory, formatDate, readingTime } from '../../data/blog.js';
+import { getCategoryFor, formatDate, readingTime } from '../../data/blog.js';
+import { useLang } from '../../i18n.js';
+const { lang, en, t } = useLang(Astro);
 interface Props { post: any; featured?: boolean }
 const { post, featured = false } = Astro.props;
 const { title, description, date, category, cover, coverAlt } = post.data;
-const cat = getCategory(category);
-const href = `/blog/${post.id}`;
+const cat = getCategoryFor(category, lang);
+const href = `${en ? '/en' : ''}/blog/${post.id}`;
 ---
 
 <!-- la versión destacada (grande) depende de la clase is-featured, así el filtro del blog puede cambiar cuál es la primera sin recargar -->
@@ -16,11 +18,11 @@ const href = `/blog/${post.id}`;
   </div>
   <div class="post-card__body flex flex-1 flex-col gap-3 p-6">
     <p class="font-ui text-[.78rem] uppercase tracking-[.12em] text-secondary" style={cat?.color ? `color:${cat.color}` : undefined}>{cat?.name}</p>
-    <p class="-mt-1 font-ui text-[.8rem] text-white/50"><time datetime={date.toISOString()}>{formatDate(date)}</time> · {readingTime(post.body)} min de lectura</p>
+    <p class="-mt-1 font-ui text-[.8rem] text-white/50"><time datetime={date.toISOString()}>{formatDate(date, lang)}</time> · {readingTime(post.body)} {t('min de lectura', 'min read')}</p>
     <h2 class="post-card__title font-display text-[1.3rem] font-medium leading-[1.15] tracking-[-0.02em]">
       <a href={href} id={`blog-articulo-${post.id}`} class="gtm-blog-articulo after:absolute after:inset-0 after:content-['']">{title}</a>
     </h2>
     <p class="line-clamp-3 text-copy">{description}</p>
-    <span class="mt-auto pt-2 font-ui text-[.9rem] text-white/80 transition-colors group-hover:text-secondary">Leer artículo →</span>
+    <span class="mt-auto pt-2 font-ui text-[.9rem] text-white/80 transition-colors group-hover:text-secondary">{t('Leer artículo', 'Read article')} →</span>
   </div>
 </article>

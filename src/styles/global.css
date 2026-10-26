@@ -74,6 +74,12 @@ main:focus { outline: none; }
 .skip-link { position: fixed; left: 16px; top: -60px; z-index: 200; padding: .7rem 1.1rem; border-radius: 999px; background: var(--color-secondary); color: #000; font-weight: 600; transition: top .2s; }
 .skip-link:focus { top: 16px; }
 
+/* botón de idioma del menú: ES | EN (el activo en blanco) */
+.lang-switch { display: flex; align-items: center; gap: .35rem; padding: 0 .35rem; font-family: var(--font-display); font-size: .8rem; letter-spacing: .06em; color: rgba(255, 255, 255, .35); }
+.lang-switch a { color: rgba(255, 255, 255, .5); transition: color .2s; padding: .35rem .1rem; }
+.lang-switch a:hover { color: var(--color-secondary); }
+.lang-switch a[aria-current] { color: #fff; }
+
 @layer components {
   /* menú, botones y formularios conservan la letra de interfaz (más estrecha) */
   [data-nav],
