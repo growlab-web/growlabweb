@@ -35,6 +35,16 @@ ErrorDocument 410 /404.html
   # 1b) los nombres de sitemap habituales (y los del WordPress anterior) llevan al sitemap real
   RewriteRule ^(sitemap_index|sitemap|wp-sitemap)\.xml$ /sitemap-index.xml [R=301,L]
 
+  # 1c) direcciones del WordPress anterior (plantilla de demostración). Las que tienen equivalente en la web nueva llevan a él;
+  #     el resto responde 410 («eliminada definitivamente»): Google las quita del índice antes que con un 404.
+  RewriteRule ^contactanos/?$ /contacto [R=301,L]
+  RewriteRule ^politica-de-proteccion-de-datos-personales/?$ /privacidad [R=301,L]
+  RewriteRule ^portfolio/webdesign-relengcorp/?$ /portafolio/relengcorp [R=301,L]
+  RewriteRule ^servicios/[^/]+/?$ /#servicios [R=301,NE,L]
+  RewriteRule ^(layouts|portfolio|portfolio_group|services|tag|category|team|wp-content|wp-includes|wp-admin|feed|comments|author)(/.*)?$ - [G]
+  RewriteRule ^blog/page/ - [G]
+  RewriteRule ^(ai\-driven\-software\-solutions\-for\-data\-management|ai\-insights\-weekly\-unveiling\-the\-latest\-features|ai\-technologies|best\-practices\-for\-running\-an\-efficient\-helpdesk|best\-project\-management\-software\-for\-growing\-teams|blog\-portfolio|boost\-your\-rankings\-with\-expert\-seo\-services|build\-loyalty\-digital\-tools\-for\-customer\-communication|building\-a\-team\-of\-ai\-experts\-is\-the\-key\-to\-success|building\-a\-thriving\-startup\-strategies\-and\-benefits|business\-automation\-podcast|cart|checkout|cloud\-based\-software\-solutions\-for\-businesses|collaborative\-ai\-networks\-enhancing\-global\-data\-sharing|decoding\-success\-selecting\-a\-consulting\-business\-model|effective\-seo\-tips\-to\-build\-high\-quality\-backlinks|effective\-ways\-to\-boost\-your\-productivity\-level|essential\-skills\-to\-develop\-for\-a\-startup\-organization|faqs|get\-a\-quote|harnessing\-ai\-for\-predictive\-analytics|helpdesk|how\-ai\-networks\-are\-reshaping\-cybersecurity|how\-content\-marketing\-enhances\-seo\-results|how\-custom\-software\-can\-boost\-productivity|how\-digital\-agencies\-transform\-online\-presence|how\-to\-learn\-from\-real\-life\-seo\-success\-stories|my\-account|newsletter\-popups|our\-team|portfolio\-list\-waves|portfolio\-slider|portfolio\-stacked|pricing|quote\-post|seo\-services|seo\-strategies\-every\-business\-should\-adopt|service\-plus|shopify\-en\-wordpress|software\-solutions|startup|streamline\-operations\-with\-innovative\-software\-solutions|technical\-seo\-audits\-the\-foundation\-of\-online\-success|the\-power\-of\-ai\-networks\-in\-modern\-computing|the\-role\-of\-digital\-agencies\-in\-startup\-growth|typography|understanding\-neural\-networks\-and\-deep\-learning|why\-networking\-is\-crucial\-for\-startup\-success|wishlist\-page)/?$ - [G]
+
   # 2) la antigua página de servicios es ahora una sección del inicio
   RewriteRule ^servicios/?$ /#servicios [R=301,NE,L]
 
