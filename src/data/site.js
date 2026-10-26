@@ -24,7 +24,10 @@ export const site = {
   ],
   contact: { href: '/contacto', label: 'Contacto' },
   privacy: { href: '/privacidad', label: 'Política de privacidad y protección de datos' },   // enlace del pie y del formulario
-  calendly: 'https://calendly.com/lab-grow/30min',   // agenda de reuniones: botón «Agendar reunión» que aparece tras enviar el formulario
+  calendly: 'https://calendly.com/lab-grow/30min',
+  // agenda del diagnóstico gratuito (/diagnostico): si en Calendly creas un evento propio para el diagnóstico, pon aquí su enlace
+  calendlyDiagnostico: 'https://calendly.com/lab-grow/30min',
+  instagram: { user: 'lab.grow', href: 'https://www.instagram.com/lab.grow/' },   // cuenta que piden seguir en el diagnóstico   // agenda de reuniones: botón «Agendar reunión» que aparece tras enviar el formulario
   cta: 'Agendar reunión', // texto del botón del menú (lleva a la página de contacto)
   social: [
     { label: 'Instagram', href: 'https://www.instagram.com/lab.grow/' },   // @lab.grow

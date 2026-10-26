@@ -2,13 +2,7 @@
 import { site } from '../data/site.js';
 import { services } from '../data/services.js';
 
-// Prefijos telefónicos del desplegable: Perú primero (es el que sale elegido) y el resto por orden alfabético
-const countries = [
-  ['Perú', '+51'], ['Alemania', '+49'], ['Argentina', '+54'], ['Bolivia', '+591'], ['Brasil', '+55'], ['Canadá', '+1'], ['Chile', '+56'],
-  ['Colombia', '+57'], ['Costa Rica', '+506'], ['Ecuador', '+593'], ['El Salvador', '+503'], ['España', '+34'], ['Estados Unidos', '+1'],
-  ['Francia', '+33'], ['Guatemala', '+502'], ['Honduras', '+504'], ['Italia', '+39'], ['México', '+52'], ['Nicaragua', '+505'], ['Panamá', '+507'],
-  ['Paraguay', '+595'], ['Portugal', '+351'], ['Puerto Rico', '+1'], ['Reino Unido', '+44'], ['República Dominicana', '+1'], ['Uruguay', '+598'], ['Venezuela', '+58'],
-];
+import { countries } from '../data/countries.js';
 
 // Campos con línea inferior e icono, como un formulario editorial
 const wrap = 'group relative flex items-center gap-3 border-b border-white/20 transition-colors focus-within:border-secondary';
@@ -216,6 +210,8 @@ const { formId = 'form-contacto' } = Astro.props;
       f.set('telefono', phone);
       f.delete('prefijo');
       f.set('pagina', location.href);
+      // varios servicios marcados: PHP sólo recibe todos si el nombre lleva [] (con «servicios» a secas llegaba sólo el último)
+      f.delete('servicios'); servicios.forEach((s) => f.append('servicios[]', s));
       button.disabled = true;
       say('Enviando…');
 
