@@ -66,7 +66,9 @@ html.lenis body {
 h1, h2, h3 { font-weight: 700 !important; letter-spacing: -0.02em !important; }
 
 /* teclado: quien navega con Tab ve siempre dónde está (con ratón o dedo no aparece) */
-:where(a, button, summary, select, [tabindex]:not([tabindex='-1'])):focus-visible { outline: 2px solid var(--color-secondary); outline-offset: 3px; }
+:where(a, button, summary, [tabindex]:not([tabindex='-1'])):focus-visible { outline: 2px solid var(--color-secondary); outline-offset: 3px; }
+/* los campos de los formularios (también los desplegables) marcan el foco con su propia línea inferior verde: sin recuadro */
+:where(input, select, textarea):focus-visible { outline: none; }
 main:focus { outline: none; }
 /* enlace «Saltar al contenido»: invisible hasta que se llega a él con Tab, es lo primero de cada página */
 .skip-link { position: fixed; left: 16px; top: -60px; z-index: 200; padding: .7rem 1.1rem; border-radius: 999px; background: var(--color-secondary); color: #000; font-weight: 600; transition: top .2s; }
