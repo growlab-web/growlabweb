@@ -87,7 +87,7 @@ el clic es siempre el botón o enlace (nunca su icono o texto interior), así qu
 | Inicio | `hero-agendar`, `servicios-anterior`, `servicios-siguiente` |
 | WhatsApp | `whatsapp-boton` |
 | Formulario | `form-contacto` (página de contacto) y `form-contacto-inicio` (inicio) como **Form ID**; `form-servicios`, `form-prefijo`, `form-enviar`, `form-privacidad`, `form-otro-mensaje`, `form-contacto-agendar` (botón a Calendly tras enviar), `juego-pong` |
-| Diagnóstico gratuito (/diagnostico) | `form-diagnostico` como **Form ID**; `diagnostico-empezar`, `diagnostico-seguir-instagram`, `diagnostico-ya-sigo`, `diagnostico-area-1…5`, `diagnostico-inversion`, `diagnostico-enviar`, `diagnostico-calendly-externo`, `diagnostico-pregunta-1…4` |
+| Diagnóstico gratuito (/diagnostico) | `form-diagnostico` como **Form ID**; `diagnostico-empezar`, `diagnostico-seguir-instagram`, `diagnostico-area-1…5`, `diagnostico-inversion`, `diagnostico-enviar`, `diagnostico-calendly-externo`, `diagnostico-pregunta-1…4` |
 | Página de contacto | `contacto-correo`, `contacto-telefono`, `contacto-instagram`, `contacto-linkedin` |
 | Nosotros | `nosotros-hablemos` |
 | Portafolio | `portafolio-anterior`, `portafolio-siguiente`, `portafolio-destacados`, `portafolio-todos`, `portafolio-agendar`, `portafolio-nombre-<proyecto>`, `portafolio-ver-<proyecto>`, `portafolio-lista-<proyecto>` |

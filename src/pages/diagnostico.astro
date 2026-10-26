@@ -1,5 +1,5 @@
 ---
-// Landing del diagnóstico gratuito: la persona sigue a @lab.grow en Instagram, deja sus datos y, al enviarlos, elige día y hora
+// Landing del diagnóstico gratuito: un aviso invita a seguir a @lab.grow en Instagram (no es obligatorio), la persona deja sus datos y, al enviarlos, elige día y hora
 // en la agenda (Calendly) que aparece dentro de la misma página. El envío usa el mismo /api/contacto.php que el formulario de
 // contacto (el lead llega por correo y queda en leads.csv); los datos propios del diagnóstico viajan en el mensaje.
 import Layout from '../layouts/Layout.astro';
@@ -18,7 +18,7 @@ const includes = [
 ];
 const faqs = [
   { q: '¿Tiene algún costo?', a: 'No. El diagnóstico y la videollamada son gratuitos y sin compromiso: si después quieres que te ayudemos, te preparamos una propuesta; si no, te quedas con las recomendaciones.' },
-  { q: '¿Por qué piden que los siga en Instagram?', a: `Ahí compartimos consejos, casos y novedades de marketing digital, y es nuestra forma de seguir en contacto después del diagnóstico. Antes de la reunión comprobamos que sigas a @${site.instagram.user}.` },
+  { q: '¿Por qué seguirlos en Instagram?', a: `En @${site.instagram.user} compartimos consejos, casos y novedades de marketing digital. Es la mejor forma de seguir aprendiendo después del diagnóstico.` },
   { q: '¿Cuánto dura y cómo es?', a: 'Es una videollamada de 30 minutos. Antes revisamos lo que nos indiques en el formulario y en la llamada te mostramos lo que encontramos y qué mejorar primero.' },
   { q: '¿Qué necesito tener?', a: 'Una web, una tienda online o campañas activas que podamos revisar. Si estás empezando, también te orientamos sobre por dónde comenzar.' },
 ];
@@ -82,27 +82,22 @@ const jsonld = [
         <div id="solicitar" class="mt-[clamp(4rem,10vh,7rem)] scroll-mt-[90px]">
           <h2 data-reveal class="text-center font-display text-[clamp(1.5rem,2.6vw,2.2rem)] font-medium tracking-[-0.02em]">Solicítalo en 3 pasos</h2>
           <ol data-reveal class="mx-auto mt-8 grid max-w-[860px] gap-3 font-body text-[.95rem] text-copy sm:grid-cols-3">
-            <li class="dg-step"><b>1</b><span>Síguenos en Instagram <span class="text-white">@{site.instagram.user}</span></span></li>
-            <li class="dg-step"><b>2</b>Cuéntanos sobre tu negocio</li>
-            <li class="dg-step"><b>3</b>Elige el día y la hora de la videollamada</li>
+            <li class="dg-step"><b>1</b>Cuéntanos sobre tu negocio</li>
+            <li class="dg-step"><b>2</b>Elige el día y la hora de la videollamada</li>
+            <li class="dg-step"><b>3</b>Recibe tu diagnóstico y un plan de acción</li>
           </ol>
 
           <div data-reveal class="relative z-[2] mx-auto mt-10 max-w-[860px] rounded-[26px] border border-white/10 bg-[#070b16]/80 p-[clamp(1.4rem,4vw,2.8rem)] backdrop-blur-sm">
             <form id="form-diagnostico" data-diag-form data-email={site.email} class="grid gap-x-10 gap-y-7 sm:grid-cols-2" novalidate>
-              <!-- paso 1: Instagram -->
+              <!-- aviso: seguirnos en Instagram (opcional, no condiciona el envío) -->
               <div class="flex flex-wrap items-center justify-between gap-4 rounded-[18px] border border-[#ff8fd0]/30 bg-[linear-gradient(120deg,rgba(255,143,208,.08),rgba(182,156,255,.08))] p-5 sm:col-span-2">
-                <p class="font-body text-[.95rem] text-copy"><span class="font-display text-white">Paso 1.</span> Síguenos en Instagram para acceder al diagnóstico.</p>
+                <p class="font-body text-[.95rem] text-copy">Síguenos en Instagram: compartimos consejos, casos y novedades de marketing digital.</p>
                 <a href={site.instagram.href} id="diagnostico-seguir-instagram" data-ig-follow target="_blank" rel="noopener noreferrer" class="gtm-boton inline-flex items-center gap-2.5 rounded-full bg-[linear-gradient(90deg,#f58529,#dd2a7b,#8134af)] px-5 py-3 font-display text-[.92rem] font-medium text-white transition-transform hover:scale-[1.03]">
                   <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"></circle></svg>
                   Seguir a @{site.instagram.user}
                 </a>
               </div>
 
-              <label class={wrap}>
-                <span class="sr-only">Tu usuario de Instagram</span>
-                <span class="font-body text-white/45" aria-hidden="true">@</span>
-                <input class={input} name="instagram" type="text" placeholder="Tu usuario de Instagram *" autocomplete="off" autocapitalize="off" spellcheck="false" required aria-required="true" />
-              </label>
               <label class={wrap}>
                 <span class="sr-only">Nombre</span>
                 <input class={input} name="nombre" type="text" placeholder="Nombre *" autocomplete="name" required aria-required="true" />
@@ -125,9 +120,9 @@ const jsonld = [
                   <input class={input} name="telefono" type="tel" inputmode="tel" placeholder="Teléfono o WhatsApp *" autocomplete="tel-national" required aria-required="true" />
                 </label>
               </div>
-              <label class={wrap + ' sm:col-span-2'}>
+              <label class={wrap}>
                 <span class="sr-only">Web, tienda o red que quieres que revisemos</span>
-                <input class={input} name="web" type="text" inputmode="url" placeholder="Web, tienda o red que quieres que revisemos (opcional)" autocomplete="url" />
+                <input class={input} name="web" type="text" inputmode="url" placeholder="Web o red a revisar (opcional)" autocomplete="url" />
               </label>
 
               <fieldset class="sm:col-span-2">
@@ -159,10 +154,6 @@ const jsonld = [
               </div>
 
               <div class="grid gap-3 sm:col-span-2">
-                <label class="flex cursor-pointer items-start gap-3 font-body text-[.92rem] text-white/70">
-                  <input type="checkbox" name="sigue" id="diagnostico-ya-sigo" class="mt-0.5 h-[18px] w-[18px] shrink-0 cursor-pointer accent-secondary" />
-                  <span>Ya sigo a <b class="font-medium text-white">@{site.instagram.user}</b> en Instagram (lo comprobamos antes de la reunión).</span>
-                </label>
                 <label class="flex cursor-pointer items-start gap-3 font-body text-[.92rem] text-white/70">
                   <input type="checkbox" name="consent" class="mt-0.5 h-[18px] w-[18px] shrink-0 cursor-pointer accent-secondary" />
                   <span>Acepto que se recopilen mis datos según la <a href={site.privacy.href} id="diagnostico-privacidad" target="_blank" class="underline underline-offset-2 transition-colors hover:text-secondary">política de privacidad</a>.</span>
@@ -238,7 +229,7 @@ const jsonld = [
     const paintPrefix = () => { if (prefix && prefixLabel) prefixLabel.textContent = prefix.value; };
     prefix?.addEventListener('change', paintPrefix);
 
-    // paso 1: clic en «Seguir a @lab.grow» (abre Instagram en otra pestaña)
+    // aviso: clic en «Seguir a @lab.grow» (abre Instagram en otra pestaña)
     form.querySelector('[data-ig-follow]')?.addEventListener('click', () => track('ig_follow_click', { form_location: 'diagnostico' }));
     form.addEventListener('focusin', () => track('form_start', { form_location: 'diagnostico' }), { once: true });
 
@@ -247,17 +238,14 @@ const jsonld = [
       const f = new FormData(form);
       const get = (k: string) => String(f.get(k) || '').trim();
       const nombre = get('nombre'), email = get('email'), telefono = get('telefono');
-      const ig = get('instagram').replace(/^@+/, '').replace(/^https?:\/\/(www\.)?instagram\.com\//i, '').replace(/\/.*$/, '');
       const areas = f.getAll('areas').map(String);
-      // obligatorios: Instagram, nombre, correo, teléfono, la casilla de que ya nos sigue y el consentimiento
+      // obligatorios: nombre, correo, teléfono y el consentimiento
       const missing = [
-        !/^[A-Za-z0-9._]{1,30}$/.test(ig) && 'tu usuario de Instagram',
         !nombre && 'tu nombre',
         !/^\S+@\S+\.\S+$/.test(email) && 'un correo válido',
         telefono.replace(/\D/g, '').length < 6 && 'un teléfono válido',
       ].filter(Boolean) as string[];
       if (missing.length) return say(`Completa ${missing.join(missing.length > 2 ? ', ' : ' y ').replace(/, ([^,]*)$/, ' y $1')}.`, 'error');
-      if (!f.get('sigue')) return say(`Para acceder al diagnóstico, síguenos en Instagram (@lab.grow) y marca la casilla.`, 'error');
       if (!f.get('consent')) return say('Para continuar debes aceptar que se recopilen tus datos.', 'error');
 
       const phone = telefono.startsWith('+') ? telefono : `${get('prefijo')} ${telefono}`.trim();
@@ -268,7 +256,6 @@ const jsonld = [
       ['Diagnóstico gratuito', ...areas].forEach((s) => out.append('servicios[]', s));
       out.set('mensaje', [
         'Solicitud: DIAGNÓSTICO GRATUITO',
-        `Instagram: @${ig} (marcó que ya sigue a @lab.grow: comprobarlo antes de la reunión)`,
         `Web o red a revisar: ${get('web') || '-'}`,
         `Qué revisar: ${areas.join(', ') || '-'}`,
         `Inversión mensual en anuncios: ${get('inversion') || '-'}`,
@@ -303,7 +290,7 @@ const jsonld = [
     // paso 3: la agenda aparece en lugar del formulario, con el nombre y el correo ya escritos
     let frame: HTMLIFrameElement | null = null;
     function showAgenda(nombre: string, email: string, test: boolean) {
-      form!.hidden = true; agenda!.hidden = false;
+      form!.hidden = true; agenda!.hidden = false; say('');
       const first = nombre.split(/\s+/)[0];
       agenda!.querySelector('[data-diag-name]')!.textContent = first ? `, ${first}` : '';
       if (test) agenda!.querySelector<HTMLElement>('[data-diag-test]')!.hidden = false;
