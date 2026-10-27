@@ -67,6 +67,11 @@ ErrorDocument 410 /404.html
   <FilesMatch "\.(png|jpe?g|webp|avif|svg|ico|woff2?)$">
     Header set Cache-Control "public, max-age=2592000"
   </FilesMatch>
+  # las tipografías se pueden usar desde otros dominios (p. ej. las grabaciones de Microsoft Clarity): sin esto, esas
+  # herramientas muestran la página con una letra del sistema
+  <FilesMatch "\.(woff2?|ttf|otf)$">
+    Header set Access-Control-Allow-Origin "*"
+  </FilesMatch>
   Header always set X-Content-Type-Options "nosniff"
   Header always set Referrer-Policy "strict-origin-when-cross-origin"
   # seguridad: sólo https (1 año), ninguna web ajena puede mostrar ésta dentro de un marco (evita engaños de «clic oculto»),
