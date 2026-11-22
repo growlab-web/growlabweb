@@ -244,6 +244,10 @@ function initPage() {
 
   if (reduceMotion) { scrollToHash(); return; }
 
+  // las piezas entran desenfocadas y se van enfocando; en táctil con menos desenfoque (es caro en un teléfono) y, al terminar,
+  // se quita el filtro para que el navegador no siga tratándolas como capa aparte
+  const blur = (px) => ({ filter: `blur(${isTouch ? Math.round(px / 2) : px}px)`, clearProps: 'filter' });
+
   // el resto de secciones se prepara aparte: en táctil, un momento después, para no competir con la entrada del hero
   const initSections = () => {
 
@@ -303,14 +307,14 @@ function initPage() {
     window.addEventListener('resize', () => { jump(setW()); upd(); });
     jump(setW()); upd();
     gsap.from('[data-services-head] > *', {
-      y: 60, opacity: 0, stagger: 0.15, duration: 1, ease: 'expo.out',
+      y: 60, opacity: 0, ...blur(12), stagger: 0.15, duration: 1, ease: 'expo.out',
       scrollTrigger: { trigger: '[data-services]', start: isTouch ? 'top 95%' : 'top 70%' },
     });
   }
 
   /* CTA: texto gigante que crece y se asienta */
   if ($('[data-cta]')) {
-    gsap.from('[data-cta-line]', { yPercent: 100, duration: 1.2, ease: 'expo.out', scrollTrigger: { trigger: '[data-cta]', start: isTouch ? 'top 95%' : 'top 60%' } });
+    gsap.from('[data-cta-line]', { yPercent: 100, ...blur(12), duration: 1.2, ease: 'expo.out', scrollTrigger: { trigger: '[data-cta]', start: isTouch ? 'top 95%' : 'top 60%' } });
     gsap.fromTo('[data-cta-big]', { scale: 0.5, yPercent: 30, opacity: 0.2 }, {
       scale: 1, yPercent: 0, opacity: 1, ease: 'none',
       scrollTrigger: { trigger: '[data-cta]', start: 'top 80%', end: 'center center', scrub: true },
@@ -336,7 +340,7 @@ function initPage() {
   const enter = (els, trigger, vars = {}, start = 'top 85%') => {
     if (isTouch) { start = 'top 97%'; vars = { ...vars, duration: 0.8 }; }   // en el teléfono las piezas aparecen en cuanto asoman
     els = (typeof els === 'string' ? $$(els) : els).filter(Boolean);
-    if (els.length) gsap.from(els, { y: 40, opacity: 0, duration: 1, ease: 'expo.out', stagger: 0.08, ...vars, scrollTrigger: { trigger: trigger || els[0], start } });
+    if (els.length) gsap.from(els, { y: 40, opacity: 0, ...blur(10), duration: 1, ease: 'expo.out', stagger: 0.08, ...vars, scrollTrigger: { trigger: trigger || els[0], start } });
   };
   enter('[data-marquee]', null, { y: 30, duration: 1.2 }, 'top 92%');
   $$('[data-manifesto]').forEach((m) => enter([m.previousElementSibling], m.parentElement));
@@ -347,9 +351,9 @@ function initPage() {
   });
   enter('footer > *', 'footer', { y: 20, stagger: 0.1 }, 'top 98%');
 
-  /* REVELADO: cualquier bloque marcado con data-reveal sube y aparece al entrar en pantalla */
+  /* REVELADO: cualquier bloque marcado con data-reveal sube, se enfoca y aparece al entrar en pantalla */
   $$('[data-reveal]').forEach((el) => {
-    gsap.from(el, { y: 50, opacity: 0, duration: isTouch ? 0.8 : 1, ease: 'expo.out', scrollTrigger: { trigger: el, start: isTouch ? 'top 97%' : 'top 88%' } });
+    gsap.from(el, { y: 50, opacity: 0, ...blur(12), duration: isTouch ? 0.8 : 1, ease: 'expo.out', scrollTrigger: { trigger: el, start: isTouch ? 'top 97%' : 'top 88%' } });
   });
 
   ScrollTrigger.refresh();
